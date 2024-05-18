@@ -16,3 +16,34 @@
     background-image: radial-gradient(circle, rgb(227, 227, 227) 0%, rgb(11, 11, 11));
     padding-top: 2px;
 }
+
+div.css-1xw1lta-MuiDateCalendar-root{
+    box-shadow: inset 3px 3px 10px rgba(155, 155, 155, 0.8),
+    inset -3px -3px 10px rgba(0, 0, 0, 0.8);
+    border-radius: 12px;
+    background-color: rgba(255, 255, 255, 0.090);
+    backdrop-filter: blur(20px); 
+}
+
+span.css-rhmlg1-MuiTypography-root-MuiDayCalendar-weekDayLabel {
+    color: rgb(255, 191, 72);
+}
+button.css-1wy8uaa-MuiButtonBase-root-MuiPickersDay-root {
+    color:white;
+    
+}
+
+button.css-23p0if-MuiButtonBase-root-MuiPickersDay-root:not(.Mui-selected){
+    border: 1px solid rgb(255, 191, 72);
+}
+button.css-23p0if-MuiButtonBase-root-MuiPickersDay-root {
+    color: rgb(255, 191, 72);
+}
+
+.css-1vooibu-MuiSvgIcon-root{
+    color: white;
+}
+
+.css-1tkx1wf-MuiSvgIcon-root-MuiPickersCalendarHeader-switchViewIcon{
+    color: white;
+}
