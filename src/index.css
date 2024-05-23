@@ -21,7 +21,9 @@ div.css-1xw1lta-MuiDateCalendar-root{
     box-shadow: inset 3px 3px 10px rgba(155, 155, 155, 0.8),
     inset -3px -3px 10px rgba(0, 0, 0, 0.8);
     border-radius: 12px;
-    background-color: rgba(255, 255, 255, 0.090);
+    /* background-color: rgba(255, 255, 255, 0.090); */
+    /* background: radial-gradient(ellipse at top left , #00134bc6, #6a00ffa9, #00134bc6); */
+    background: radial-gradient(ellipse at top left , #00134bc6, #5545ff8c, #00134bc6);
     backdrop-filter: blur(20px); 
 }
 
@@ -47,3 +49,8 @@ button.css-23p0if-MuiButtonBase-root-MuiPickersDay-root {
 .css-1tkx1wf-MuiSvgIcon-root-MuiPickersCalendarHeader-switchViewIcon{
     color: white;
 }
+
+img.secure{
+    /* filter: drop-shadow(0 4px 6px rgb(255, 0, 0)); */
+}
+
