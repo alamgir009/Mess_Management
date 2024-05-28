@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaUsers, FaLightbulb, FaAward, FaRocket, FaHeart, FaPaintBrush } from "react-icons/fa";
+import { FaUsers, FaLightbulb, FaAward, FaRocket, FaHeart, FaPaintBrush, FaEnvelope, FaPhone } from "react-icons/fa";
 
 export const About = () => {
   return (
@@ -64,6 +64,22 @@ export const About = () => {
           <div className='flex flex-col justify-center items-center bg-blue-900 p-5 rounded-lg shadow-lg w-36 h-36 md:w-44 md:h-44 lg:w-52 lg:h-52'>
             <FaPaintBrush size={50} className='text-orange-400 mb-3'/>
             <h3 className='text-xl font-semibold text-white'>Creativity</h3>
+          </div>
+        </div>
+      </div>
+
+      <div className='flex flex-col justify-center items-center text-center py-10 px-5'>
+        <h2 className='text-3xl md:text-4xl lg:text-5xl font-inter font-semibold mb-5 text-transparent bg-clip-text bg-gradient-to-b from-green-400 to-blue-400'>
+          Contact Us
+        </h2>
+        <div className='flex flex-col items-center'>
+          <div className='flex items-center mb-3'>
+            <FaEnvelope className='text-yellow-400 mr-2' />
+            <a href="mailto:alamgirislam009@gmail.com" className='text-lg md:text-xl text-gray-200'>alamgirislam009@gmail.com</a>
+          </div>
+          <div className='flex items-center'>
+            <FaPhone className='text-green-400 mr-2' />
+            <a href="tel:+9052920326" className='text-lg md:text-xl text-gray-200'>9052920326</a>
           </div>
         </div>
       </div>
