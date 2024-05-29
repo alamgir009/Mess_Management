@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { FaUtensils, FaLeaf, FaDrumstickBite, FaFish, FaCarrot, FaPizzaSlice, FaIceCream, FaAppleAlt } from "react-icons/fa";
+import { FaLeaf, FaDrumstickBite, FaFish, FaCarrot } from "react-icons/fa";
+import { ImSpoonKnife } from "react-icons/im";
+import { LuSoup } from "react-icons/lu";
 
 const foodImages = [
   {
     url: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    title: 'Delicious Dessert',
-    description: 'A mouth-watering dessert that will satisfy your sweet tooth.',
-    icon: FaIceCream,
+    title: 'Delicious Briyani',
+    description: 'Aromatic layers of seasoned rice, succulent Chicken or vegetables, and fragrant spices create an irresistible symphony of flavors in every bite of this delectable biryani.',
+    icon: ImSpoonKnife,
   },
   {
     url: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1971&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    title: 'Gourmet Pizza',
-    description: 'A delicious pizza with a variety of toppings to choose from.',
-    icon: FaPizzaSlice,
+    title: 'Spiced Chicken Curry',
+    description: 'Tender chicken infused with bold flavors in a rich curry.',
+    icon: FaDrumstickBite,
   },
   {
     url: 'https://images.unsplash.com/photo-1633383718081-22ac93e3db65?q=80&w=1958&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -22,21 +24,21 @@ const foodImages = [
   },
   {
     url: 'https://images.unsplash.com/photo-1604152135912-04a022e23696?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    title: 'Juicy Steak',
-    description: 'A perfectly grilled steak seasoned to perfection.',
-    icon: FaDrumstickBite,
+    title: 'Creamy Dal Makhni',
+    description: ' This option describes both the creamy texture and the flavorful spices used in the dish.',
+    icon: LuSoup,
   },
   {
     url: 'https://plus.unsplash.com/premium_photo-1694699355770-8eddcab92a26?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    title: 'Seafood Delight',
-    description: 'A delectable assortment of seafood including shrimp, mussels, and crab legs.',
-    icon: FaFish,
+    title: 'Tender Vegetables',
+    description: 'Hearty and healthy, our vegetable curry is packed with flavor. Aromatic blend of spices meets tender vegetables in this comforting curry.',
+    icon: FaCarrot,
   },
   {
     url: 'https://images.unsplash.com/photo-1574484284002-952d92456975?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    title: 'Fresh Vegetables',
-    description: 'A colorful array of fresh vegetables including bell peppers, carrots, and broccoli.',
-    icon: FaCarrot,
+    title:  'Spiced Fish Symphony',
+    description: 'Succulent fish bathed in a vibrant melody of aromatic spices. Dive into a symphony of flavors with our spiced fish.',
+    icon: FaFish,
   },
  
 ];
