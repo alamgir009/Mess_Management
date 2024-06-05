@@ -13,8 +13,8 @@ server.use(cors());
 server.use(express.json());
 server.use(cookieParser());
 
-server.use("/", userRouter);
-server.use("/", marketRouter);
+server.use("/user", userRouter);
+server.use("/market", marketRouter);
 
 //Database Connection
 dataBase();
