@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
     default: "pending",
   },
   gasBill: {
-    type: Sting,
+    type: String,
     enum: ["pending", "success", "failed"],
     default: "pending",
   },
