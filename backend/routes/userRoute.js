@@ -7,6 +7,7 @@ const {
   deleteUser,
   updateUser,
 } = require("../controllers/userController");
+const isVerify = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -15,6 +16,6 @@ router.post("/signin", loginUser);
 router.get("/", getUsers);
 router.get("/:id", getUserById);
 router.delete("/:id", deleteUser);
-router.put("/:id", updateUser);
+router.put("/update", isVerify, updateUser);
 
 module.exports = router;

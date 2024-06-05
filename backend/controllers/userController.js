@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const env = require("dotenv");
 const UserModel = require("../models/user");
+const mongoose = require("mongoose");
 
 env.config();
 
@@ -36,11 +37,12 @@ const registerUser = async (req, res) => {
   }
 };
 
+// User Login
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await UserModel.findOne({ email });
-
+    // console.log(user);
     if (!user) {
       return res
         .status(404)
@@ -78,10 +80,56 @@ const getUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   const id = req.params.id;
   try {
-    const user = await UserModel.findById(id, { password: 0 });
-    if (!user) {
+    const userWithLookups = await UserModel.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(id) } },
+      {
+        $lookup: {
+          from: "markets",
+          localField: "markets",
+          foreignField: "_id",
+          as: "marketDetails",
+        },
+      },
+      {
+        $lookup: {
+          from: "meals",
+          localField: "meals",
+          foreignField: "_id",
+          as: "mealDetails",
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          email: 1,
+          phone: 1,
+          role: 1,
+          userStatus: 1,
+          payment: 1,
+          gasBill: 1,
+          marketDetails: {
+            _id: 1,
+            items: 1,
+            amount: 1,
+            date: 1,
+          },
+          mealDetails: {
+            _id: 1,
+            mealTime: 1,
+            date: 1,
+          },
+        },
+      },
+    ]);
+
+    // Check if user exists
+    if (!userWithLookups || userWithLookups.length === 0) {
       return res.status(404).json({ message: "User not found" });
     }
+
+    // Assuming we only match one user by ID, take the first result
+    const user = userWithLookups[0];
+
     return res.status(200).json(user);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -90,16 +138,20 @@ const getUserById = async (req, res) => {
 
 // Update a user by ID
 const updateUser = async (req, res) => {
+  const { id } = req.user;
+  //   id = req.params.id;
+  console.log(id);
   try {
     const updatedUser = await UserModel.findByIdAndUpdate(
-      req.params.id,
+      //   req.params.id,
+      { _id: id },
       req.body,
       { new: true, runValidators: true }
     );
     if (!updatedUser) {
       return res.status(404).send({ error: "User not found" });
     }
-    res.status(200).send(updatedUser);
+    res.status(200).json({ message: "User data updated", updatedUser });
   } catch (error) {
     res.status(400).send({ error: error.message });
   }

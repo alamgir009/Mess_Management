@@ -3,6 +3,7 @@ const env = require("dotenv");
 const cors = require("cors");
 const dataBase = require("./config/db");
 const userRouter = require("./routes/userRoute.js");
+const marketRouter = require("./routes/marketRoute.js");
 const cookieParser = require("cookie-parser");
 
 env.config();
@@ -13,6 +14,7 @@ server.use(express.json());
 server.use(cookieParser());
 
 server.use("/", userRouter);
+server.use("/", marketRouter);
 
 //Database Connection
 dataBase();
