@@ -170,6 +170,21 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// Signout user
+const signoutUser = async (req, res) => {
+  try {
+    const { id } = req.user;
+    const user = await UserModel.findById(id);
+    if (!user) {
+      return res.status(401).json({ message: "Signin first!" });
+    }
+    res.clearCookie("token");
+    return res.status(200).json({ message: "Signout successful" });
+  } catch (error) {
+    return res.status(500).json({ message: "Something went wrong!" });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -177,4 +192,5 @@ module.exports = {
   getUserById,
   updateUser,
   deleteUser,
+  signoutUser,
 };
