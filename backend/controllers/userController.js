@@ -157,6 +157,29 @@ const updateUser = async (req, res) => {
   }
 };
 
+// Update userDetails by "Admin" with the user Id
+const updateUserByAdmin = async (req, res) => {
+  try {
+    const { role } = req.user;
+    const { id } = req.params;
+    console.log(role);
+
+    if (role !== "admin") {
+      return res.status(403).json({ message: "Restricted resource access!" });
+    }
+    const user = await UserModel.findByIdAndUpdate({ _id: id }, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!user) {
+      return res.status(404).json({ message: "User not found!" });
+    }
+    return res.status(200).json({ message: "User updated successfully." });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong!" });
+  }
+};
+
 // Delete a user by ID
 const deleteUser = async (req, res) => {
   try {
@@ -193,4 +216,5 @@ module.exports = {
   updateUser,
   deleteUser,
   signoutUser,
+  updateUserByAdmin,
 };

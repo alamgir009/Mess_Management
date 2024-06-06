@@ -7,6 +7,7 @@ const {
   deleteUser,
   updateUser,
   signoutUser,
+  updateUserByAdmin,
 } = require("../controllers/userController");
 const isVerify = require("../middleware/auth");
 
@@ -19,5 +20,6 @@ router.get("/", getUsers);
 router.get("/:id", getUserById);
 router.delete("/:id", deleteUser);
 router.put("/update", isVerify, updateUser);
+router.put("/updatebyadmin/:id", isVerify, updateUserByAdmin);
 
 module.exports = router;
