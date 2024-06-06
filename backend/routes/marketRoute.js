@@ -6,10 +6,11 @@ const {
   marketUpdatedById,
   marketDeleteById,
 } = require("../controllers/marketController.js");
+const isVerify = require("../middleware/auth.js");
 
 const router = express.Router();
 
-router.post("/addMarket", addMarkets);
+router.post("/addMarket", isVerify, addMarkets);
 router.get("/getMarket", getAllMarkets);
 router.get("/:id", getMarketById);
 router.put("/:id", marketUpdatedById);

@@ -13,7 +13,9 @@ const getAllMarkets = async (req, res) => {
 
 // add new market via (POST)
 const addMarkets = async (req, res) => {
+  const { id } = req.user;
   try {
+    req.body.marketOwner = id;
     const newMarket = new MarketModel(req.body);
     await newMarket.save();
 
