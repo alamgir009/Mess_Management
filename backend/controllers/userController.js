@@ -42,16 +42,23 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await UserModel.findOne({ email });
-    // console.log(user);
     if (!user) {
       return res
         .status(404)
         .json({ message: "User not found Registerd first!" });
     }
 
+    // Checking password and compare
     const checkPassword = await bcrypt.compare(password, user.password);
     if (!checkPassword) {
       return res.status(401).json({ message: "Email or Password is wrong!" });
+    }
+
+    // Check userStatus for "approved"
+    if (user.userStatus !== "approved") {
+      return res
+        .status(403)
+        .json({ message: "Pending Approval. Please Await!" });
     }
 
     const token = jwt.sign(
@@ -136,7 +143,7 @@ const getUserById = async (req, res) => {
   }
 };
 
-// Update a user by ID
+// Update a user by ID (PUT)
 const updateUser = async (req, res) => {
   const { id } = req.user;
   //   id = req.params.id;
@@ -157,7 +164,7 @@ const updateUser = async (req, res) => {
   }
 };
 
-// Update userDetails by "Admin" with the user Id
+// Update userDetails by "Admin" with the user Id (PUT)
 const updateUserByAdmin = async (req, res) => {
   try {
     const { role } = req.user;
@@ -180,7 +187,7 @@ const updateUserByAdmin = async (req, res) => {
   }
 };
 
-// Delete a user by ID
+// Delete a user by ID (DELETE)
 const deleteUser = async (req, res) => {
   try {
     const deletedUser = await UserModel.findByIdAndDelete(req.params.id);
