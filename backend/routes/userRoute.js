@@ -22,6 +22,6 @@ router.get("/:id", getUserById);
 router.delete("/:id", deleteUser);
 router.put("/update", isVerify, updateUser);
 router.put("/updatebyadmin/:id", isVerify, updateUserByAdmin);
-router.delete("/delete/:id", deleteUserByAdmin);
+router.delete("/delete/:id", isVerify, deleteUserByAdmin);
 
 module.exports = router;
