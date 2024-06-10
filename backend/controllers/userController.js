@@ -200,6 +200,24 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// Delete user by Admin with their id
+
+const deleteUserByAdmin = async (req, res) => {
+  const { role } = req.user;
+  const { id } = req.params;
+  try {
+    if (role !== "admin") {
+      return res.status(403).json({ message: "Restricted resource access!" });
+    }
+    const user = await UserModel.findByIdAndDelete(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found!" });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Something went wrong!" });
+  }
+};
+
 // Signout user
 const signoutUser = async (req, res) => {
   try {
@@ -224,4 +242,5 @@ module.exports = {
   deleteUser,
   signoutUser,
   updateUserByAdmin,
+  deleteUserByAdmin,
 };
