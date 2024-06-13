@@ -30,6 +30,31 @@ const addMarkets = async (req, res) => {
   }
 };
 
+// Add market by Admin
+const addMarketByAdmin = async (req, res) => {
+  const { role } = req.user;
+  const { id } = req.params;
+  try {
+    req.body.marketOwner = id;
+    if (role !== "admin") {
+      return res.status(403).json({ message: "Restricted resource access!" });
+    }
+
+    const market = new MarketModel(req.body);
+    await market.save();
+
+    await UserModel.findByIdAndUpdate(req.body.marketOwner, {
+      $push: { markets: market._id },
+    });
+
+    return res
+      .status(201)
+      .json({ message: "Market added successfully", market });
+  } catch (error) {
+    return res.status(500).json({ message: "Something went wrong!" });
+  }
+};
+
 // Get market by id
 const getMarketById = async (req, res) => {
   try {
@@ -85,4 +110,5 @@ module.exports = {
   getMarketById,
   marketUpdatedById,
   marketDeleteById,
+  addMarketByAdmin,
 };
