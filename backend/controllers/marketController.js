@@ -85,6 +85,27 @@ const marketUpdatedById = async (req, res) => {
   }
 };
 
+// Update Market by Admin (PUT)
+const updateMarketByAdmin = async (req, res) => {
+  const { role } = req.user;
+  const { id } = req.params;
+  try {
+    if (role !== "admin")
+      return res.status(403).json({ message: "Restricted resource access!" });
+
+    const market = await MarketModel.findByIdAndUpdate({ _id: id }, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!market) return res.status(404).json({ message: "Market not found!" });
+
+    return res.status(200).json({ message: "Market updated Successful." });
+  } catch (error) {
+    return res.status(500).json({ message: "Something went wrong!" });
+  }
+};
+
 // Delete market by ID
 const marketDeleteById = async (req, res) => {
   try {
@@ -132,6 +153,7 @@ module.exports = {
   addMarkets,
   getMarketById,
   marketUpdatedById,
+  updateMarketByAdmin,
   marketDeleteById,
   addMarketByAdmin,
   deleteMarketByAdmin,
