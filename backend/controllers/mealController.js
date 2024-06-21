@@ -30,6 +30,29 @@ const addMeals = async (req, res) => {
   }
 };
 
+// Add meal by Admin
+const addMealByAdmin = async (req, res) => {
+  const { role } = req.user;
+  const { id } = req.params;
+  try {
+    req.body.mealOwner = id;
+    if (role !== "admin") {
+      return res.status(403).json({ message: "Restricted resource access!" });
+    }
+
+    const meal = new MealModel(req.body);
+    await meal.save();
+
+    await UserModel.findByIdAndUpdate(req.body.mealOwner, {
+      $push: { meals: meal._id },
+    });
+
+    return res.status(201).json({ message: "meal added successfully", meal });
+  } catch (error) {
+    return res.status(500).json({ message: "Something went wrong!" });
+  }
+};
+
 // Get meal by id
 const getMealById = async (req, res) => {
   try {
@@ -60,6 +83,27 @@ const mealUpdatedById = async (req, res) => {
   }
 };
 
+// Update meal by Admin (PUT)
+const updateMealByAdmin = async (req, res) => {
+  const { role } = req.user;
+  const { id } = req.params;
+  try {
+    if (role !== "admin")
+      return res.status(403).json({ message: "Restricted resource access!" });
+
+    const meal = await MealModel.findByIdAndUpdate({ _id: id }, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!meal) return res.status(404).json({ message: "Meal not found!" });
+
+    return res.status(200).json({ message: "Meal updated Successful." });
+  } catch (error) {
+    return res.status(500).json({ message: "Something went wrong!" });
+  }
+};
+
 // Delete meal by ID
 const mealDeleteById = async (req, res) => {
   try {
@@ -79,10 +123,36 @@ const mealDeleteById = async (req, res) => {
   }
 };
 
+//Delete meal by Admin (Delete)
+const deleteMealByAdmin = async (req, res) => {
+  const { role } = req.user;
+  const { id } = req.params;
+  try {
+    if (role !== "admin") {
+      return res.status(403).json({ message: "Restricted resource access!" });
+    }
+    const newmeal = await MealModel.findByIdAndDelete(id);
+    if (!newmeal) {
+      return res.status(404).json({ message: "meal not found!" });
+    }
+
+    await UserModel.findByIdAndUpdate(newmeal.mealOwner, {
+      $pull: { meals: newmeal._id },
+    });
+
+    return res.status(200).json({ message: "meal deleted!", newmeal });
+  } catch (error) {
+    return res.status(500).jsin({ message: "Something went wrong!" });
+  }
+};
+
 module.exports = {
   getAllMeals,
   addMeals,
   getMealById,
   mealUpdatedById,
   mealDeleteById,
+  addMealByAdmin,
+  updateMealByAdmin,
+  deleteMealByAdmin,
 };
