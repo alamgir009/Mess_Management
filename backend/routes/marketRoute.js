@@ -6,6 +6,7 @@ const {
   marketUpdatedById,
   marketDeleteById,
   addMarketByAdmin,
+  deleteMarketByAdmin,
 } = require("../controllers/marketController.js");
 const isVerify = require("../middleware/auth.js");
 
@@ -17,5 +18,6 @@ router.get("/:id", getMarketById);
 router.put("/:id", marketUpdatedById);
 router.delete("/:id", marketDeleteById);
 router.post("/addmarketbyadmin/:id", isVerify, addMarketByAdmin);
+router.delete("/deletemarketbyadmin/:id", isVerify, deleteMarketByAdmin);
 
 module.exports = router;

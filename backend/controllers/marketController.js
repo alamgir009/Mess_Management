@@ -104,6 +104,29 @@ const marketDeleteById = async (req, res) => {
   }
 };
 
+//Delete Market by Admin (Delete)
+const deleteMarketByAdmin = async (req, res) => {
+  const { role } = req.user;
+  const { id } = req.params;
+  try {
+    if (role !== "admin") {
+      return res.status(403).json({ message: "Restricted resource access!" });
+    }
+    const newMarket = await MarketModel.findByIdAndDelete(id);
+    if (!newMarket) {
+      return res.status(404).json({ message: "Market not found!" });
+    }
+
+    await UserModel.findByIdAndUpdate(newMarket.marketOwner, {
+      $pull: { markets: newMarket._id },
+    });
+
+    return res.status(200).json({ message: "Market deleted!", newMarket });
+  } catch (error) {
+    return res.status(500).jsin({ message: "Something went wrong!" });
+  }
+};
+
 module.exports = {
   getAllMarkets,
   addMarkets,
@@ -111,4 +134,5 @@ module.exports = {
   marketUpdatedById,
   marketDeleteById,
   addMarketByAdmin,
+  deleteMarketByAdmin,
 };
