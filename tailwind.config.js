@@ -6,6 +6,7 @@ export default {
       fontFamily: {
         sarina: ["Sarina", "sans-serif"],
         inter: ["Inter", "sans-serif"],
+        saira: ["Saira Stencil One", "sans-serif"],
       },
     },
   },

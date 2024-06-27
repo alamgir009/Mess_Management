@@ -11,6 +11,11 @@ const {
   deleteUserByAdmin,
 } = require("../controllers/userController");
 const isVerify = require("../middleware/auth");
+const {
+  requestOTP,
+  validateOTP,
+  resetPassword,
+} = require("../utils/otpValidation");
 
 const router = express.Router();
 
@@ -23,5 +28,8 @@ router.delete("/:id", deleteUser);
 router.put("/update", isVerify, updateUser);
 router.put("/updatebyadmin/:id", isVerify, updateUserByAdmin);
 router.delete("/delete/:id", isVerify, deleteUserByAdmin);
+router.post("/requestotp", requestOTP);
+router.post("/validateotp", validateOTP);
+router.post("/resetpassword", resetPassword);
 
 module.exports = router;

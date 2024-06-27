@@ -30,8 +30,8 @@ export const Header = () => {
         <>
             <nav className={`flex justify-between items-center px-5 lg:px-10 h-20 font-inter fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${isScrolled ? 'bg-black/50 backdrop-blur-sm' : 'bg-black'}`}>
                 <div>
-                    <h1 className='font-sarina text-transparent bg-clip-text bg-gradient-to-b from-sky-300 to-white text-xl'>
-                        B.Kitchen
+                    <h1 className='font-saira text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 text-xl'>
+                        UnitedMess
                     </h1>
                 </div>
                 <div className='md:hidden'>

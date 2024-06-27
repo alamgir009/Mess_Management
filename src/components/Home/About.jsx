@@ -9,7 +9,7 @@ export const About = () => {
           About Us
         </h1>
         <p className='mt-4 text-lg md:text-xl lg:text-2xl max-w-2xl md:max-w-3xl lg:max-w-4xl'>
-          Discover the story behind B.Kitchen, a dedicated team passionate about revolutionizing meal management. Learn more about our journey, values, and commitment to excellence.
+          Discover the story behind UnitedMess, a dedicated team passionate about revolutionizing meal management. Learn more about our journey, values, and commitment to excellence.
         </p>
       </div>
 
@@ -18,21 +18,21 @@ export const About = () => {
           <FaLightbulb size={60} className='text-yellow-400 mb-5'/>
           <h2 className='text-3xl md:text-4xl font-inter font-semibold mb-5 text-white'>Our Mission</h2>
           <p className='font-inter text-lg text-gray-200'>
-            Our mission is to simplify your cooking routine with seamless meal management solutions. At B.Kitchen, we strive to make every meal a delightful experience.
+            Our mission is to simplify your cooking routine with seamless meal management solutions. At UnitedMess, we strive to make every meal a delightful experience.
           </p>
         </div>
         <div className='flex flex-col justify-center items-center p-5 text-center bg-gradient-to-br from-green-800 to-teal-600 rounded-lg shadow-lg w-full md:w-5/12 lg:w-1/3'>
           <FaAward size={60} className='text-red-400 mb-5'/>
           <h2 className='text-3xl md:text-4xl font-inter font-semibold mb-5 text-white'>Our Values</h2>
           <p className='font-inter text-lg text-gray-200'>
-            Integrity, innovation, and customer satisfaction are at the heart of B.Kitchen. We believe in creating solutions that enhance your culinary experience while upholding our commitment to quality.
+            Integrity, innovation, and customer satisfaction are at the heart of UnitedMess. We believe in creating solutions that enhance your culinary experience while upholding our commitment to quality.
           </p>
         </div>
         <div className='flex flex-col justify-center items-center p-5 text-center bg-gradient-to-br from-yellow-800 to-orange-600 rounded-lg shadow-lg w-full md:w-5/12 lg:w-1/3'>
           <FaRocket size={60} className='text-blue-400 mb-5'/>
           <h2 className='text-3xl md:text-4xl font-inter font-semibold mb-5 text-white'>Our Vision</h2>
           <p className='font-inter text-lg text-gray-200'>
-            At B.Kitchen, our vision is to revolutionize meal management with cutting-edge technology, ensuring that every meal is an enjoyable and stress-free experience.
+            At UnitedMess, our vision is to revolutionize meal management with cutting-edge technology, ensuring that every meal is an enjoyable and stress-free experience.
           </p>
         </div>
       </div>
@@ -42,7 +42,7 @@ export const About = () => {
           Meet Our Team
         </h2>
         <p className='font-inter text-lg max-w-2xl md:max-w-3xl lg:max-w-4xl mb-10'>
-          Our diverse and dedicated team is the backbone of B.Kitchen. Each member brings unique expertise and passion, driving us towards our shared goal of culinary excellence.
+          Our diverse and dedicated team is the backbone of UnitedMess. Each member brings unique expertise and passion, driving us towards our shared goal of culinary excellence.
         </p>
         <div className='flex flex-wrap justify-center items-center gap-5 md:gap-10'>
           <div className='flex flex-col justify-center items-center bg-purple-900 p-5 rounded-lg shadow-lg w-36 h-36 md:w-44 md:h-44 lg:w-52 lg:h-52'>

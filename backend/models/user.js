@@ -19,6 +19,8 @@ const userSchema = new mongoose.Schema({
     enum: ["pending", "success", "failed"],
     default: "pending",
   },
+  resetPasswordOTP: { type: String },
+  resetPasswordExpiry: { type: Date },
 });
 
 const UserModel = mongoose.model("user", userSchema);

@@ -29,7 +29,7 @@ export const Home = () => {
             faster
           </h1>
           <p className='mt-4'>
-            Your culinary companion for seamless meal management. Track and handle your meals effortlessly with B.Kitchen's intuitive interface. Simplify your cooking routine with B.Kitchen, ensuring every meal is a breeze.
+            Your culinary companion for seamless meal management. Track and handle your meals effortlessly with UnitedMess's intuitive interface. Simplify your cooking routine with UnitedMess, ensuring every meal is a breeze.
           </p>
           <div className='py-5'>
             <button className='bg-gradient-to-b from-gray-300 via-gray-400 to-gray-300 border-sky-200 border rounded-md p-2 text-black font-semibold shadow-black shadow-md'>
@@ -51,7 +51,7 @@ export const Home = () => {
             Calendar
           </h1>
           <p className='mt-5 font-inter'>
-            Effortlessly manage schedules with B.kitchen's integrated calendar. Organize events, appointments, and tasks seamlessly for enhanced productivity and smoother workflow.
+            Effortlessly manage schedules with UnitedMess's integrated calendar. Organize events, appointments, and tasks seamlessly for enhanced productivity and smoother workflow.
           </p>
           <button className='mt-5 bg-gradient-to-b from-gray-300 via-gray-400 to-gray-300 border-sky-200 border rounded-md p-2 text-black font-semibold shadow-black shadow-md'>
             Get Started
@@ -63,7 +63,7 @@ export const Home = () => {
         <div className='w-full p-5 lg:w-2/5'>
           <h1 className='text-3xl md:text-4xl lg:text-5xl font-inter font-semibold mb-5'>Security</h1>
           <p className='font-inter'>
-            B.Kitchen prioritizes robust security, encryption, and privacy. We ensure compliance with regulations, employ multi-factor authentication, and grant user control.
+            UnitedMess prioritizes robust security, encryption, and privacy. We ensure compliance with regulations, employ multi-factor authentication, and grant user control.
           </p>
         </div>
         <div className=' w-72 lg:w-96'>
@@ -84,7 +84,7 @@ export const Home = () => {
             <h1 className='text-3xl md:text-4xl lg:text-5xl font-inter font-semibold mb-5'>Indulge in Culinary
               <span className='text-yellow-400'> Excellence</span></h1>
             <p className='font-inter text-center'>
-              Experience culinary delight with B.Kitchen's quality food a symphony of flavors crafted for discerning palates.
+              Experience culinary delight with UnitedMess's quality food a symphony of flavors crafted for discerning palates.
             </p>
 
           </div>
@@ -116,7 +116,7 @@ export const Home = () => {
           <h1 className='text-transparent bg-clip-text bg-gradient-to-b from-white to-green-300'>
             Savor Healthy Dining:
           </h1>
-          <h1 className='text-transparent bg-clip-text bg-gradient-to-b from-white to-green-400'>B.Kitchen Online.</h1>
+          <h1 className='text-transparent bg-clip-text bg-gradient-to-b from-white to-green-400'>UnitedMess Online.</h1>
         </div>
 
         <ul className='flex flex-wrap gap-x-32 gap-y-10 md:justify-center md:items-center'>
