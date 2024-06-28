@@ -11,10 +11,12 @@ import { MdOutlineShoppingCart } from "react-icons/md";
 import { GoGraph } from "react-icons/go";
 import { MdSecurity } from "react-icons/md";
 import { CiPizza } from "react-icons/ci";
+import { useNavigate } from 'react-router-dom';
 
 
 
 export const Home = () => {
+  const navigate = useNavigate()
   return (
     <div className='bg-gradient-to-b from-black to-blue-950 text-gray-200 mt-20 pb-10'>
       <div className='flex flex-wrap justify-center items-center '>
@@ -32,7 +34,8 @@ export const Home = () => {
             Your culinary companion for seamless meal management. Track and handle your meals effortlessly with UnitedMess's intuitive interface. Simplify your cooking routine with UnitedMess, ensuring every meal is a breeze.
           </p>
           <div className='py-5'>
-            <button className='bg-gradient-to-b from-gray-300 via-gray-400 to-gray-300 border-sky-200 border rounded-md p-2 text-black font-semibold shadow-black shadow-md'>
+            <button className='bg-gradient-to-b from-gray-300 via-gray-400 to-gray-300 border-sky-200 border rounded-md p-2 text-black font-semibold shadow-black shadow-md'
+            onClick={()=>navigate("/register")}>
               Get Started
             </button>
           </div>
@@ -53,7 +56,8 @@ export const Home = () => {
           <p className='mt-5 font-inter'>
             Effortlessly manage schedules with UnitedMess's integrated calendar. Organize events, appointments, and tasks seamlessly for enhanced productivity and smoother workflow.
           </p>
-          <button className='mt-5 bg-gradient-to-b from-gray-300 via-gray-400 to-gray-300 border-sky-200 border rounded-md p-2 text-black font-semibold shadow-black shadow-md'>
+          <button className='mt-5 bg-gradient-to-b from-gray-300 via-gray-400 to-gray-300 border-sky-200 border rounded-md p-2 text-black font-semibold shadow-black shadow-md'
+          onClick={()=>navigate("/register")}>
             Get Started
           </button>
         </div>

@@ -10,7 +10,12 @@ const cookieParser = require("cookie-parser");
 env.config();
 const server = express();
 
-server.use(cors());
+server.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:5173",
+  })
+);
 server.use(express.json());
 server.use(cookieParser());
 

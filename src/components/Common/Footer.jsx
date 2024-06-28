@@ -10,7 +10,7 @@ export const Footer = () => {
             <div className='footer'>
                 <div className='text-gray-200 px-5 py-3 sm:px-10 sm:py-5 flex flex-col sm:flex-row justify-between items-center'>
                     <div className='mb-3 sm:mb-0'>
-                        <h1 className='font-saira text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 text-lg sm:text-xl'>
+                        <h1 className='font-saira text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 text-lg sm:text-xl lg:text-2xl'>
                             UnitedMess
                         </h1>
                     </div>
