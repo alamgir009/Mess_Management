@@ -89,9 +89,9 @@ export const RequestOtp = () => {
   };
 
   return (
-    <div className="bg-gradient-to-b from-black to-blue-950 text-gray-50 h-screen flex justify-center items-center">
+    <div className="bg-gradient-to-b from-black to-blue-950 text-gray-50 mt-20 h-screen flex justify-center items-center">
       <form
-        className="border border-green-300 p-5 font-inter w-full md:w-80 lg:w-80 xl:w-96 rounded-md m-2 bg-green-400/10"
+        className="border border-green-300 p-5 font-inter w-full md:w-80 lg:w-80 xl:w-96 rounded-md m-2 -mt-20 bg-green-400/10"
         onSubmit={handleRequestOtp}
       >
         <h1 className="text-4xl mb-5 text-center">Request OTP</h1>
