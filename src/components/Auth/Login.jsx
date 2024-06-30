@@ -15,7 +15,7 @@ export const Login = () => {
                 <label htmlFor="password" className=''>Password
                     <input type="password" name='password' placeholder='password' className='inpt' />
                 </label>
-                <p className='cursor-pointer'>Forgot password?</p>
+                <p className='cursor-pointer' onClick={()=>navigate('/requestotp')}>Forgot password?</p>
                 <button className='bg-sky-500 hover:bg-sky-600 w-full rounded-md h-8 mt-2 font-semibold' >Sign in</button>
                 <p className='text-center p-5 font-light text-sm'>Don't have account? <span typeof='button' className='text-green-300 cursor-pointer'onClick={() => navigate('/register')} >Sign up</span></p>
             </form>

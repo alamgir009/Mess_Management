@@ -2,7 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-
+*{
+    box-sizing: border-box;
+}
+body{
+    background-color: black;
+}
 .footer{
     background: linear-gradient(180deg,rgb(22, 22, 22),black,rgb(22, 22, 22));
     

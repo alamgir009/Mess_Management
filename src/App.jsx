@@ -7,6 +7,8 @@ import { About } from './components/Home/About.jsx'
 import { Home } from './components/Home/Home.jsx'
 import { Food } from './components/Home/Food.jsx'
 import { Footer } from './components/Common/Footer.jsx'
+import { RequestOtp } from './components/Home/RequestOtp.jsx'
+import { ResetPassword } from './components/Home/ResetPassword.jsx'
 
 function App() {
 
@@ -20,6 +22,8 @@ function App() {
           <Route path='/signin' element={<Login/>} />
           <Route path='/register' element={<Register/>} />
           <Route path='/food' element={<Food/>} />
+          <Route path='/requestotp' element={<RequestOtp/>} />
+          <Route path='/resetpassword' element={<ResetPassword/>}/>
         </Routes>
         <Footer/>
       </Router>

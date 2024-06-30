@@ -30,8 +30,6 @@ export const Register = () => {
                 })
             }
             const response = await axios.post(`http://localhost:8080/user/register`, (formData),{withCredentials:true})
-            // setFormData(response.data)
-            // console.log(response)
             if(response){
                 setTimeout(()=>{
                     navigate('/signin')
