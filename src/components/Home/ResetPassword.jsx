@@ -31,14 +31,18 @@ export const ResetPassword = () => {
                 return toast.error(`Password not matched!`)
             }
             const response = await axios.post(`http://localhost:8080/user/resetpassword`, (reset),{withCredentials:true})
-            if(response){
+            if(response && response.data){
                 toast.success(`${response.data.message}`,{
                     duration:2000
                 })
                 dispatch(addUserId(null))
+                setTimeout(() => {
+                    navigate('/signin');
+                  }, 2000);
             }
         } catch (error) {
-           return toast.error(`${error.response.data.message}`)
+            const errorMessage = error.response?.data?.message || 'There was an error';
+            return toast.error(errorMessage, { duration: 2000 });
         }
     }
 

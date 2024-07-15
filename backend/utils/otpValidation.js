@@ -1,11 +1,20 @@
 const bcrypt = require("bcrypt");
 const env = require("dotenv");
+const nodemailer = require("nodemailer");
 const UserModel = require("../models/user");
-const { Resend } = require("resend");
 
 env.config();
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Nodemailer transporter setup
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: false, // Use `true` for port 465, `false` for all other ports
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
 
 // Helper function to generate a random OTP
 const generateOTP = () => {
@@ -62,14 +71,19 @@ const requestOTP = async (req, res) => {
       </html>
     `;
 
-    await resend.emails.send({
-      from: "unitedmess@resend.dev",
+    const info = await transporter.sendMail({
+      // from: '"UnitedMess 👻" <alamgirislam009@outlook.com>',
+      from: process.env.EMAIL_USER,
       to: user.email,
       subject: "Your One-Time Password (OTP) for Verification",
       html: emailTemplate,
     });
 
-    return res.status(200).json({ message: "OTP sent to email" });
+    if (info.messageId) {
+      console.log(info);
+      console.log(info.messageId);
+      return res.status(200).json({ message: "OTP sent to email", info });
+    }
   } catch (error) {
     return res.status(500).json({ message: "Something went wrong!" });
   }

@@ -16,6 +16,7 @@ const {
   validateOTP,
   resetPassword,
 } = require("../utils/otpValidation");
+const { requestMobileOtp, verifyMobileOtp } = require("../utils/mobileOtp");
 
 const router = express.Router();
 
@@ -31,5 +32,8 @@ router.delete("/delete/:id", isVerify, deleteUserByAdmin);
 router.post("/requestotp", requestOTP);
 router.post("/validateotp", validateOTP);
 router.post("/resetpassword", resetPassword);
+
+router.post("/requestmobileotp", requestMobileOtp);
+router.post("/verifymobileotp", verifyMobileOtp);
 
 module.exports = router;
