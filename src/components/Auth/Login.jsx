@@ -25,7 +25,7 @@ export const Login = () => {
       if (response && response.data) {
         toast.success(response.data.message, { duration: 2000 });
         setTimeout(() => {
-          navigate('/');
+          navigate('/dashboard');
         }, 2000);
       }
     } catch (error) {

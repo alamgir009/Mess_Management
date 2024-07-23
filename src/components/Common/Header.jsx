@@ -43,7 +43,7 @@ export const Header = () => {
                     <li className='p-5 md:p-0'><Link to="/" onClick={toggleMenu}> Home</Link></li>
                     <li className='p-5 md:p-0'><Link to="/about" onClick={toggleMenu}>About</Link></li>
                     <li className='p-5 md:p-0'><Link to="/food" onClick={toggleMenu}>Food</Link></li>
-                    <li className='p-0.5 lg:p-0.5 mb-5 md:mb-0 md:p-0 bg-gradient-to-b from-gray-500 to-transparent rounded-full'><Link to="/signin" onClick={toggleMenu}>
+                    <li className='p-0.5 lg:p-0.5 mb-5 md:mb-0 md:p-0.5 bg-gradient-to-b from-gray-500 to-transparent rounded-full'><Link to="/signin" onClick={toggleMenu}>
                         <div className='flex bg-black w-full h-full justify-center items-center rounded-full px-5 py-2'>Sign in</div>
                     </Link></li>
                 </ul>

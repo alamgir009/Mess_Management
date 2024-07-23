@@ -9,6 +9,7 @@ import { Food } from './components/Home/Food.jsx'
 import { Footer } from './components/Common/Footer.jsx'
 import { RequestOtp } from './components/Home/RequestOtp.jsx'
 import { ResetPassword } from './components/Home/ResetPassword.jsx'
+import { Dashboard } from './components/Dashboard/Dashboard.jsx'
 
 function App() {
 
@@ -24,9 +25,12 @@ function App() {
           <Route path='/food' element={<Food/>} />
           <Route path='/requestotp' element={<RequestOtp/>} />
           <Route path='/resetpassword' element={<ResetPassword/>}/>
+          <Route path='/dashboard' element={<Dashboard/>}/>
         </Routes>
         <Footer/>
       </Router>
+
+      
     </>
   )
 }
