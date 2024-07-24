@@ -2,9 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { login } from '../../store/slices/userLogSlice';
+
 
 export const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
+
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -27,6 +32,7 @@ export const Login = () => {
         setTimeout(() => {
           navigate('/dashboard');
         }, 2000);
+        dispatch(login("login"))
       }
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'There was an error';

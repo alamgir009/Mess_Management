@@ -12,28 +12,32 @@ const registerUser = async (req, res) => {
   try {
     const { name, email, password, phone } = req.body;
 
+    if (!name || !email || !password || !phone) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     const user = await UserModel.findOne({ email });
     if (user) {
-      return res.status(403).json({ message: "User already registerd" });
+      return res.status(403).json({ message: "User already registered" });
     }
 
     const salt = await bcrypt.genSalt();
-    const hashedPasswrod = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = new UserModel({
       name,
       email,
-      password: hashedPasswrod,
+      password: hashedPassword,
       phone,
     });
 
     await newUser.save();
 
     return res.status(201).json({
-      message: "User registered successful",
+      message: "User registered successfully",
       newUser,
     });
   } catch (error) {
-    return res.status(500).json({ message: "Something went worng!" });
+    return res.status(500).json({ message: "Something went wrong" });
   }
 };
 
@@ -41,35 +45,37 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     const user = await UserModel.findOne({ email });
     if (!user) {
-      return res
-        .status(404)
-        .json({ message: "User not found Registerd first!" });
+      return res.status(404).json({ message: "User not registered" });
     }
 
-    // Checking password and compare
-    const checkPassword = await bcrypt.compare(password, user.password);
-    if (!checkPassword) {
-      return res.status(401).json({ message: "Email or Password is wrong!" });
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Email or Password is wrong" });
     }
 
-    // Check userStatus for "approved"
     if (user.userStatus !== "approved") {
       return res
         .status(403)
-        .json({ message: "Pending Approval. Please Await!" });
+        .json({ message: "Pending Approval. Please Await" });
     }
 
     const token = jwt.sign(
       { userId: user._id, role: user.role },
-      process.env.SECRET_KEY
+      process.env.SECRET_KEY,
+      { expiresIn: "1h" } // Token expiry time for added security
     );
-    res.cookie("token", token, { httpOnly: true });
+    res.cookie("token", token, { httpOnly: true, secure: true });
 
     return res.status(200).json({ message: "Signin successful" });
   } catch (error) {
-    return res.status(500).json({ message: "Something went wrong!" });
+    return res.status(500).json({ message: "Something went wrong" });
   }
 };
 

@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaBars, FaTimes } from 'react-icons/fa'; // Import icons for the menu button
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../../store/slices/userLogSlice';
 
 export const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+
+    const dispatch = useDispatch()
+    const userLog = useSelector((state) => state.userLogs.userLog)
+
+    const handleLogout = ()=>{
+        dispatch(logout("logout"))
+    }
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -43,9 +52,17 @@ export const Header = () => {
                     <li className='p-5 md:p-0'><Link to="/" onClick={toggleMenu}> Home</Link></li>
                     <li className='p-5 md:p-0'><Link to="/about" onClick={toggleMenu}>About</Link></li>
                     <li className='p-5 md:p-0'><Link to="/food" onClick={toggleMenu}>Food</Link></li>
-                    <li className='p-0.5 lg:p-0.5 mb-5 md:mb-0 md:p-0.5 bg-gradient-to-b from-gray-500 to-transparent rounded-full'><Link to="/signin" onClick={toggleMenu}>
-                        <div className='flex bg-black w-full h-full justify-center items-center rounded-full px-5 py-2'>Sign in</div>
+                    {
+                        userLog !== "login" ? (
+                            <li className='p-0.5 lg:p-0.5 mb-5 md:mb-0 md:p-0.5 bg-gradient-to-b from-gray-500 to-transparent rounded-full'><Link to="/signin" onClick={toggleMenu}>
+                                <div className='flex bg-black w-full h-full justify-center items-center rounded-full px-5 py-2'>Sign in</div>
+                            </Link></li>
+                        ) : (
+                            <li className='p-0.5 lg:p-0.5 mb-5 md:mb-0 md:p-0.5 bg-gradient-to-b from-gray-500 to-transparent rounded-full'><Link to="/" onClick={handleLogout}>
+                        <div className='flex bg-black w-full h-full justify-center items-center rounded-full px-5 py-2'>Sign out</div>
                     </Link></li>
+                        )
+                    }
                 </ul>
             </nav>
         </>
