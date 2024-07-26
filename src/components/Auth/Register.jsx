@@ -24,7 +24,7 @@ export const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match!', { duration: 2000 });
+      toast.error("Passwords don't match!", { duration: 2000 });
       return;
     }
 

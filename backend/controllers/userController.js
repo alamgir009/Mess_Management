@@ -57,13 +57,13 @@ const loginUser = async (req, res) => {
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Email or Password is wrong" });
+      return res.status(401).json({ message: "Email or Password is wrong!" });
     }
 
     if (user.userStatus !== "approved") {
       return res
         .status(403)
-        .json({ message: "Pending Approval. Please Await" });
+        .json({ message: "Pending Approval. Please Await!" });
     }
 
     const token = jwt.sign(
@@ -75,7 +75,7 @@ const loginUser = async (req, res) => {
 
     return res.status(200).json({ message: "Signin successful" });
   } catch (error) {
-    return res.status(500).json({ message: "Something went wrong" });
+    return res.status(500).json({ message: "Something went wrong!" });
   }
 };
 
