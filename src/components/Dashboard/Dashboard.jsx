@@ -6,7 +6,7 @@ export const Dashboard = () => {
   const userLog = useSelector((state)=>state.userLogs.userLog)
 
   return (
-    <div className='flex justify-between text-white mt-20 bg-gradient-to-b from-black to-blue-950'>
+    <div className='flex justify-between text-white bg-gradient-to-b from-black to-blue-950 h-screen'>
         <div>
             <SideBar/>
         </div>
