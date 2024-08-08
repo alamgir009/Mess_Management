@@ -18,14 +18,14 @@ export const Header = () => {
     const handleLogout = async (e) => {
         e.preventDefault()
         try {
-            const response = await axios.post('http://localhost:8080/user/signout', null, {withCredentials:true})
+            const response = await axios.post('http://localhost:8080/user/signout', null, { withCredentials: true })
             if (response && response.data) {
                 toast.success(response.data.message, { duration: 2000 });
                 setTimeout(() => {
-                  navigate('/');
+                    navigate('/');
                 }, 2000);
-                dispatch(logout("logout"))
-              }
+                dispatch(logout(false))
+            }
         } catch (error) {
             const errorMessage = error.response?.data?.message || 'There was an error';
             toast.error(errorMessage, { duration: 2000 });
@@ -69,17 +69,15 @@ export const Header = () => {
                     <li className='p-5 md:p-0'><Link to="/" onClick={toggleMenu}> Home</Link></li>
                     <li className='p-5 md:p-0'><Link to="/about" onClick={toggleMenu}>About</Link></li>
                     <li className='p-5 md:p-0'><Link to="/food" onClick={toggleMenu}>Food</Link></li>
-                    {
-                        userLog !== "login" ? (
-                            <li className='p-0.5 lg:p-0.5 mb-5 md:mb-0 md:p-0.5 bg-gradient-to-b from-gray-500 to-transparent rounded-full'><Link to="/signin" onClick={toggleMenu}>
-                                <div className='flex bg-black w-full h-full justify-center items-center rounded-full px-5 py-2'>Sign in</div>
-                            </Link></li>
-                        ) : (
-                            <li className='p-0.5 lg:p-0.5 mb-5 md:mb-0 md:p-0.5 bg-gradient-to-b from-gray-500 to-transparent rounded-full'>
-                                <div className='flex bg-black w-full h-full justify-center items-center rounded-full px-5 py-2' onClick={handleLogout}>Sign out</div>
-                            </li>
-                        )
-                    }
+                    {userLog === true ? (
+                        <li className='p-0.5 lg:p-0.5 mb-5 md:mb-0 md:p-0.5 bg-gradient-to-b from-gray-500 to-transparent rounded-full'>
+                            <div className='flex bg-black w-full h-full justify-center items-center rounded-full px-5 py-2' onClick={handleLogout}>Sign out</div>
+                        </li>
+                    ) : (
+                        <li className='p-0.5 lg:p-0.5 mb-5 md:mb-0 md:p-0.5 bg-gradient-to-b from-gray-500 to-transparent rounded-full'><Link to="/signin" onClick={toggleMenu}>
+                            <div className='flex bg-black w-full h-full justify-center items-center rounded-full px-5 py-2'>Sign in</div>
+                        </Link></li>
+                    )}
                 </ul>
             </nav>
             <Toaster position='top-center' reverseOrder={false} />

@@ -32,7 +32,7 @@ export const Login = () => {
         setTimeout(() => {
           navigate('/dashboard');
         }, 2000);
-        dispatch(login("login"))
+        dispatch(login(true))
       }
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'There was an error';

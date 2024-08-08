@@ -22,21 +22,25 @@ function App() {
   return (
     <Router>
       <Routes>
-        {userLog !== "login" ? (
+
+      {
+        userLog && (
           <>
-            <Route path="/" element={<MainLayout><Home /></MainLayout>} />
-            <Route path="/about" element={<MainLayout><About /></MainLayout>} />
-            <Route path="/signin" element={<MainLayout><Login /></MainLayout>} />
-            <Route path="/register" element={<MainLayout><Register /></MainLayout>} />
-            <Route path="/food" element={<MainLayout><Food /></MainLayout>} />
-            <Route path="/requestotp" element={<MainLayout><RequestOtp /></MainLayout>} />
-            <Route path="/resetpassword" element={<MainLayout><ResetPassword /></MainLayout>} />
-          </>
-        ) : (
           <Route path="/dashboard" element={<Dashboard />} />
-        )}
+          </>
+        )
+      }
+
+        <Route path="/" element={<MainLayout><Home /></MainLayout>} />
+        <Route path="/about" element={<MainLayout><About /></MainLayout>} />
+        <Route path="/signin" element={<MainLayout><Login /></MainLayout>} />
+        <Route path="/register" element={<MainLayout><Register /></MainLayout>} />
+        <Route path="/food" element={<MainLayout><Food /></MainLayout>} />
+        <Route path="/requestotp" element={<MainLayout><RequestOtp /></MainLayout>} />
+        <Route path="/resetpassword" element={<MainLayout><ResetPassword /></MainLayout>} />
         <Route path="/error" element={<ErrorPage message="You are not authorized to access this page." />} />
         <Route path="*" element={<NotFoundPage />} />
+
       </Routes>
     </Router>
   );
