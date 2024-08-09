@@ -72,6 +72,12 @@ div.card-list{
 
 
 }
+
+div.sidebar{
+    box-shadow:  inset 1px 1px 5px rgba(104, 104, 104, 0.8),
+    inset -1px -1px 5px rgba(104, 104, 104, 0.8);
+}
+
 img.card-img{
     width: 100%;
     height: 100%;

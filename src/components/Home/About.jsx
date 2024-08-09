@@ -79,7 +79,7 @@ export const About = () => {
           </div>
           <div className='flex items-center'>
             <FaPhone className='text-green-400 mr-2' />
-            <a href="tel:+9052920326" className='text-lg md:text-xl text-gray-200'>9052920326</a>
+            <a href="tel:+9052920326" className='text-lg md:text-xl text-gray-200'>+91-9052920326</a>
           </div>
         </div>
       </div>
