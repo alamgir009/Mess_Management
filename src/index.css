@@ -55,10 +55,6 @@ button.css-23p0if-MuiButtonBase-root-MuiPickersDay-root {
     color: white;
 }
 
-img.secure{
-    /* filter: drop-shadow(0 4px 6px rgb(255, 0, 0)); */
-}
-
 div.card-list{
     padding: 20px;
     /* border: 1px solid gray; */
@@ -100,4 +96,3 @@ form .inpt{
     margin-bottom: 10px;
     color: black;
 }
-
