@@ -1,6 +1,6 @@
 import React from 'react';
 import { IoHome, IoNotifications } from "react-icons/io5";
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { TbTable } from "react-icons/tb";
 import { MdShoppingCart, MdOutlineChat, MdLogout } from "react-icons/md";
 import { GiMeal } from "react-icons/gi";
@@ -46,10 +46,14 @@ export const SideBar = () => {
       </h1>
       <div className="border-t border-gray-600">
         {menuItems.map((item, index) => (
-          <Link key={index} className="flex pt-5 items-center hover:text-sky-500" to={item.to}>
+          <NavLink
+            key={index}
+            to={item.to}
+            className={({ isActive }) => `flex pt-5 items-center ${isActive ? 'text-yellow-300' : 'hover:text-sky-400'}`}
+          >
             {item.icon}
             <h1 className="pl-5">{item.label}</h1>
-          </Link>
+          </NavLink>
         ))}
       </div>
       <div className="border-b border-gray-600 pb-5" />
