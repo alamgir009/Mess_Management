@@ -47,7 +47,7 @@ export const Dashboard = () => {
       <div className="flex-grow border rounded-md border-gray-500 m-1 p-4 overflow-auto">
         <h1 className="text-center text-xl sm:text-2xl w-full mb-4">User Overview</h1>
         <hr className="mb-4" />
-        <div className="overflow-x-auto rounded-md border border-gray-500">
+        <div className="overflow-x-auto rounded-md border border-gray-500 font-inter">
           <table className="min-w-full bg-gray-900/50 text-white">
             <thead>
               <tr className="bg-gray-700 text-left">
