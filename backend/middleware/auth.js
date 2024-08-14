@@ -1,12 +1,10 @@
-const mongoose = require("mongoose");
-const cookie = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const env = require("dotenv");
 env.config();
 
 const isVerify = async (req, res, next) => {
   try {
-    const { token } = req.cookies;
+    let { token } = req.cookies;
 
     // If not found in cookie, then check authorization header (Bearer Token)
     if (!token && req.headers.authorization) {
