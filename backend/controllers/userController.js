@@ -89,6 +89,68 @@ const getUsers = async (req, res) => {
   }
 };
 
+// Get user Profile
+const getProfile = async (req, res) => {
+  const { id } = req.user;
+  try {
+    const userWithLookups = await UserModel.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(id) } },
+      {
+        $lookup: {
+          from: "markets",
+          localField: "markets",
+          foreignField: "_id",
+          as: "marketDetails",
+        },
+      },
+      {
+        $lookup: {
+          from: "meals",
+          localField: "meals",
+          foreignField: "_id",
+          as: "mealDetails",
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          email: 1,
+          phone: 1,
+          role: 1,
+          userStatus: 1,
+          payment: 1,
+          gasBill: 1,
+          marketDetails: {
+            _id: 1,
+            items: 1,
+            amount: 1,
+            date: 1,
+          },
+          mealDetails: {
+            _id: 1,
+            mealTime: 1,
+            date: 1,
+          },
+        },
+      },
+    ]);
+
+    // Check if user exists
+    if (!userWithLookups || userWithLookups.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Assuming we only match one user by ID, take the first result
+    const user = userWithLookups[0];
+
+    return res.status(200).json(user);
+  } catch (error) {
+    if (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  }
+};
+
 // Get a user by ID
 const getUserById = async (req, res) => {
   const id = req.params.id;
@@ -249,4 +311,5 @@ module.exports = {
   signoutUser,
   updateUserByAdmin,
   deleteUserByAdmin,
+  getProfile,
 };
