@@ -19,9 +19,11 @@ export const SideBar = () => {
     e.preventDefault();
     try {
       const { data } = await axios.post('http://localhost:8080/user/signout', null, { withCredentials: true });
-      dispatch(logout(false));
-      toast.success(data.message);
-      navigate('/');
+      if (data) {
+        dispatch(logout(false));
+        alert(data.message);
+        navigate('/');
+      }
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'There was an error';
       toast.error(errorMessage);

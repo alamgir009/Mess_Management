@@ -1,34 +1,21 @@
-import React from 'react'
+import React, { useEffect } from 'react';
 import { SideBar } from './SideBar';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Toaster, toast } from 'react-hot-toast';
-import axios from 'axios';
-import { logout } from '../../store/slices/userLogSlice';
+import { fetchProfile } from '../../store/slices/userSlice';
 
 const Profiles = () => {
-    const userLog = useSelector((state) => state.userLogs.userLog);
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
 
-    const handleLogout = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await axios.post(
-                'http://localhost:8080/user/signout',
-                null,
-                { withCredentials: true }
-            );
-            if (response && response.data) {
-                dispatch(logout(false));
-                navigate('/signin');
-                return alert(`${response.data.message}`)
-            }
-        } catch (error) {
-            const errorMessage = error.response?.data?.message || 'There was an error';
-            toast.error(errorMessage, { duration: 2000 });
-        }
-    };
+    const dispatch = useDispatch();
+    const { profile, loading, error } = useSelector((state) => state.userData);
+
+    useEffect(() => {
+        // Assuming 'fetchProfile' is the correct action to fetch the user profile
+        dispatch(fetchProfile());
+    }, [dispatch]);
+
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p className="text-red-500">Error: {error}</p>;
 
     return (
         <div className="flex flex-col lg:flex-row justify-between text-white bg-gradient-to-b from-black to-blue-950 h-screen">
@@ -37,19 +24,24 @@ const Profiles = () => {
             </div>
             <div className="flex-grow border rounded-md border-gray-500 m-1 p-4">
                 <h1 className="text-center text-xl sm:text-2xl w-full mb-4">Profile</h1>
-                <hr className="mb-4" />
-                <div className="flex flex-col sm:flex-row justify-center gap-4">
-                    <button onClick={() => console.log(userLog)} className="bg-sky-500 p-3 sm:p-5 rounded-md">
-                        Log
-                    </button>
-                    <button onClick={handleLogout} className="bg-sky-500 p-3 sm:p-5 rounded-md">
-                        Log out
-                    </button>
-                </div>
+
+                {profile ? (
+                    <div className="space-y-4">
+                        <h2 className="text-lg font-semibold">Name: <span className="font-normal">{profile.name}</span></h2>
+                        <h2 className="text-lg font-semibold">Email: <span className="font-normal">{profile.email}</span></h2>
+                        <h2 className="text-lg font-semibold">Phone: <span className="font-normal">{profile.phone}</span></h2>
+                        <h2 className="text-lg font-semibold">Role: <span className="font-normal">{profile.role}</span></h2>
+                        <h2 className="text-lg font-semibold">User Status: <span className="font-normal">{profile.userStatus}</span></h2>
+                        <h2 className="text-lg font-semibold">Payment Status: <span className="font-normal">{profile.payment}</span></h2>
+                        <h2 className="text-lg font-semibold">Gas Bill Status: <span className="font-normal">{profile.gasBill}</span></h2>
+                    </div>
+                ) : (
+                    <p>No profile data available.</p>
+                )}
             </div>
             <Toaster position="top-center" reverseOrder={false} />
         </div>
     );
-}
+};
 
-export default Profiles
+export default Profiles;
