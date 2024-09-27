@@ -41,7 +41,7 @@ export const Dashboard = () => {
 
   return (
     <div className="flex flex-col lg:flex-row justify-between text-white bg-gradient-to-b from-black to-blue-950 h-screen">
-      <div className="sidebar w-screen m-1 rounded-md text-white lg:w-80 p-5 bg-gray-950">
+      <div className="sidebar w-screen m-1 rounded-md text-white lg:w-80 bg-gray-950">
         <SideBar />
       </div>
       <div className="flex-grow border rounded-md border-gray-500 m-1 p-4 overflow-auto">

@@ -32,11 +32,11 @@ const Payments = () => {
 
     return (
         <div className="flex flex-col lg:flex-row justify-between text-white bg-gradient-to-b from-black to-blue-950 h-screen">
-            <div className="sidebar w-screen m-1 rounded-md text-white lg:w-80 p-5 bg-gray-950">
+            <div className="sidebar w-screen m-1 rounded-md text-white lg:w-80 bg-gray-950">
                 <SideBar />
             </div>
             <div className="flex-grow border rounded-md border-gray-500 m-1 p-4">
-                <h1 className="text-center text-xl sm:text-2xl w-full mb-4">Payments</h1>
+                <h1 className="text-center text-xl sm:text-2xl w-full mb-5">Payments</h1>
                 <hr className="mb-4" />
                 <div className="flex flex-col sm:flex-row justify-center gap-4">
                     <button onClick={() => console.log(userLog)} className="bg-sky-500 p-3 sm:p-5 rounded-md">

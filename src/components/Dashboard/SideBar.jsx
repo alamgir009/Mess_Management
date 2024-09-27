@@ -43,7 +43,7 @@ export const SideBar = () => {
 
   return (
     <div>
-      <h1 className="font-saira text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 text-xl lg:text-2xl pb-3">
+      <h1 className="font-saira text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 text-xl lg:text-2xl p-5">
         UnitedMess
       </h1>
       <div className="border-t border-gray-600">
@@ -51,16 +51,16 @@ export const SideBar = () => {
           <NavLink
             key={index}
             to={item.to}
-            className={({ isActive }) => `flex pt-5 items-center ${isActive ? 'text-yellow-300' : 'hover:text-sky-400'}`}
+            className={({ isActive }) => `flex lg:font-semibold p-3 lg:p-5 items-center ${isActive ? 'bg-teal-400/20' : 'hover:bg-teal-400/10'}`}
           >
             {item.icon}
             <h1 className="pl-5">{item.label}</h1>
           </NavLink>
         ))}
       </div>
-      <div className="border-b border-gray-600 pb-5" />
+      <div className="border-b border-gray-600 " />
       <div
-        className="flex pt-5 items-center w-full hover:text-red-500 cursor-pointer"
+        className="flex p-5 items-center w-full lg:font-semibold hover:bg-red-400/20 cursor-pointer"
         onClick={handleLogout}
       >
         <MdLogout size={21} />
