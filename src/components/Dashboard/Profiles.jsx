@@ -47,10 +47,16 @@ const Profiles = () => {
             </div>
 
             <div className="flex-grow border rounded-md border-gray-500 m-1 p-4">
-                <h1 className="text-center text-xl sm:text-2xl w-full mb-4">
-                    Profile /{" "}
+                <h1 className="text-xl sm:text-2xl w-full mb-4">
+
                     {profile ? (
-                        <span className="text-sky-500 capitalize">{profile.role}</span>
+                        <>
+                            <h2 className="text-lg font-semibold text-gray-400">
+                                Profile:
+                                <span className="text-lime-500 capitalize"> {profile.name} </span>
+                                <span className="text-sky-500 capitalize">( {profile.role} )</span>
+                            </h2>
+                        </>
                     ) : (
                         <p>No profile data available.</p>
                     )}
@@ -58,9 +64,7 @@ const Profiles = () => {
 
                 {profile ? (
                     <div className="space-y-4">
-                        <h2 className="text-lg text-center bg-teal-500 rounded-sm font-semibold">
-                            Hello <span>{profile.name}</span>
-                        </h2>
+
 
                         {/* Market Details */}
                         {profile.marketDetails && profile.marketDetails.length > 0 ? (
