@@ -15,21 +15,21 @@ export const About = () => {
 
       <div className='flex flex-wrap justify-center items-center gap-5 md:gap-10 lg:gap-20 py-10'>
         <div className='flex flex-col justify-center items-center p-5 text-center bg-gradient-to-br from-blue-800 to-purple-600 rounded-lg shadow-lg w-full md:w-5/12 lg:w-1/3'>
-          <FaLightbulb size={60} className='text-yellow-400 mb-5'/>
+          <FaLightbulb size={60} className='text-yellow-400 mb-5' />
           <h2 className='text-3xl md:text-4xl font-inter font-semibold mb-5 text-white'>Our Mission</h2>
           <p className='font-inter text-lg text-gray-200'>
             Our mission is to simplify your cooking routine with seamless meal management solutions. At UnitedMess, we strive to make every meal a delightful experience.
           </p>
         </div>
         <div className='flex flex-col justify-center items-center p-5 text-center bg-gradient-to-br from-green-800 to-teal-600 rounded-lg shadow-lg w-full md:w-5/12 lg:w-1/3'>
-          <FaAward size={60} className='text-red-400 mb-5'/>
+          <FaAward size={60} className='text-red-400 mb-5' />
           <h2 className='text-3xl md:text-4xl font-inter font-semibold mb-5 text-white'>Our Values</h2>
           <p className='font-inter text-lg text-gray-200'>
             Integrity, innovation, and customer satisfaction are at the heart of UnitedMess. We believe in creating solutions that enhance your culinary experience while upholding our commitment to quality.
           </p>
         </div>
         <div className='flex flex-col justify-center items-center p-5 text-center bg-gradient-to-br from-yellow-800 to-orange-600 rounded-lg shadow-lg w-full md:w-5/12 lg:w-1/3'>
-          <FaRocket size={60} className='text-blue-400 mb-5'/>
+          <FaRocket size={60} className='text-blue-400 mb-5' />
           <h2 className='text-3xl md:text-4xl font-inter font-semibold mb-5 text-white'>Our Vision</h2>
           <p className='font-inter text-lg text-gray-200'>
             At UnitedMess, our vision is to revolutionize meal management with cutting-edge technology, ensuring that every meal is an enjoyable and stress-free experience.
@@ -46,23 +46,23 @@ export const About = () => {
         </p>
         <div className='flex flex-wrap justify-center items-center gap-5 md:gap-10'>
           <div className='flex flex-col justify-center items-center bg-purple-900 p-5 rounded-lg shadow-lg w-36 h-36 md:w-44 md:h-44 lg:w-52 lg:h-52'>
-            <FaUsers size={50} className='text-blue-400 mb-3'/>
+            <FaUsers size={50} className='text-blue-400 mb-3' />
             <h3 className='text-xl font-semibold text-white'>Teamwork</h3>
           </div>
           <div className='flex flex-col justify-center items-center bg-pink-900 p-5 rounded-lg shadow-lg w-36 h-36 md:w-44 md:h-44 lg:w-52 lg:h-52'>
-            <FaLightbulb size={50} className='text-yellow-400 mb-3'/>
+            <FaLightbulb size={50} className='text-yellow-400 mb-3' />
             <h3 className='text-xl font-semibold text-white'>Innovation</h3>
           </div>
           <div className='flex flex-col justify-center items-center bg-indigo-900 p-5 rounded-lg shadow-lg w-36 h-36 md:w-44 md:h-44 lg:w-52 lg:h-52'>
-            <FaAward size={50} className='text-green-400 mb-3'/>
+            <FaAward size={50} className='text-green-400 mb-3' />
             <h3 className='text-xl font-semibold text-white'>Excellence</h3>
           </div>
           <div className='flex flex-col justify-center items-center bg-green-900 p-5 rounded-lg shadow-lg w-36 h-36 md:w-44 md:h-44 lg:w-52 lg:h-52'>
-            <FaHeart size={50} className='text-red-400 mb-3'/>
+            <FaHeart size={50} className='text-red-400 mb-3' />
             <h3 className='text-xl font-semibold text-white'>Passion</h3>
           </div>
           <div className='flex flex-col justify-center items-center bg-blue-900 p-5 rounded-lg shadow-lg w-36 h-36 md:w-44 md:h-44 lg:w-52 lg:h-52'>
-            <FaPaintBrush size={50} className='text-orange-400 mb-3'/>
+            <FaPaintBrush size={50} className='text-orange-400 mb-3' />
             <h3 className='text-xl font-semibold text-white'>Creativity</h3>
           </div>
         </div>
@@ -75,7 +75,7 @@ export const About = () => {
         <div className='flex flex-col items-center'>
           <div className='flex items-center mb-3'>
             <FaEnvelope className='text-yellow-400 mr-2' />
-            <a href="mailto:alamgirislam009@gmail.com" className='text-lg md:text-xl text-gray-200'>alamgirislam009@gmail.com</a>
+            <a href="mailto:unitedmess96@gmail.com" className='text-lg md:text-xl text-gray-200'>unitedmess96@gmail.com</a>
           </div>
           <div className='flex items-center'>
             <FaPhone className='text-green-400 mr-2' />

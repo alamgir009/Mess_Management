@@ -60,7 +60,7 @@ const requestOTP = async (req, res) => {
                 Best regards,<br><br>
                 UnitedMess<br>
                 Phone: 9052920326<br>
-                Email: alamgirislam009@gmail.com
+                Email: unitedmess96@gmail.com
               </p>
             </div>
             <div class="text-center text-sm text-gray-600 py-4 bg-gray-200 rounded-b-lg">

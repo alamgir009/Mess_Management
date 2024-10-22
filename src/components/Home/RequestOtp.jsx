@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
@@ -7,15 +7,18 @@ import { addUserId } from '../../store/slices/resetPasswordSlice';
 
 export const RequestOtp = () => {
   const navigate = useNavigate();
-
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const [otpRequested, setOtpRequested] = useState(false);
-  const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState(Array(6).fill(""));
+  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState(Array(6).fill(''));
+  const [otpCooldown, setOtpCooldown] = useState(false); // Cooldown flag
+  const [otpResendTime, setOtpResendTime] = useState(0); // Timer for resend
 
+  // Function to handle OTP request with cooldown
   const handleRequestOtp = async (e) => {
     e.preventDefault();
+    if (otpCooldown) return; // Prevent repeated OTP requests during cooldown
     try {
       const response = await axios.post(
         'http://localhost:8080/user/requestotp',
@@ -23,17 +26,32 @@ export const RequestOtp = () => {
         { withCredentials: true }
       );
       if (response) {
-        toast.success(response.data.message, {
-          duration: 2000,
-        });
+        toast.success(response.data.message, { duration: 2000 });
         setOtpRequested(true);
+        setOtpCooldown(true); // Start cooldown
+        setOtpResendTime(60); // Set 60 seconds cooldown
       }
     } catch (error) {
       toast.error(error.response.data.message);
     }
   };
 
+  // Countdown timer for OTP resend
+  useEffect(() => {
+    let timer;
+    if (otpCooldown && otpResendTime > 0) {
+      timer = setInterval(() => {
+        setOtpResendTime((prevTime) => prevTime - 1);
+      }, 1000);
+    } else if (otpResendTime === 0) {
+      setOtpCooldown(false); // Reset cooldown when time runs out
+    }
+    return () => clearInterval(timer);
+  }, [otpCooldown, otpResendTime]);
+
+  // Resend OTP handler with the same cooldown logic
   const handleResend = async () => {
+    if (otpCooldown) return; // Prevent resending during cooldown
     try {
       const response = await axios.post(
         'http://localhost:8080/user/requestotp',
@@ -41,9 +59,9 @@ export const RequestOtp = () => {
         { withCredentials: true }
       );
       if (response) {
-        toast.success(response.data.message, {
-          duration: 2000,
-        });
+        toast.success(response.data.message, { duration: 2000 });
+        setOtpCooldown(true); // Restart cooldown on resend
+        setOtpResendTime(60); // Reset 60 seconds cooldown
       }
     } catch (error) {
       toast.error(error.response.data.message);
@@ -52,37 +70,32 @@ export const RequestOtp = () => {
 
   const handleSubmitOtp = async (e) => {
     e.preventDefault();
-    const otpCode = otp.join("");
+    const otpCode = otp.join('');
     try {
       const response = await axios.post(
         'http://localhost:8080/user/validateotp',
         { email, otp: otpCode },
         { withCredentials: true }
       );
-      console.log(response.data)
       if (response) {
-        toast.success(response.data.message, {
-          duration: 2000,
-        });
-        dispatch(addUserId(response.data.userId))
-        setTimeout(()=>{
+        toast.success(response.data.message, { duration: 2000 });
+        dispatch(addUserId(response.data.userId));
+        setTimeout(() => {
           navigate('/resetpassword');
-        },3000)
+        }, 3000);
       }
     } catch (error) {
-      toast.error(error.response.data.message, {
-        duration: 2000,
-      });
+      toast.error(error.response.data.message, { duration: 2000 });
     }
   };
 
   const handleOtpChange = (e, index) => {
     const { value } = e.target;
-    if (/^[0-9]$/.test(value) || value === "") {
+    if (/^[0-9]$/.test(value) || value === '') {
       const newOtp = [...otp];
       newOtp[index] = value;
       setOtp(newOtp);
-      if (value !== "" && index < 5) {
+      if (value !== '' && index < 5) {
         document.getElementById(`otp-${index + 1}`).focus();
       }
     }
@@ -91,12 +104,12 @@ export const RequestOtp = () => {
   return (
     <div className="bg-gradient-to-b from-black to-blue-950 text-gray-50 mt-20 h-screen flex justify-center items-center">
       <form
-        className="border border-green-300 p-5 font-inter w-full md:w-80 lg:w-80 xl:w-96 rounded-md m-2 -mt-20 bg-green-400/10"
+        className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-sky-300 p-8 rounded-lg shadow-lg w-full max-w-md -mt-20"
         onSubmit={handleRequestOtp}
       >
-        <h1 className="text-4xl mb-5 text-center">Request OTP</h1>
+        <h1 className="text-3xl mb-6 text-center text-sky-200 font-bold">Request OTP</h1>
 
-        <label htmlFor="email" className="block mb-3">
+        <label htmlFor="email" className='block text-sm font-medium text-gray-200 font-inter'>
           Email
           <input
             type="email"
@@ -104,7 +117,7 @@ export const RequestOtp = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="username@email.com"
-            className="inpt mt-1 w-full p-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-sky-500"
+            className='mt-1 p-2 w-full border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-gray-100 bg-gray-700'
             required
           />
         </label>
@@ -112,53 +125,55 @@ export const RequestOtp = () => {
         {!otpRequested && (
           <button
             type="submit"
-            className="bg-sky-500 hover:bg-sky-600 w-full rounded-md h-8 mt-2 font-semibold"
+            className="w-full mt-4 bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 rounded-md shadow transition duration-200"
+            disabled={otpCooldown}
           >
-            Request OTP
+            {otpCooldown ? `Wait ${otpResendTime}s` : 'Request OTP'}
           </button>
         )}
 
         {otpRequested && (
-          <div className="mt-5">
-            <h2 className="text-2xl mb-3 text-center">Enter OTP</h2>
-            <div className="flex justify-center space-x-2">
-              {otp.map((value, index) => (
-                <input
-                  key={index}
-                  id={`otp-${index}`}
-                  type="text"
-                  maxLength="1"
-                  value={value}
-                  onChange={(e) => handleOtpChange(e, index)}
-                  className="text-black w-10 h-10 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
-                />
-              ))}
+          <>
+            <div className="mt-5">
+              <h2 className="text-2xl mb-3 text-center font-bold text-sky-200">Enter OTP</h2>
+              <div className="flex justify-center space-x-2">
+                {otp.map((value, index) => (
+                  <input
+                    key={index}
+                    id={`otp-${index}`}
+                    type="text"
+                    maxLength="1"
+                    value={value}
+                    onChange={(e) => handleOtpChange(e, index)}
+                    className="text-gray-200 w-10 h-10 text-center border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 bg-gray-700"
+                  />
+                ))}
+              </div>
+              <p className="text-green-300 text-center mt-5 font-light text-sm lg:text-base">
+                OTP has been sent to your email.
+              </p>
             </div>
-            <p className="text-green-300 text-center mt-5 font-light text-sm lg:text-base">
-              OTP has been sent to your email.
+
+            <button
+              type="button"
+              className="w-full mt-4 bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 rounded-md shadow transition duration-200"
+              onClick={handleSubmitOtp}
+            >
+              Submit OTP
+            </button>
+
+            <p className="text-center p-5 font-light text-sm lg:text-base">
+              Didn't get OTP?{' '}
+              <span
+                className={`${otpCooldown ? 'text-gray-400' : 'text-green-300 cursor-pointer'
+                  }`}
+                onClick={handleResend}
+              >
+                {otpCooldown ? `Resend in ${otpResendTime}s` : 'Resend'}
+              </span>
             </p>
-          </div>
+          </>
         )}
-
-        {otpRequested && (
-          <button
-            type="button"
-            className="bg-sky-500 hover:bg-sky-600 w-full rounded-md h-8 mt-5 font-semibold"
-            onClick={handleSubmitOtp}
-          >
-            Submit OTP
-          </button>
-        )}
-
-        <p className="text-center p-5 font-light text-sm lg:text-base">
-          Didn't get OTP?{' '}
-          <span
-            className="text-green-300 cursor-pointer"
-            onClick={handleResend}
-          >
-            Resend
-          </span>
-        </p>
       </form>
       <Toaster position="top-center" reverseOrder={false} />
     </div>

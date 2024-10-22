@@ -46,7 +46,7 @@ export const SideBar = () => {
       <h1 className="font-saira text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 text-xl lg:text-2xl p-5">
         UnitedMess
       </h1>
-      <div className="border-t border-gray-600">
+      <div className="border-t border-gray-600 text-gray-300">
         {menuItems.map((item, index) => (
           <NavLink
             key={index}

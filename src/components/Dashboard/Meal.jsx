@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { SideBar } from './SideBar';
-
 import { Toaster, toast } from 'react-hot-toast';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -39,63 +38,67 @@ const Meal = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row justify-between text-white bg-gradient-to-b from-black to-blue-950 h-screen">
-      <div className="sidebar w-screen m-1 rounded-md text-white lg:w-80 bg-gray-950">
+    <div className="flex flex-col lg:flex-row justify-between bg-gradient-to-b from-gray-900 to-blue-950 h-screen text-gray-100">
+      {/* Sidebar */}
+      <div className="sidebar w-full lg:w-80 bg-gray-950 rounded-md lg:m-1 shadow-lg">
         <SideBar />
       </div>
-      <div className="flex-grow border rounded-md border-gray-500 m-1 p-4">
-        <h1 className="text-center text-xl sm:text-2xl w-full mb-4">Meals</h1>
-        <hr className="mb-4" />
-        <div className="flex justify-center gap-4">
-          <form
-            className="border border-green-300 p-5 font-inter w-full md:w-80 lg:w-80 xl:w-96 rounded-md lg:mt-20 bg-green-400/10"
-            onSubmit={handleSubmit}
-          >
-            <h1 className="text-4xl mb-5 text-center">Add Meal</h1>
 
-            <label htmlFor="mealTime" className="block mb-2">
-              Meal Time
+      {/* Form Container */}
+      <div className="flex-grow flex flex-col justify-center items-center p-4 lg:ml-5">
+        <div className="w-full max-w-lg bg-black/50 border border-gray-600 rounded-lg shadow-xl p-8 backdrop-blur-md">
+          <h1 className="text-3xl text-center font-bold text-sky-200 mb-8">Add Meal</h1>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+
+            {/* Meal Time Selection */}
+            <div className="flex flex-col">
+              <label htmlFor="mealTime" className="text-sm font-medium text-gray-300 mb-2">Meal Time</label>
               <select
                 id="mealTime"
                 name="mealTime"
                 value={formData.mealTime}
                 onChange={handleChange}
-                className="w-full p-2 border rounded-md text-black"
+                className="w-full p-3 bg-gray-700 text-gray-300 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
-                <option value="">Select an meal</option>
+                <option value="" disabled>Select a meal</option>
                 {meal_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
+                  <option key={option} value={option} className="text-gray-300 bg-gray-900">
                     {option}
                   </option>
                 ))}
               </select>
-            </label>
+            </div>
 
-
-            <label htmlFor="date" className="block mb-2">
-              Date
+            {/* Date Input */}
+            <div className="flex flex-col">
+              <label htmlFor="date" className="text-sm font-medium text-gray-300 mb-2">Date</label>
               <input
                 type="date"
                 id="date"
                 name="date"
-                placeholder="02/10/24"
                 value={formData.date}
                 onChange={handleChange}
-                className="w-full p-2 border rounded-md text-black"
+                className="w-full p-3 bg-gray-700 text-gray-300 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
-            </label>
+            </div>
 
-            <button
-              type="submit"
-              className="bg-sky-500 hover:bg-sky-600 w-full rounded-md p-2 mt-4 font-semibold"
-            >
-              Add Meal
-            </button>
+            {/* Submit Button */}
+            <div>
+              <button
+                type="submit"
+                className="w-full py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Add Meal
+              </button>
+            </div>
+
           </form>
         </div>
       </div>
+
       <Toaster position="top-center" reverseOrder={false} />
     </div>
   );

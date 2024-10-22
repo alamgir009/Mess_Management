@@ -43,82 +43,42 @@ export const Register = () => {
   };
 
   return (
-    <div className='bg-gradient-to-b from-black to-blue-950 text-gray-50 mt-20 h-screen flex justify-center items-center'>
+    <div className='bg-gradient-to-b from-black to-blue-950 text-white min-h-screen flex justify-center items-center mt-20'>
       <form
         onSubmit={handleSubmit}
-        className='border border-green-300 p-5 font-inter w-full md:w-80 lg:w-80 xl:w-96 rounded-md m-2 lg:-mt-20 bg-green-400/10'
+        className='bg-gray-500 bg-opacity-10 backdrop-blur-md border border-sky-300 p-8 rounded-lg shadow-lg w-full max-w-md -mt-20'
       >
-        <h1 className='text-4xl mb-5 text-center'>Sign up</h1>
-        <label htmlFor='name'>
-          Name
-          <input
-            type='text'
-            name='name'
-            placeholder='Enter your name'
-            className='inpt'
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <label htmlFor='email'>
-          Email
-          <input
-            type='email'
-            name='email'
-            placeholder='username@email.com'
-            className='inpt'
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <label htmlFor='phone'>
-          Phone
-          <input
-            type='tel'
-            name='phone'
-            placeholder='+91'
-            className='inpt'
-            value={formData.phone}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <label htmlFor='password'>
-          Password
-          <input
-            type='password'
-            name='password'
-            placeholder='password'
-            className='inpt'
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <label htmlFor='confirmPassword'>
-          Confirm Password
-          <input
-            type='password'
-            name='confirmPassword'
-            placeholder='Confirm password'
-            className='inpt'
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-          />
-        </label>
-        <button className='bg-sky-500 hover:bg-sky-600 w-full rounded-md h-8 mt-2 font-semibold'>
-          Sign up
+        <h1 className='text-3xl mb-6 text-center text-sky-300 font-bold'>Sign Up</h1>
+
+        {/* Form Fields */}
+        {['name', 'email', 'phone', 'password', 'confirmPassword'].map((field, index) => (
+          <div key={field} className='mb-4'>
+            <label htmlFor={field} className='block text-sm font-medium text-gray-200'>
+              {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
+            </label>
+            <input
+              type={field.includes('password') ? 'password' : field === 'phone' ? 'tel' : 'text'}
+              name={field}
+              placeholder={field === 'phone' ? '+91' : `Enter your ${field}`}
+              className='mt-1 p-2 w-full border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-gray-100 bg-gray-700'
+              value={formData[field]}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        ))}
+
+        <button className='bg-sky-500 hover:bg-sky-600 w-full rounded-md h-10 mt-4 font-semibold transition duration-200'>
+          Sign Up
         </button>
-        <p className='text-center p-5 font-light text-sm'>
+
+        <p className='text-center mt-4 text-sm text-gray-200'>
           Already have an account?{' '}
           <span
-            className='text-green-300 cursor-pointer'
+            className='text-green-300 cursor-pointer hover:underline font-inter'
             onClick={() => navigate('/signin')}
           >
-            Sign in
+            Sign In
           </span>
         </p>
       </form>

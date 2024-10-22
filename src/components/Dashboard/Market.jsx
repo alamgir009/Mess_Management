@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { SideBar } from './SideBar';
-
 import { Toaster, toast } from 'react-hot-toast';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -40,41 +39,41 @@ const Market = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row justify-between text-white bg-gradient-to-b from-black to-blue-950 h-screen">
-      <div className="sidebar w-screen m-1 rounded-md text-white lg:w-80 bg-gray-950">
+    <div className="flex flex-col lg:flex-row justify-between bg-gradient-to-b from-gray-900 to-blue-950 h-screen text-gray-100">
+      {/* Sidebar */}
+      <div className="sidebar w-full lg:w-80 bg-gray-950 rounded-md lg:m-1 shadow-lg">
         <SideBar />
       </div>
-      <div className="flex-grow border rounded-md border-gray-500 m-1 p-4">
-        <h1 className="text-center text-xl sm:text-2xl w-full mb-4">Markets</h1>
-        <hr className="mb-4" />
-        <div className="flex justify-center gap-4">
-          <form
-            className="border border-green-300 p-5 font-inter w-full md:w-80 lg:w-80 xl:w-96 rounded-md lg:mt-20 bg-green-400/10"
-            onSubmit={handleSubmit}
-          >
-            <h1 className="text-4xl mb-5 text-center">Add Market</h1>
 
-            <label htmlFor="items" className="block mb-2">
-              items
+      {/* Form Container */}
+      <div className="flex-grow flex flex-col justify-center items-center p-4 lg:ml-5">
+        <div className="w-full max-w-lg bg-black/45 border border-gray-600  backdrop-blur-sm rounded-lg shadow-lg p-8">
+          <h1 className="text-3xl text-center font-bold text-sky-200 mb-8">Add Market</h1>
+          <form onSubmit={handleSubmit} className="space-y-5">
+
+            {/* Items Selection */}
+            <div>
+              <label htmlFor="items" className="block text-sm font-medium text-gray-300 mb-2">Items</label>
               <select
                 id="items"
                 name="items"
                 value={formData.items}
                 onChange={handleChange}
-                className="w-full p-2 border rounded-md text-black"
+                className="w-full p-3 bg-gray-700 text-gray-300 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
-                <option value="">Select an items</option>
+                <option value="" disabled>Select an item</option>
                 {items_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
+                  <option key={option} value={option} className="text-gray-300 bg-black/70">
                     {option}
                   </option>
                 ))}
               </select>
-            </label>
+            </div>
 
-            <label htmlFor="amount" className="block mb-2">
-              Amount
+            {/* Amount Input */}
+            <div>
+              <label htmlFor="amount" className="block text-sm font-medium text-gray-300 mb-2">Amount</label>
               <input
                 type="number"
                 id="amount"
@@ -82,31 +81,34 @@ const Market = () => {
                 placeholder="₹"
                 value={formData.amount}
                 onChange={handleChange}
-                className="w-full p-2 border rounded-md text-black"
+                className="w-full p-3 bg-gray-700 text-gray-300 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
-            </label>
+            </div>
 
-            <label htmlFor="date" className="block mb-2">
-              Date
+            {/* Date Input */}
+            <div>
+              <label htmlFor="date" className="block text-sm font-medium text-gray-300 mb-2">Date</label>
               <input
                 type="date"
                 id="date"
                 name="date"
-                placeholder="02/10/24"
                 value={formData.date}
                 onChange={handleChange}
-                className="w-full p-2 border rounded-md text-black"
+                className="w-full p-3 bg-gray-700 text-gray-300 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
-            </label>
+            </div>
 
-            <button
-              type="submit"
-              className="bg-sky-500 hover:bg-sky-600 w-full rounded-md p-2 mt-4 font-semibold"
-            >
-              Add Market
-            </button>
+            {/* Submit Button */}
+            <div>
+              <button
+                type="submit"
+                className="w-full p-3 bg-blue-600 text-gray-100 font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+              >
+                Add Market
+              </button>
+            </div>
           </form>
         </div>
       </div>
