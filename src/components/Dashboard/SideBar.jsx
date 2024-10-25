@@ -26,7 +26,7 @@ export const SideBar = () => {
       }
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'There was an error';
-      toast.error(errorMessage);
+      alert(errorMessage);
     }
   };
 
