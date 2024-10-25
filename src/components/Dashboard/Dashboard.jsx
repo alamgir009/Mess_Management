@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getUsers } from '../../store/slices/userSlice';
 import { SideBar } from './SideBar';
-import { Toaster } from 'react-hot-toast';
+// import { Toaster } from 'react-hot-toast';
 
 export const Dashboard = () => {
 
@@ -108,7 +108,7 @@ export const Dashboard = () => {
           </table>
         </div>
       </div>
-      <Toaster position="top-center" reverseOrder={false} />
+      {/* <Toaster position="top-center" reverseOrder={false} /> */}
     </div>
   );
 };
