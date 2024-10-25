@@ -46,7 +46,7 @@ export const Login = () => {
         className='bg-gray-500 bg-opacity-10 backdrop-blur-md border border-sky-300 p-8 rounded-lg shadow-lg w-full max-w-md -mt-20'
         onSubmit={handleSubmit}
       >
-        <h1 className='text-3xl mb-6 text-center text-sky-300 font-bold'>Sign In</h1>
+        <h1 className='text-3xl mb-6 text-center text-sky-300 font-bold'>Sign in</h1>
 
         <div className='mb-4'>
           <label htmlFor='email' className='block text-sm font-medium text-gray-200 font-inter'>Email</label>
@@ -81,7 +81,7 @@ export const Login = () => {
         </div>
 
         <button className='w-full mt-4 bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 rounded-md shadow transition duration-200'>
-          Sign In
+          Sign in
         </button>
 
         <p className='text-center mt-6 text-sm text-gray-200'>
@@ -90,7 +90,7 @@ export const Login = () => {
             className='text-green-300 cursor-pointer hover:underline font-inter'
             onClick={() => navigate('/register')}
           >
-            Sign Up
+            Sign up
           </span>
         </p>
       </form>

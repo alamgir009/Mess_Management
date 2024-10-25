@@ -48,7 +48,7 @@ export const Register = () => {
         onSubmit={handleSubmit}
         className='bg-gray-500 bg-opacity-10 backdrop-blur-md border border-sky-300 p-8 rounded-lg shadow-lg w-full max-w-md -mt-20'
       >
-        <h1 className='text-3xl mb-6 text-center text-sky-300 font-bold'>Sign Up</h1>
+        <h1 className='text-3xl mb-6 text-center text-sky-300 font-bold'>Sign up</h1>
 
         {/* Form Fields */}
         {['name', 'email', 'phone', 'password', 'confirmPassword'].map((field, index) => (
@@ -69,7 +69,7 @@ export const Register = () => {
         ))}
 
         <button className='bg-sky-500 hover:bg-sky-600 w-full rounded-md h-10 mt-4 font-semibold transition duration-200'>
-          Sign Up
+          Sign up
         </button>
 
         <p className='text-center mt-4 text-sm text-gray-200'>
@@ -78,7 +78,7 @@ export const Register = () => {
             className='text-green-300 cursor-pointer hover:underline font-inter'
             onClick={() => navigate('/signin')}
           >
-            Sign In
+            Sign in
           </span>
         </p>
       </form>
