@@ -111,6 +111,30 @@ const getProfile = async (req, res) => {
           as: "mealDetails",
         },
       },
+      // Add fields for totalAmount and totalMeal with custom meal counting logic
+      {
+        $addFields: {
+          totalAmount: { $sum: "$marketDetails.amount" }, // Sum of 'amount' in 'marketDetails'
+          totalMeal: {
+            $reduce: {
+              input: "$mealDetails",
+              initialValue: 0,
+              in: {
+                $add: [
+                  "$$value",
+                  {
+                    $cond: [
+                      { $eq: ["$$this.mealTime", "both"] },
+                      2, // Add 2 if mealTime is 'both'
+                      1, // Add 1 if mealTime is 'day' or 'night'
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
       {
         $project: {
           name: 1,
@@ -131,6 +155,8 @@ const getProfile = async (req, res) => {
             mealTime: 1,
             date: 1,
           },
+          totalAmount: 1, // Include the calculated totalAmount
+          totalMeal: 1, // Include the calculated totalMeal
         },
       },
     ]);
@@ -173,6 +199,30 @@ const getUserById = async (req, res) => {
           as: "mealDetails",
         },
       },
+      // Add fields for totalAmount and totalMeal with custom meal counting logic
+      {
+        $addFields: {
+          totalAmount: { $sum: "$marketDetails.amount" }, // Sum of 'amount' in 'marketDetails'
+          totalMeal: {
+            $reduce: {
+              input: "$mealDetails",
+              initialValue: 0,
+              in: {
+                $add: [
+                  "$$value",
+                  {
+                    $cond: [
+                      { $eq: ["$$this.mealTime", "both"] },
+                      2, // Add 2 if mealTime is 'both'
+                      1, // Add 1 if mealTime is 'day' or 'night'
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
       {
         $project: {
           name: 1,
@@ -193,6 +243,8 @@ const getUserById = async (req, res) => {
             mealTime: 1,
             date: 1,
           },
+          totalAmount: 1, // Include the calculated totalAmount
+          totalMeal: 1, // Include the calculated totalMeal
         },
       },
     ]);

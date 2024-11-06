@@ -9,7 +9,7 @@ import { RiMoneyRupeeCircleFill } from "react-icons/ri";
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { logout } from '../../store/slices/userLogSlice';
-// import { Toaster, toast } from 'react-hot-toast';
+
 
 export const SideBar = () => {
   const dispatch = useDispatch();
@@ -66,7 +66,6 @@ export const SideBar = () => {
         <MdLogout size={21} />
         <button className="pl-5">Signout</button>
       </div>
-      {/* <Toaster position="top-center" reverseOrder={false} /> */}
     </div>
   );
 };
