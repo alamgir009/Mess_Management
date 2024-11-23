@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useMemo } from "react";
 import { SideBar } from "./SideBar";
 import { useDispatch, useSelector } from "react-redux";
 import { Toaster } from "react-hot-toast";
@@ -9,28 +9,16 @@ const Profiles = () => {
     const { profile, loading, error } = useSelector((state) => state.userData);
 
     const mealCount = useMemo(() => {
-        if (profile?.mealDetails) {
-            return profile.mealDetails.reduce((count, meal) => {
-                return count + (meal.mealTime === "both" ? 2 : meal.mealTime ? 1 : 0);
-            }, 0);
-        }
-        return 0;
+        return profile?.mealDetails?.reduce((count, meal) => count + (meal.mealTime === "both" ? 2 : 1), 0) || 0;
     }, [profile?.mealDetails]);
 
     const marketCount = useMemo(() => {
-        if (profile?.marketDetails) {
-            return profile.marketDetails.reduce((count, market) => count + (market.amount >= 1 ? market.amount : 0), 0);
-        }
-        return 0;
+        return profile?.marketDetails?.reduce((count, market) => count + (market.amount >= 1 ? market.amount : 0), 0) || 0;
     }, [profile?.marketDetails]);
 
-    const fetchProfileData = useCallback(() => {
+    useEffect(() => {
         dispatch(fetchProfile());
     }, [dispatch]);
-
-    useEffect(() => {
-        fetchProfileData();
-    }, [fetchProfileData]);
 
     const getWeekday = (date) => new Date(date).toLocaleString("default", { weekday: "long" });
 
@@ -55,32 +43,32 @@ const Profiles = () => {
                     )}
                 </h1>
                 <ul className="flex flex-col sm:flex-row gap-4 justify-center items-center text-center">
-                    <li className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 m-1" onClick={() => console.log(profile)}>
-                        <p className="text-blue-400 text-2xl">167540</p> Total Market
+                    <li className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 m-1">
+                        <p className="text-blue-400 text-2xl">{marketCount}</p> Total Market
                     </li>
                     <li className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 m-1">
-                        <p className="text-blue-400 text-2xl">441</p> Total Meal
+                        <p className="text-blue-400 text-2xl">{mealCount}</p> Total Meal
                     </li>
                     <li className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 m-1">
                         <p className="text-blue-400 text-2xl">44</p> Meal Charge
                     </li>
                     <li className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 m-1">
-                        <p className={`text-2xl ${profile.payment === "success" ? "text-green-400" : "text-orange-400"}`}>{profile.payment}</p> Payment
+                        <p className={`text-2xl ${profile?.payment === "success" ? "text-green-400" : "text-orange-400"}`}>{profile?.payment}</p> Payment
                     </li>
                 </ul>
 
                 {profile && (
                     <div className="space-y-4">
-                        {profile.marketDetails && profile.marketDetails.length > 0 ? (
+                        {profile.marketDetails?.length > 0 ? (
                             <div className="space-y-4">
                                 <h2 className="text-lg font-semibold text-gray-400">
                                     Market Details: ( <span className="text-sky-400">{profile.marketDetails.length}</span> )
                                 </h2>
                                 <h2 className="text-lg font-semibold text-gray-400">
-                                    Market Amount: ( <span className="text-sky-400">{profile.totalAmount}</span> )
+                                    Market Amount: ( <span className="text-sky-400">{marketCount}</span> )
                                 </h2>
                                 <div className="max-h-64 overflow-y-auto rounded-lg shadow-lg border border-gray-700">
-                                    <table className="min-w-full bg-gray-900 text-white relative">
+                                    <table className="min-w-full bg-gray-900 text-white">
                                         <thead className="sticky top-0">
                                             <tr className="bg-teal-700 text-left text-sm">
                                                 <th className="py-2 px-4">No.</th>
@@ -111,13 +99,13 @@ const Profiles = () => {
                             <p className="text-sm">No market details available.</p>
                         )}
 
-                        {profile.mealDetails && profile.mealDetails.length > 0 ? (
+                        {profile.mealDetails?.length > 0 ? (
                             <div className="space-y-4">
                                 <h2 className="text-lg font-semibold text-gray-400">
-                                    Meal Details: ( <span className="text-sky-400">{profile.totalMeal}</span> )
+                                    Meal Details: ( <span className="text-sky-400">{mealCount}</span> )
                                 </h2>
                                 <div className="max-h-44 overflow-y-auto rounded-lg shadow-lg border border-gray-700">
-                                    <table className="min-w-full bg-gray-900 text-white relative">
+                                    <table className="min-w-full bg-gray-900 text-white">
                                         <thead className="sticky top-0">
                                             <tr className="bg-teal-700 text-left text-sm">
                                                 <th className="py-2 px-4">No.</th>
