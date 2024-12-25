@@ -11,6 +11,62 @@ const getAllMeals = async (req, res) => {
   }
 };
 
+// Get Grand total meal of all users
+const totalMeal = async (req, res) => {
+  try {
+    const totalMeal = await MealModel.aggregate([
+      {
+        $addFields: {
+          mealValue: {
+            $switch: {
+              branches: [
+                {
+                  case: {
+                    $eq: ["$mealTime", "day"],
+                  },
+                  then: 1,
+                },
+                {
+                  case: {
+                    $eq: ["$mealTime", "night"],
+                  },
+                  then: 1,
+                },
+                {
+                  case: {
+                    $eq: ["$mealTime", "both"],
+                  },
+                  then: 2,
+                },
+              ],
+              default: 0,
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$mealOwner",
+          overAllMeal: {
+            $sum: "$mealValue",
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          grandTotalMeal: {
+            $sum: "$overAllMeal",
+          },
+        },
+      },
+    ]);
+    return res.status(200).json(totalMeal);
+  } catch (error) {
+    return res.status(500).json({ message: "Something went worng!" });
+  }
+};
+
 // add new meal via (POST)
 const addMeals = async (req, res) => {
   const { id } = req.user;
@@ -148,6 +204,7 @@ const deleteMealByAdmin = async (req, res) => {
 
 module.exports = {
   getAllMeals,
+  totalMeal,
   addMeals,
   getMealById,
   mealUpdatedById,

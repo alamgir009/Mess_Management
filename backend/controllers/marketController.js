@@ -11,6 +11,26 @@ const getAllMarkets = async (req, res) => {
   }
 };
 
+// Get total market
+const getTotalMarket = async (req, res) => {
+  try {
+    const totalMarket = await MarketModel.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalAmount: {
+            $sum: "$amount",
+          },
+        },
+      },
+    ]);
+
+    return res.status(200).json(totalMarket);
+  } catch (error) {
+    return res.status(500).json({ message: "Something went wrong!" });
+  }
+};
+
 // add new market via (POST)
 const addMarkets = async (req, res) => {
   const { id } = req.user;
@@ -150,6 +170,7 @@ const deleteMarketByAdmin = async (req, res) => {
 
 module.exports = {
   getAllMarkets,
+  getTotalMarket,
   addMarkets,
   getMarketById,
   marketUpdatedById,

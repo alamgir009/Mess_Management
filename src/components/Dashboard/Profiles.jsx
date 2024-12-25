@@ -7,6 +7,7 @@ import { fetchProfile } from "../../store/slices/userSlice";
 const Profiles = () => {
     const dispatch = useDispatch();
     const { profile, loading, error } = useSelector((state) => state.userData);
+    let dataOfMArkets = useSelector((state) => state.marketData)
 
     const mealCount = useMemo(() => {
         return profile?.mealDetails?.reduce((count, meal) => count + (meal.mealTime === "both" ? 2 : 1), 0) || 0;
@@ -18,6 +19,7 @@ const Profiles = () => {
 
     useEffect(() => {
         dispatch(fetchProfile());
+        console.log(dataOfMArkets)
     }, [dispatch]);
 
     const getWeekday = (date) => new Date(date).toLocaleString("default", { weekday: "long" });
@@ -42,7 +44,7 @@ const Profiles = () => {
                         <p>No profile data available.</p>
                     )}
                 </h1>
-                <ul className="flex flex-col sm:flex-row gap-4 justify-center items-center text-center">
+                <ul className="flex flex-col sm:flex-row gap-4 justify-center items-center text-center text-gray-300">
                     <li className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 m-1">
                         <p className="text-blue-400 text-2xl">{marketCount}</p> Total Market
                     </li>
