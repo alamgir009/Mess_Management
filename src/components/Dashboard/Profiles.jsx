@@ -3,29 +3,38 @@ import { SideBar } from "./SideBar";
 import { useDispatch, useSelector } from "react-redux";
 import { Toaster } from "react-hot-toast";
 import { fetchProfile } from "../../store/slices/userSlice";
+import { fetchGrandTotalAmount } from "../../store/slices/marketSlice";
+import { fetchAllMeals, fetchTotalMeals } from "../../store/slices/mealSlice";
 
 const Profiles = () => {
     const dispatch = useDispatch();
-    const { profile, loading, error } = useSelector((state) => state.userData);
-    let dataOfMArkets = useSelector((state) => state.marketData)
 
+    const { profile, loading, error } = useSelector((state) => state.userData);
+    const { grandTotalAmount, marketLoading, marketError } = useSelector((state) => state.marketData);
+    const { totalMeal } = useSelector((state) => state.mealData);
+
+    // Memoized calculation for total meal count
     const mealCount = useMemo(() => {
         return profile?.mealDetails?.reduce((count, meal) => count + (meal.mealTime === "both" ? 2 : 1), 0) || 0;
     }, [profile?.mealDetails]);
 
+    // Memoized calculation for market amount
     const marketCount = useMemo(() => {
         return profile?.marketDetails?.reduce((count, market) => count + (market.amount >= 1 ? market.amount : 0), 0) || 0;
     }, [profile?.marketDetails]);
 
     useEffect(() => {
         dispatch(fetchProfile());
-        console.log(dataOfMArkets)
+        dispatch(fetchGrandTotalAmount());
+        dispatch(fetchTotalMeals());
+        dispatch(fetchAllMeals())
+        console.log(totalMeal)
     }, [dispatch]);
 
     const getWeekday = (date) => new Date(date).toLocaleString("default", { weekday: "long" });
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p className="text-red-500">Error: {error}</p>;
+    if (loading || marketLoading) return <p>Loading...</p>;
+    if (error || marketError) return <p className="text-red-500">Error: {error || marketError}</p>;
 
     return (
         <div className="font-inter flex flex-col lg:flex-row justify-between text-white bg-gradient-to-b from-black to-blue-950 min-h-screen">
@@ -46,29 +55,51 @@ const Profiles = () => {
                 </h1>
                 <ul className="flex flex-col sm:flex-row gap-4 justify-center items-center text-center text-gray-300">
                     <li className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 m-1">
-                        <p className="text-blue-400 text-2xl">{marketCount}</p> Total Market
+                        <p className="text-blue-400 text-2xl">{grandTotalAmount || 0} ₹</p> Total Market
                     </li>
                     <li className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 m-1">
                         <p className="text-blue-400 text-2xl">{mealCount}</p> Total Meal
                     </li>
                     <li className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 m-1">
-                        <p className="text-blue-400 text-2xl">44</p> Meal Charge
+                        <p className="text-blue-400 text-2xl">{(grandTotalAmount / mealCount).toFixed(2) || 0} </p> Meal Charge
                     </li>
                     <li className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 m-1">
                         <p className={`text-2xl ${profile?.payment === "success" ? "text-green-400" : "text-orange-400"}`}>{profile?.payment}</p> Payment
                     </li>
                 </ul>
 
+                {/* Market and Meal Details */}
                 {profile && (
                     <div className="space-y-4">
+                        {/* Market Details */}
                         {profile.marketDetails?.length > 0 ? (
                             <div className="space-y-4">
-                                <h2 className="text-lg font-semibold text-gray-400">
-                                    Market Details: ( <span className="text-sky-400">{profile.marketDetails.length}</span> )
-                                </h2>
-                                <h2 className="text-lg font-semibold text-gray-400">
-                                    Market Amount: ( <span className="text-sky-400">{marketCount}</span> )
-                                </h2>
+                                <div className="flex flex-wrap gap-4 pt-4">
+                                    {/* Card 1: Market Details */}
+                                    <div className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 min-w-[250px]">
+                                        <h2 className="text-lg font-semibold text-gray-400">
+                                            Market Details:
+                                            <span className="text-sky-400"> {profile.marketDetails.length}</span>
+                                        </h2>
+                                    </div>
+
+                                    {/* Card 2: Market Amount */}
+                                    <div className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 min-w-[250px]">
+                                        <h2 className="text-lg font-semibold text-gray-400">
+                                            Market Amount:
+                                            <span className="text-sky-400"> {marketCount} ₹</span>
+                                        </h2>
+                                    </div>
+
+                                    {/* Card 3: Payable Amount */}
+                                    <div className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 min-w-[250px]">
+                                        <h2 className="text-lg font-semibold text-gray-400">
+                                            Payable Amount:
+                                            <span className="text-sky-400"> {(profile.marketDetails.length * (grandTotalAmount / mealCount)).toFixed(2) || 0} ₹</span>
+                                        </h2>
+                                    </div>
+                                </div>
+
                                 <div className="max-h-64 overflow-y-auto rounded-lg shadow-lg border border-gray-700">
                                     <table className="min-w-full bg-gray-900 text-white">
                                         <thead className="sticky top-0">
@@ -101,6 +132,7 @@ const Profiles = () => {
                             <p className="text-sm">No market details available.</p>
                         )}
 
+                        {/* Meal Details */}
                         {profile.mealDetails?.length > 0 ? (
                             <div className="space-y-4">
                                 <h2 className="text-lg font-semibold text-gray-400">
@@ -146,8 +178,8 @@ const Profiles = () => {
 // Helper function to format date
 const formatDate = (date) => {
     const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
 };

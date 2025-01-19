@@ -23,9 +23,15 @@ const getTotalMarket = async (req, res) => {
           },
         },
       },
+      {
+        $project: {
+          _id: 0, // Exclude the _id field
+          totalAmount: 1, // Include only the totalAmount field
+        },
+      },
     ]);
 
-    return res.status(200).json(totalMarket);
+    return res.status(200).json(totalMarket[0] || { totalAmount: 0 }); // Return the first result or default to 0
   } catch (error) {
     return res.status(500).json({ message: "Something went wrong!" });
   }

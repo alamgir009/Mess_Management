@@ -21,21 +21,15 @@ const totalMeal = async (req, res) => {
             $switch: {
               branches: [
                 {
-                  case: {
-                    $eq: ["$mealTime", "day"],
-                  },
+                  case: { $eq: ["$mealTime", "day"] },
                   then: 1,
                 },
                 {
-                  case: {
-                    $eq: ["$mealTime", "night"],
-                  },
+                  case: { $eq: ["$mealTime", "night"] },
                   then: 1,
                 },
                 {
-                  case: {
-                    $eq: ["$mealTime", "both"],
-                  },
+                  case: { $eq: ["$mealTime", "both"] },
                   then: 2,
                 },
               ],
@@ -60,10 +54,16 @@ const totalMeal = async (req, res) => {
           },
         },
       },
+      {
+        $project: {
+          _id: 0, // Exclude the _id field
+          grandTotalMeal: 1, // Include only the grandTotalMeal field
+        },
+      },
     ]);
-    return res.status(200).json(totalMeal);
+    return res.status(200).json(totalMeal[0]); // Return the object directly
   } catch (error) {
-    return res.status(500).json({ message: "Something went worng!" });
+    return res.status(500).json({ message: "Something went wrong!" });
   }
 };
 
