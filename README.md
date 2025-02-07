@@ -1,4 +1,4 @@
-# Mess Management System
+# United Mess
 
 The **Mess Management System** is a web application designed to help users manage their meals, track expenses, and update meal records seamlessly. This system provides an intuitive interface for users to add their meals, monitor their market expenses, and keep track of their daily meal consumption. Built with modern web technologies, the application ensures a smooth and efficient user experience.
 
