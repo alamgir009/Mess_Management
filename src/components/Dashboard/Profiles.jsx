@@ -58,10 +58,10 @@ const Profiles = () => {
                         <p className="text-blue-400 text-2xl">{grandTotalAmount || 0} ₹</p> Total Market
                     </li>
                     <li className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 m-1">
-                        <p className="text-blue-400 text-2xl">{mealCount}</p> Total Meal
+                        <p className="text-blue-400 text-2xl">{totalMeal?.grandTotalMeal}</p> Total Meal
                     </li>
                     <li className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 m-1">
-                        <p className="text-blue-400 text-2xl">{(grandTotalAmount / mealCount).toFixed(2) || 0} </p> Meal Charge
+                        <p className="text-blue-400 text-2xl">{(grandTotalAmount / totalMeal?.grandTotalMeal).toFixed(2) || 0} </p> Meal Charge
                     </li>
                     <li className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 m-1">
                         <p className={`text-2xl ${profile?.payment === "success" ? "text-green-400" : "text-orange-400"}`}>{profile?.payment}</p> Payment
