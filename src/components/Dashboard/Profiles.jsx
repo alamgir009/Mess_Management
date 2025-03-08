@@ -66,6 +66,9 @@ const Profiles = () => {
                     <li className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 m-1">
                         <p className={`text-2xl ${profile?.payment === "success" ? "text-green-400" : "text-orange-400"}`}>{profile?.payment}</p> Payment
                     </li>
+                    <li className="bg-gray-500 bg-opacity-10 backdrop-blur-md border border-teal-600 p-4 rounded-lg shadow-lg flex-1 m-1">
+                        <p className={`text-2xl ${profile?.payment === "success" ? "text-green-400" : "text-orange-400"}`}>{profile?.gasBill}</p> Gas Bill
+                    </li>
                 </ul>
 
                 {/* Market and Meal Details */}
