@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
   email: String,
   password: String,
   phone: Number,
+  image: String,
   role: { type: String, enum: ["admin", "user"], default: "user" },
   userStatus: { type: String, enum: ["approved", "denied"], default: "denied" },
   markets: [{ type: mongoose.Schema.Types.ObjectId, ref: "market" }],

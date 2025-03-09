@@ -100,45 +100,103 @@ const Table = () => {
                     </tr>
 
                     {expandedUserId === user._id && selectedUser && (
-                      <tr className="bg-gray-800">
+                      <tr className="bg-gray-900">
                         <td colSpan="6" className="px-4 py-2 border-t border-gray-700">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-                            <div className="space-y-2">
-                              <p><span className="font-semibold">Email:</span> {selectedUser.email}</p>
-                              <p>
-                                <span className="font-semibold">Role:</span> {' '}
-                                <span className={getRoleClass(selectedUser.role)}>{selectedUser.role}</span>
-                              </p>
-                              <p>
-                                <span className="font-semibold">Status:</span> {' '}
-                                <span className={getStatusClass(selectedUser.userStatus)}>{selectedUser.userStatus}</span>
-                              </p>
+                          <div className="p-4 space-y-6">
+                            {/* Summary Cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="bg-gray-700 p-4 rounded-lg">
+                                <h3 className="text-lg font-semibold mb-2">Financial Summary</h3>
+                                <p className="flex justify-between">
+                                  <span>Total Market:</span>
+                                  <span className="text-green-400">₹{selectedUser.totalAmount}</span>
+                                </p>
+                                <p className="flex justify-between">
+                                  <span>Total Meals:</span>
+                                  <span className="text-cyan-400">{selectedUser.totalMeal}</span>
+                                </p>
+                              </div>
+
+                              <div className="bg-gray-700 p-4 rounded-lg">
+                                <h3 className="text-lg font-semibold mb-2">Account Status</h3>
+                                <p className="flex justify-between">
+                                  <span>Payment:</span>
+                                  <span className={getPaymentClass(selectedUser.payment)}>
+                                    {selectedUser.payment}
+                                  </span>
+                                </p>
+                                <p className="flex justify-between">
+                                  <span>Gas Bill:</span>
+                                  <span className={getGasClass(selectedUser.gasBill)}>
+                                    {selectedUser.gasBill}
+                                  </span>
+                                </p>
+                              </div>
                             </div>
 
-                            <div>
-                              <p className="font-semibold mb-2">Market Details:</p>
-                              {selectedUser.markets?.length > 0 ? (
-                                <ul className="list-disc pl-5 space-y-1">
-                                  {selectedUser.markets.map((market, index) => (
-                                    <li key={index} className="text-sm">₹{market}</li>
-                                  ))}
-                                </ul>
-                              ) : (
-                                <p className="text-sm">No market entries</p>
-                              )}
-                            </div>
+                            {/* User Information */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              <div className="bg-gray-700 p-4 rounded-lg">
+                                <h3 className="text-lg font-semibold mb-2">Basic Information</h3>
+                                <p><span className="font-semibold">Name:</span> {selectedUser.name}</p>
+                                <p><span className="font-semibold">Phone:</span> {selectedUser.phone}</p>
+                                <p><span className="font-semibold">Email:</span> {selectedUser.email}</p>
+                                <p>
+                                  <span className="font-semibold">Role:</span> {' '}
+                                  <span className={getRoleClass(selectedUser.role)}>
+                                    {selectedUser.role}
+                                  </span>
+                                </p>
+                                <p>
+                                  <span className="font-semibold">Status:</span> {' '}
+                                  <span className={getStatusClass(selectedUser.userStatus)}>
+                                    {selectedUser.userStatus}
+                                  </span>
+                                </p>
+                              </div>
 
-                            <div>
-                              <p className="font-semibold mb-2">Meal Details:</p>
-                              {selectedUser.meals?.length > 0 ? (
-                                <ul className="list-disc pl-5 space-y-1">
-                                  {selectedUser.meals.map((meal, index) => (
-                                    <li key={index} className="text-sm">{meal}</li>
-                                  ))}
-                                </ul>
-                              ) : (
-                                <p className="text-sm">No meal entries</p>
-                              )}
+                              {/* Market Details */}
+                              <div className="bg-gray-700 p-4 rounded-lg">
+                                <h3 className="text-lg font-semibold mb-2">Market Entries</h3>
+                                {selectedUser.marketDetails?.length > 0 ? (
+                                  <div className="space-y-2">
+                                    {selectedUser.marketDetails.map((market, index) => (
+                                      <div key={market._id} className="bg-gray-800 p-3 rounded-md">
+                                        <p className="flex justify-between">
+                                          <span className="font-medium">{market.items}</span>
+                                          <span className="text-green-400">₹{market.amount}</span>
+                                        </p>
+                                        <p className="text-sm text-gray-400">
+                                          {new Date(market.date).toLocaleDateString()}
+                                        </p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <p className="text-gray-400 text-sm">No market entries found</p>
+                                )}
+                              </div>
+
+                              {/* Meal Details */}
+                              <div className="bg-gray-700 p-4 rounded-lg">
+                                <h3 className="text-lg font-semibold mb-2">Meal Entries</h3>
+                                {selectedUser.mealDetails?.length > 0 ? (
+                                  <div className="space-y-2">
+                                    {selectedUser.mealDetails.map((meal, index) => (
+                                      <div key={meal._id} className="bg-gray-800 p-3 rounded-md">
+                                        <p className="flex justify-between">
+                                          <span className="capitalize font-medium">{meal.mealTime}</span>
+                                          <span className="text-cyan-400">
+                                            {new Date(meal.date).toLocaleDateString()}
+                                          </span>
+                                        </p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <p className="text-gray-400 text-sm">No meal entries found</p>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </td>
