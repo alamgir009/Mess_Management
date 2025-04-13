@@ -6,6 +6,7 @@ import { fetchProfile } from "../../store/slices/userSlice";
 import { fetchGrandTotalAmount } from "../../store/slices/marketSlice";
 import { fetchAllMeals, fetchTotalMeals } from "../../store/slices/mealSlice";
 import { HiCurrencyRupee, HiFire, HiShoppingCart, HiUserCircle, HiCalendar, HiClock } from "react-icons/hi";
+import { PiBowlSteamFill } from "react-icons/pi";
 
 const Profiles = () => {
     const dispatch = useDispatch();
@@ -100,7 +101,7 @@ const Profiles = () => {
                         },
 
                         {
-                            icon: <HiFire className="w-6 h-6" />,
+                            icon: <PiBowlSteamFill className="w-6 h-6" />,
                             title: "Total Meal",
                             value: totalMeal?.grandTotalMeal,
                             bg: "bg-purple-500/20"
@@ -181,7 +182,7 @@ const Profiles = () => {
                 {profile?.mealDetails?.length > 0 && (
                     <div className="bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-lg">
                         <div className="flex items-center gap-2 mb-6">
-                            <HiFire className="w-6 h-6 text-purple-400" />
+                            <PiBowlSteamFill className="w-6 h-6 text-purple-400" />
                             <h2 className="text-xl font-semibold">Meal Details</h2>
                             <span className="ml-2 text-purple-400">({mealCount} meals)</span>
                         </div>

@@ -1,7 +1,6 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Toaster, toast } from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
 import { addUserId } from '../../store/slices/resetPasswordSlice';
 
@@ -12,13 +11,12 @@ export const RequestOtp = () => {
   const [otpRequested, setOtpRequested] = useState(false);
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState(Array(6).fill(''));
-  const [otpCooldown, setOtpCooldown] = useState(false); // Cooldown flag
-  const [otpResendTime, setOtpResendTime] = useState(0); // Timer for resend
+  const [otpCooldown, setOtpCooldown] = useState(false);
+  const [otpResendTime, setOtpResendTime] = useState(0);
 
-  // Function to handle OTP request with cooldown
   const handleRequestOtp = async (e) => {
     e.preventDefault();
-    if (otpCooldown) return; // Prevent repeated OTP requests during cooldown
+    if (otpCooldown) return;
     try {
       const response = await axios.post(
         'http://localhost:8080/user/requestotp',
@@ -26,17 +24,16 @@ export const RequestOtp = () => {
         { withCredentials: true }
       );
       if (response) {
-        toast.success(response.data.message, { duration: 2000 });
+        alert(response?.data?.message);
         setOtpRequested(true);
-        setOtpCooldown(true); // Start cooldown
-        setOtpResendTime(60); // Set 60 seconds cooldown
+        setOtpCooldown(true);
+        setOtpResendTime(60);
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      alert(error.response?.data?.message || 'Something went wrong!');
     }
   };
 
-  // Countdown timer for OTP resend
   useEffect(() => {
     let timer;
     if (otpCooldown && otpResendTime > 0) {
@@ -44,14 +41,13 @@ export const RequestOtp = () => {
         setOtpResendTime((prevTime) => prevTime - 1);
       }, 1000);
     } else if (otpResendTime === 0) {
-      setOtpCooldown(false); // Reset cooldown when time runs out
+      setOtpCooldown(false);
     }
     return () => clearInterval(timer);
   }, [otpCooldown, otpResendTime]);
 
-  // Resend OTP handler with the same cooldown logic
   const handleResend = async () => {
-    if (otpCooldown) return; // Prevent resending during cooldown
+    if (otpCooldown) return;
     try {
       const response = await axios.post(
         'http://localhost:8080/user/requestotp',
@@ -59,12 +55,12 @@ export const RequestOtp = () => {
         { withCredentials: true }
       );
       if (response) {
-        toast.success(response.data.message, { duration: 2000 });
-        setOtpCooldown(true); // Restart cooldown on resend
-        setOtpResendTime(60); // Reset 60 seconds cooldown
+        alert(response?.data?.message);
+        setOtpCooldown(true);
+        setOtpResendTime(60);
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      alert(error.response?.data?.message || 'Failed to resend OTP.');
     }
   };
 
@@ -78,14 +74,14 @@ export const RequestOtp = () => {
         { withCredentials: true }
       );
       if (response) {
-        toast.success(response.data.message, { duration: 2000 });
+        alert(response?.data?.message);
         dispatch(addUserId(response.data.userId));
         setTimeout(() => {
           navigate('/resetpassword');
         }, 3000);
       }
     } catch (error) {
-      toast.error(error.response.data.message, { duration: 2000 });
+      alert(error.response?.data?.message || 'Invalid OTP.');
     }
   };
 
@@ -175,7 +171,6 @@ export const RequestOtp = () => {
           </>
         )}
       </form>
-      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 };
