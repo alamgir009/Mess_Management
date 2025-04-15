@@ -61,15 +61,22 @@ export const ResetPassword = () => {
     };
 
     const getAlertStyles = (type) => {
-        const base =
-            'fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-xl shadow-md bg-gray-100 z-50 flex items-center gap-3 transition-all duration-300';
+        const base = `
+          fixed top-5 left-1/2 transform -translate-x-1/2 
+          px-6 py-3 rounded-xl shadow-md z-50 
+          flex items-center gap-3 
+          backdrop-blur-md bg-white/10 border transition-all duration-300
+        `;
+
         const color = {
-            success: 'border border-green-500 text-green-600',
-            error: 'border border-red-500 text-red-600',
-            info: 'border border-blue-500 text-blue-600'
+            success: 'border-green-400/30 text-green-300',
+            error: 'border-red-400/30 text-red-300',
+            info: 'border-blue-400/30 text-blue-300'
         };
+
         return `${base} ${color[type] || color.info}`;
     };
+
 
 
     const getAlertIcon = (type) => {
