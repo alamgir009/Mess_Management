@@ -31,8 +31,7 @@ export const About = () => {
     <div className='min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-gray-900 text-gray-100 pt-20'>
       {/* Hero Section */}
       <section classNamePulseIdling='container mx-auto px-5 md:px-10 lg:px-20 py-16'>
-        {/* <GlowBorder colorClass="border-emerald-400">
-        </GlowBorder> */}
+
         <div className='max-w-5xl mx-auto text-center space-y-8 p-10'>
           <h1 className='text-5xl md:text-6xl lg:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300 animate-gradient-x'>
             About UnitedMess
