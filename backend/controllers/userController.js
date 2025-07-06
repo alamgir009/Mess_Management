@@ -89,6 +89,77 @@ const getUsers = async (req, res) => {
   }
 };
 
+// Get all users with Aggregation
+const getUsersWithAggregation = async (req, res) => {
+  try {
+    const usersWithLookups = await UserModel.aggregate([
+      {
+        $lookup: {
+          from: "markets",
+          localField: "markets",
+          foreignField: "_id",
+          as: "marketDetails",
+        },
+      },
+      {
+        $lookup: {
+          from: "meals",
+          localField: "meals",
+          foreignField: "_id",
+          as: "mealDetails",
+        },
+      },
+      {
+        $addFields: {
+          totalAmount: {
+            $sum: {
+              $map: {
+                input: "$marketDetails",
+                as: "market",
+                in: "$$market.amount",
+              },
+            },
+          },
+          totalMeal: {
+            $reduce: {
+              input: "$mealDetails",
+              initialValue: 0,
+              in: {
+                $add: [
+                  "$$value",
+                  {
+                    $cond: [{ $eq: ["$$this.mealTime", "both"] }, 2, 1],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          email: 1,
+          phone: 1,
+          image: 1,
+          role: 1,
+          userStatus: 1,
+          payment: 1,
+          gasBill: 1,
+          marketDetails: 1, // include full or adjust via $map
+          mealDetails: 1,
+          totalAmount: 1,
+          totalMeal: 1,
+        },
+      },
+    ]);
+
+    return res.status(200).json(usersWithLookups);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 // Get user Profile
 const getProfile = async (req, res) => {
   const { id } = req.user;
@@ -366,4 +437,5 @@ module.exports = {
   updateUserByAdmin,
   deleteUserByAdmin,
   getProfile,
+  getUsersWithAggregation,
 };

@@ -24,6 +24,21 @@ export const getUsers = createAsyncThunk(
   }
 );
 
+// Fetch users with aggregated data
+export const getAggeratedUsers = createAsyncThunk(
+  "user/getAggeratedUsers",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.get("/user/aggregatedUsers");
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch aggregated users"
+      );
+    }
+  }
+);
+
 // Fetch logged-in user's profile
 export const fetchProfile = createAsyncThunk(
   "user/getProfile",
@@ -139,6 +154,20 @@ const userSlice = createSlice({
         state.users = action.payload;
       })
       .addCase(getUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Get Aggregated Users
+      .addCase(getAggeratedUsers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAggeratedUsers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.users = action.payload;
+      })
+      .addCase(getAggeratedUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

@@ -10,6 +10,7 @@ const {
   updateUserByAdmin,
   deleteUserByAdmin,
   getProfile,
+  getUsersWithAggregation,
 } = require("../controllers/userController");
 const isVerify = require("../middleware/auth");
 const {
@@ -27,6 +28,7 @@ router.post("/signin", loginUser);
 router.post("/signout", isVerify, signoutUser);
 
 router.get("/", getUsers);
+router.get("/aggregatedUsers", getUsersWithAggregation);
 router.get("/profile", isVerify, getProfile);
 router.get("/:id", getUserById);
 router.delete("/:id", deleteUser);

@@ -141,12 +141,12 @@ const Profiles = () => {
                 </div>
 
                 {/* Market Details Section */}
-                {profile?.marketDetails?.length > 0 && (
+                {profile?.totalAmount && (
                     <div className="bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-lg">
                         <div className="flex items-center gap-2 mb-6">
                             <HiShoppingCart className="w-6 h-6 text-teal-400" />
-                            <h2 className="text-xl font-semibold">Market Details</h2>
-                            <span className="ml-2 text-teal-400">({profile.marketDetails.length} entries)</span>
+                            <h2 className="text-xl font-semibold">Your Market :</h2>
+                            <span className="ml-2 text-teal-400">({profile.totalAmount} ₹)</span>
                         </div>
 
                         <div className="overflow-x-auto rounded-lg border border-white/10">
@@ -183,7 +183,7 @@ const Profiles = () => {
                     <div className="bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-lg">
                         <div className="flex items-center gap-2 mb-6">
                             <PiBowlSteamFill className="w-6 h-6 text-purple-400" />
-                            <h2 className="text-xl font-semibold">Meal Details</h2>
+                            <h2 className="text-xl font-semibold">Your Meal :</h2>
                             <span className="ml-2 text-purple-400">({mealCount} meals)</span>
                         </div>
 

@@ -28,7 +28,7 @@ export const About = () => {
   );
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-gray-900 text-gray-100 pt-20'>
+    <div className='min-h-screen bg-gradient-to-br from-pink-900 via-indigo-900 to-green-700 text-gray-100 pt-20'>
       {/* Hero Section */}
       <section classNamePulseIdling='container mx-auto px-5 md:px-10 lg:px-20 py-16'>
 
@@ -300,8 +300,8 @@ export const About = () => {
                     <FaEnvelope className='w-5 h-5 mt-1 mr-4 text-blue-400' />
                     <div>
                       <p className='text-gray-400'>Email Support</p>
-                      <a href="mailto:support@unitedmess.com" className='text-gray-300 hover:text-blue-400 transition-colors'>
-                        support@unitedmess.com
+                      <a href="mailto:unitedmess96@gmail.com" className='text-gray-300 hover:text-blue-400 transition-colors'>
+                        unitedmess96@gmail.com
                       </a>
                     </div>
                   </div>
