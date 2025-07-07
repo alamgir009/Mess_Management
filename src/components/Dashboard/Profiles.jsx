@@ -78,7 +78,7 @@ const Profiles = () => {
                                     className={
                                         profile?.role === "admin"
                                             ? "text-purple-300 bg-purple-500/20 px-2 py-1 rounded-full"
-                                            : "text-teal-300 bg-teal-500/20 px-2 py-1 rounded-full"
+                                            : "text-yellow-300 bg-teal-500/20 px-2 py-1 rounded-full"
                                     }
                                 >
                                     {profile?.role}
