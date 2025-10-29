@@ -3,7 +3,7 @@ import { SideBar } from "./SideBar";
 import { useDispatch, useSelector } from "react-redux";
 import { Toaster, toast } from "react-hot-toast";
 import { fetchProfile } from "../../store/slices/userSlice";
-import { fetchGrandTotalAmount, deleteMarketById } from "../../store/slices/marketSlice"; // Make sure deleteMarketById is exported from marketSlice
+import { fetchGrandTotalAmount, deleteMarketById } from "../../store/slices/marketSlice";
 import { deleteMealById, fetchAllMeals, fetchTotalMeals } from "../../store/slices/mealSlice";
 import {
     HiCurrencyRupee,
@@ -155,7 +155,7 @@ const Profiles = () => {
     if (error || marketError)
         return (
             <div className="min-h-screen bg-gradient-to-b from-black to-blue-950 flex items-center justify-center">
-                <div className="bg-red-500/20 p-6 rounded-lg border border-red-500 backdrop-blur-lg">
+                <div className="bg-red-500/10 p-6 rounded-2xl border border-red-500/30 backdrop-blur-2xl shadow-2xl">
                     <p className="text-red-400 text-lg">Error: {error || marketError}</p>
                 </div>
             </div>
@@ -164,20 +164,22 @@ const Profiles = () => {
     return (
         <div className="font-inter flex flex-col lg:flex-row justify-between text-white bg-gradient-to-b from-black to-blue-950 min-h-screen">
             {/* Sidebar */}
-            <div className="sidebar w-full lg:w-80 m-1 rounded-md bg-gray-950">
+            <div className="sidebar w-full lg:w-80 m-1 rounded-2xl bg-black/20 backdrop-blur-2xl border border-white/10 shadow-2xl">
                 <SideBar />
             </div>
 
             {/* Main Content */}
             <div className="flex-grow m-1 p-4 space-y-6">
                 {/* Profile Header */}
-                <div className="bg-gradient-to-r from-teal-600/20 to-blue-600/20 p-6 rounded-2xl border border-white/10 backdrop-blur-lg shadow-xl">
-                    <div className="flex items-center gap-4">
+                <div className="bg-white/5 p-6 rounded-3xl border border-white/20 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
+                    {/* Glass effect overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5"></div>
+                    <div className="relative z-10 flex items-center gap-4">
                         {localProfile?.image ? (
                             <img
                                 src={localProfile.image}
                                 alt={localProfile.name || "User Profile"}
-                                className="w-16 h-16 rounded-full object-cover border border-white/20"
+                                className="w-16 h-16 rounded-2xl object-cover border border-white/30 backdrop-blur-lg shadow-lg"
                                 onError={(e) => (e.target.style.display = "none")}
                             />
                         ) : (
@@ -191,14 +193,14 @@ const Profiles = () => {
                                 <span
                                     className={
                                         localProfile?.role === "admin"
-                                            ? "text-purple-300 bg-purple-500/20 px-2 py-1 rounded-full"
-                                            : "text-yellow-300 bg-teal-500/20 px-2 py-1 rounded-full"
+                                            ? "text-purple-300 bg-purple-500/20 px-3 py-1 rounded-full backdrop-blur-lg border border-purple-500/30"
+                                            : "text-yellow-300 bg-teal-500/20 px-3 py-1 rounded-full backdrop-blur-lg border border-teal-500/30"
                                     }
                                 >
                                     {localProfile?.role}
                                 </span>
                                 <span className="text-white/60">•</span>
-                                <span className="text-sm">{localProfile?.email}</span>
+                                <span className="text-sm text-white/80">{localProfile?.email}</span>
                             </p>
                         </div>
                     </div>
@@ -211,19 +213,19 @@ const Profiles = () => {
                             icon: <HiCurrencyRupee className="w-6 h-6" />,
                             title: "Total Market",
                             value: `₹${localGrandTotal || 0}`,
-                            bg: "bg-blue-500/20"
+                            bg: "bg-blue-500/10"
                         },
                         {
                             icon: <PiBowlSteamFill className="w-6 h-6" />,
                             title: "Total Meal",
                             value: localTotalMeal?.grandTotalMeal || 0,
-                            bg: "bg-purple-500/20"
+                            bg: "bg-purple-500/10"
                         },
                         {
                             icon: <HiShoppingCart className="w-6 h-6" />,
                             title: "Meal Charge",
                             value: `₹${mealCharge}`,
-                            bg: "bg-teal-500/20"
+                            bg: "bg-teal-500/10"
                         },
                         {
                             icon: <HiCurrencyRupee className="w-6 h-6" />,
@@ -231,8 +233,8 @@ const Profiles = () => {
                             value: localProfile?.payment,
                             status:
                                 localProfile?.payment === "success"
-                                    ? "bg-green-500/20 text-green-400"
-                                    : "bg-orange-500/20 text-orange-400"
+                                    ? "bg-green-500/10 text-green-400"
+                                    : "bg-orange-500/10 text-orange-400"
                         },
                         {
                             icon: <HiFire className="w-6 h-6" />,
@@ -240,19 +242,21 @@ const Profiles = () => {
                             value: localProfile?.gasBill,
                             status:
                                 localProfile?.gasBill === "success"
-                                    ? "bg-green-500/20 text-green-400"
-                                    : "bg-orange-500/20 text-orange-400"
+                                    ? "bg-green-500/10 text-green-400"
+                                    : "bg-orange-500/10 text-orange-400"
                         }
                     ].map((stat, idx) => (
                         <div
                             key={idx}
-                            className={`${stat.bg || stat.status} p-4 rounded-xl border border-white/10 backdrop-blur-lg hover:bg-white/5 transition-all`}
+                            className={`${stat.bg || stat.status} p-4 rounded-2xl border border-white/20 backdrop-blur-2xl shadow-2xl hover:bg-white/10 transition-all duration-300 relative overflow-hidden group`}
                         >
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-white/10 rounded-lg">{stat.icon}</div>
+                            {/* Glass shine effect */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                            <div className="relative z-10 flex items-center gap-3">
+                                <div className="p-2 bg-white/10 rounded-xl backdrop-blur-lg border border-white/20">{stat.icon}</div>
                                 <div>
-                                    <p className="text-sm text-gray-300">{stat.title}</p>
-                                    <p className="text-xl font-semibold">{stat.value}</p>
+                                    <p className="text-sm text-white/70">{stat.title}</p>
+                                    <p className="text-xl font-semibold text-white">{stat.value}</p>
                                 </div>
                             </div>
                         </div>
@@ -261,66 +265,72 @@ const Profiles = () => {
 
                 {/* Market Details Section */}
                 {localProfile?.marketDetails?.length > 0 && (
-                    <div className="bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-lg">
-                        <div className="flex items-center gap-2 mb-6">
-                            <HiShoppingCart className="w-6 h-6 text-teal-400" />
-                            <h2 className="text-xl font-semibold">Your Market :</h2>
-                            <span className="ml-2 text-teal-400">({localProfile.totalAmount || 0} ₹)</span>
-                        </div>
+                    <div className="bg-white/5 p-6 rounded-3xl border border-white/20 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/0"></div>
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-2 mb-6">
+                                <HiShoppingCart className="w-6 h-6 text-teal-400" />
+                                <h2 className="text-xl font-semibold text-white">Your Market :</h2>
+                                <span className="ml-2 text-teal-400">({localProfile.totalAmount || 0} ₹)</span>
+                            </div>
 
-                        <div className="overflow-x-auto rounded-lg border border-white/10">
-                            <table className="w-full">
-                                <thead className="bg-white/10">
-                                    <tr>
-                                        {["Item", "Amount", "Date", "Day", "Action"].map((header, idx) => (
-                                            <th
-                                                key={idx}
-                                                className="px-4 py-3 text-left text-sm font-semibold text-teal-300"
-                                            >
-                                                {header}
-                                            </th>
+                            <div className="overflow-x-auto rounded-2xl border border-white/20 backdrop-blur-lg">
+                                <table className="w-full">
+                                    <thead className="bg-white/10 backdrop-blur-lg">
+                                        <tr>
+                                            {["Item", "Amount", "Date", "Day", "Action"].map((header, idx) => (
+                                                <th
+                                                    key={idx}
+                                                    className="px-4 py-3 text-left text-sm font-semibold text-teal-300 border-b border-white/10"
+                                                >
+                                                    {header}
+                                                </th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white/5">
+                                        {localProfile.marketDetails.map((market) => (
+                                            <MarketRow 
+                                                key={market._id} 
+                                                market={market} 
+                                                getWeekday={getWeekday}
+                                                onMarketDelete={handleMarketDelete}
+                                                openMenuId={openMenuId}
+                                                setOpenMenuId={setOpenMenuId}
+                                                isDeleting={deletingMarketId === market._id}
+                                            />
                                         ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {localProfile.marketDetails.map((market) => (
-                                        <MarketRow 
-                                            key={market._id} 
-                                            market={market} 
-                                            getWeekday={getWeekday}
-                                            onMarketDelete={handleMarketDelete}
-                                            openMenuId={openMenuId}
-                                            setOpenMenuId={setOpenMenuId}
-                                            isDeleting={deletingMarketId === market._id}
-                                        />
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 )}
 
                 {/* Meal Details Section */}
                 {localProfile?.mealDetails?.length > 0 && (
-                    <div className="bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-lg">
-                        <div className="flex items-center gap-2 mb-6">
-                            <PiBowlSteamFill className="w-6 h-6 text-yellow-400" />
-                            <h2 className="text-xl font-semibold">Your Meal :</h2>
-                            <span className="ml-2 text-yellow-300">({mealCount} meals)</span>
-                        </div>
+                    <div className="bg-white/5 p-6 rounded-3xl border border-white/20 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/0"></div>
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-2 mb-6">
+                                <PiBowlSteamFill className="w-6 h-6 text-yellow-300" />
+                                <h2 className="text-xl font-semibold text-white">Your Meal :</h2>
+                                <span className="ml-2 text-yellow-300">({mealCount} meals)</span>
+                            </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {localProfile.mealDetails.map((meal) => (
-                                <MealCard 
-                                    key={meal._id} 
-                                    meal={meal} 
-                                    getWeekday={getWeekday} 
-                                    onMealDelete={handleMealDelete}
-                                    openMenuId={openMenuId}
-                                    setOpenMenuId={setOpenMenuId}
-                                    isDeleting={deletingMealId === meal._id}
-                                />
-                            ))}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {localProfile.mealDetails.map((meal) => (
+                                    <MealCard 
+                                        key={meal._id} 
+                                        meal={meal} 
+                                        getWeekday={getWeekday} 
+                                        onMealDelete={handleMealDelete}
+                                        openMenuId={openMenuId}
+                                        setOpenMenuId={setOpenMenuId}
+                                        isDeleting={deletingMealId === meal._id}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     </div>
                 )}
@@ -383,14 +393,14 @@ const MarketRow = ({ market, getWeekday, onMarketDelete, openMenuId, setOpenMenu
     };
 
     return (
-        <tr className={`hover:bg-white/5 transition-colors border-t border-white/10 ${isDeleting ? 'opacity-50' : ''}`}>
-            <td className="px-4 py-3 font-medium">{market.items}</td>
-            <td className="px-4 py-3 text-teal-400">₹{market.amount}</td>
-            <td className="px-4 py-3 flex items-center gap-2">
-                <HiCalendar className="w-4 h-4 text-gray-400" />
+        <tr className={`hover:bg-white/10 transition-colors duration-200 border-b border-white/10 last:border-b-0 ${isDeleting ? 'opacity-50' : ''}`}>
+            <td className="px-4 py-3 font-medium text-white/90">{market.items}</td>
+            <td className="px-4 py-3 text-lime-300 font-semibold">₹{market.amount}</td>
+            <td className="px-4 py-3 flex items-center gap-2 text-white/80">
+                <HiCalendar className="w-4 h-4 text-teal-400" />
                 {formatDate(market.date)}
             </td>
-            <td className="px-4 py-3 text-gray-400">
+            <td className="px-4 py-3 text-white/70">
                 {getWeekday(market.date)}
             </td>
             <td className="px-4 py-3">
@@ -400,22 +410,22 @@ const MarketRow = ({ market, getWeekday, onMarketDelete, openMenuId, setOpenMenu
                     ) : (
                         <>
                             <HiOutlineCog
-                                className={`w-5 h-5 cursor-pointer transition-all ${
-                                    isMenuOpen ? 'text-teal-400 rotate-90' : 'hover:text-teal-400'
+                                className={`w-5 h-5 cursor-pointer transition-all duration-200 ${
+                                    isMenuOpen ? 'text-teal-400 rotate-90' : 'text-white/70 hover:text-teal-400'
                                 }`}
                                 onClick={toggleMenu}
                             />
                             {isMenuOpen && (
-                                <div className="absolute right-0 mt-2 w-32 bg-gray-900 border border-white/10 rounded-lg shadow-xl z-50 animate-fadeIn">
+                                <div className="absolute right-0 mt-2 w-32 bg-black/80 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl z-50 animate-fadeIn overflow-hidden">
                                     <button
                                         onClick={handleEdit}
-                                        className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/10 w-full text-left rounded-t-lg transition-colors"
+                                        className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/10 w-full text-left transition-colors duration-200 border-b border-white/10"
                                     >
                                         <HiPencilAlt className="w-4 h-4 text-blue-400" /> Edit
                                     </button>
                                     <button
                                         onClick={handleDelete}
-                                        className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/10 w-full text-left text-red-400 rounded-b-lg transition-colors"
+                                        className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/10 w-full text-left text-red-400 transition-colors duration-200"
                                     >
                                         <HiTrash className="w-4 h-4" /> Delete
                                     </button>
@@ -472,55 +482,63 @@ const MealCard = ({ meal, getWeekday, onMealDelete, openMenuId, setOpenMenuId, i
     };
 
     return (
-        <div className={`relative bg-white/5 p-4 rounded-lg border border-white/10 hover:bg-white/10 transition-all ${isDeleting ? 'opacity-50' : ''}`}>
-            {/* Top Row: Meal Time + Menu Icon */}
-            <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center gap-3">
-                    <HiClock className="w-5 h-5 text-teal-400" />
-                    <span className="font-medium capitalize">{meal.mealTime}</span>
-                </div>
-
-                <div className="relative" ref={menuRef}>
-                    {isDeleting ? (
-                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-teal-500"></div>
-                    ) : (
-                        <>
-                            <HiDotsVertical
-                                className={`w-5 h-5 cursor-pointer transition-all ${
-                                    isMenuOpen ? 'text-teal-400' : 'hover:text-teal-400'
-                                }`}
-                                onClick={toggleMenu}
-                            />
-
-                            {isMenuOpen && (
-                                <div className="absolute right-0 mt-2 w-32 bg-gray-900 border border-white/10 rounded-lg shadow-xl z-50 animate-fadeIn">
-                                    <button
-                                        onClick={handleEdit}
-                                        className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/10 w-full text-left rounded-t-lg transition-colors"
-                                    >
-                                        <HiPencilAlt className="w-4 h-4 text-blue-400" /> Edit
-                                    </button>
-                                    <button
-                                        onClick={handleDelete}
-                                        className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/10 w-full text-left text-red-400 rounded-b-lg transition-colors"
-                                    >
-                                        <HiTrash className="w-4 h-4" /> Delete
-                                    </button>
-                                </div>
-                            )}
-                        </>
-                    )}
-                </div>
+        <div className={`relative bg-white/5 rounded-2xl border border-white/20 backdrop-blur-lg hover:bg-white/10 transition-all duration-300 group ${isDeleting ? 'opacity-50' : ''}`}>
+            {/* Glass shine effect - moved outside the content area */}
+            <div className="absolute inset-0 rounded-2xl overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
             </div>
+            
+            {/* Content area - no overflow hidden */}
+            <div className="relative p-4 z-10">
+                {/* Top Row: Meal Time + Menu Icon */}
+                <div className="flex justify-between items-center mb-3">
+                    <div className="flex items-center gap-3">
+                        <HiClock className="w-5 h-5 text-teal-400" />
+                        <span className="font-medium capitalize text-white/90">{meal.mealTime}</span>
+                    </div>
 
-            {/* Bottom Row: Date + Day */}
-            <div className="flex justify-between items-center text-sm text-gray-400">
-                <div className="flex items-center gap-3">
-                    <HiCalendar className="w-4 h-4" />
-                    <span>{formatDate(meal.date)}</span>
-                    <span className="ml-2 px-2 py-1 bg-white/5 rounded-full">
-                        {getWeekday(meal.date)}
-                    </span>
+                    <div className="relative" ref={menuRef}>
+                        {isDeleting ? (
+                            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-teal-500"></div>
+                        ) : (
+                            <>
+                                <HiDotsVertical
+                                    className={`w-5 h-5 cursor-pointer transition-all duration-200 ${
+                                        isMenuOpen ? 'text-teal-400' : 'text-white/70 hover:text-teal-400'
+                                    }`}
+                                    onClick={toggleMenu}
+                                />
+
+                                {isMenuOpen && (
+                                    <div className="absolute right-0 top-full mt-2 w-32 bg-black/80 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl z-50 animate-fadeIn">
+                                        <button
+                                            onClick={handleEdit}
+                                            className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/10 w-full rounded-t-2xl text-left transition-colors duration-200 border-b border-white/10"
+                                        >
+                                            <HiPencilAlt className="w-4 h-4 text-blue-400" /> Edit
+                                        </button>
+                                        <button
+                                            onClick={handleDelete}
+                                            className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/10 w-full rounded-b-2xl text-left text-red-400 transition-colors duration-200"
+                                        >
+                                            <HiTrash className="w-4 h-4" /> Delete
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+                </div>
+
+                {/* Bottom Row: Date + Day */}
+                <div className="flex justify-between items-center text-sm text-white/70">
+                    <div className="flex items-center gap-3">
+                        <HiCalendar className="w-4 h-4 text-teal-400" />
+                        <span>{formatDate(meal.date)}</span>
+                        <span className="px-2 py-1 bg-white/10 rounded-full backdrop-blur-lg border border-white/10 text-white/80">
+                            {getWeekday(meal.date)}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
