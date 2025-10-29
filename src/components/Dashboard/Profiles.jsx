@@ -271,7 +271,7 @@ const Profiles = () => {
                             <div className="flex items-center gap-2 mb-6">
                                 <HiShoppingCart className="w-6 h-6 text-teal-400" />
                                 <h2 className="text-xl font-semibold text-white">Your Market :</h2>
-                                <span className="ml-2 text-teal-400">({localProfile.totalAmount || 0} ₹)</span>
+                                <span className="ml-2 font-semibold text-teal-400">{localProfile.totalAmount || 0} ₹</span>
                             </div>
 
                             <div className="overflow-x-auto rounded-2xl border border-white/20 backdrop-blur-lg">
@@ -315,7 +315,7 @@ const Profiles = () => {
                             <div className="flex items-center gap-2 mb-6">
                                 <PiBowlSteamFill className="w-6 h-6 text-yellow-300" />
                                 <h2 className="text-xl font-semibold text-white">Your Meal :</h2>
-                                <span className="ml-2 text-yellow-300">({mealCount} meals)</span>
+                                <span className="ml-2 font-semibold text-yellow-300">{mealCount} 🍽️</span>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
