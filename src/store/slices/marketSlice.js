@@ -24,6 +24,19 @@ export const fetchMarketAmounts = createAsyncThunk(
   }
 );
 
+// NEW: Delete market item action
+export const deleteMarketById = createAsyncThunk(
+  "meals/deleteMealById",
+  async (id, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.delete(`/market/${id}`);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data || error.message);
+    }
+  }
+);
+
 // Fetch grand total amount
 export const fetchGrandTotalAmount = createAsyncThunk(
   "markets/fetchGrandTotalAmount",
