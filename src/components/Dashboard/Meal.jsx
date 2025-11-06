@@ -3,16 +3,20 @@ import { SideBar } from './SideBar';
 import { Toaster, toast } from 'react-hot-toast';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { addMeal } from '../../store/slices/mealSlice';
 
 const meal_OPTIONS = ['day', 'night', 'both'];
 
 const Meal = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     mealTime: '',
     date: ''
   });
 
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,17 +28,25 @@ const Meal = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post("http://localhost:8080/meal/addmeal", formData, { withCredentials: true });
-      const successMessage = response?.data?.message || 'Meal added successfully';
-      toast.success(successMessage, { duration: 2000 });
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 2000);
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'There was an error';
-      toast.error(errorMessage, { duration: 2000 });
-    }
+      if (!formData.mealTime || !formData.date) {
+          toast.error("All fields are required");
+          return;
+        }
+    
+        try {
+          const resultAction = await dispatch(addMeal(formData));
+    
+          if (addMeal.fulfilled.match(resultAction)) {
+            toast.success("Meal added successfully", { duration: 2000 });
+            setFormData({ mealTime: "", date: "" }); // Reset form
+            setTimeout(() => navigate("/dashboard"), 2000);
+          } else {
+            // Handles rejectWithValue or API error message
+            toast.error(resultAction.payload || "Failed to add meal.");
+          }
+        } catch (error) {
+          toast.error(error.message || "Something went wrong");
+        }
   };
 
   return (
