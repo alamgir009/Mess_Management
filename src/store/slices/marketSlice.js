@@ -3,68 +3,86 @@ import axios from "axios";
 
 const API_URL = "http://localhost:8080";
 
-// Set up Axios instance
+// ✅ Axios instance (use consistent URL structure)
 const axiosInstance = axios.create({
   baseURL: API_URL,
   withCredentials: true,
 });
 
-// Fetch all Markets total amount
+// ✅ Add Market
+export const addMarket = createAsyncThunk(
+  "markets/addMarket",
+  async (market, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.post("/market/addMarket", market);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to add new market"
+      );
+    }
+  }
+);
+
+// ✅ Fetch all Markets total amount
 export const fetchMarketAmounts = createAsyncThunk(
   "markets/fetchMarketAmounts",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get("/market/getMarket");
-      return response.data; // Assuming the API returns an array of market data
+      const { data } = await axiosInstance.get("/market/getMarket");
+      return data; // Expecting an array of markets
     } catch (error) {
       return rejectWithValue(
-        error.response?.data || "Failed to fetch market amounts"
+        error.response?.data?.message || "Failed to fetch market amounts"
       );
     }
   }
 );
 
-// NEW: Delete market item action
+// ✅ Delete market item by ID
 export const deleteMarketById = createAsyncThunk(
-  "meals/deleteMealById",
+  "markets/deleteMarketById", // fixed incorrect type string
   async (id, { rejectWithValue }) => {
     try {
       const { data } = await axiosInstance.delete(`/market/${id}`);
-      return data;
+      return id; // return the deleted market ID for state update
     } catch (error) {
-      return rejectWithValue(error?.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete market"
+      );
     }
   }
 );
 
-// Fetch grand total amount
+// ✅ Fetch grand total amount
 export const fetchGrandTotalAmount = createAsyncThunk(
   "markets/fetchGrandTotalAmount",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get("/market/getTotalMarket");
-      return response.data; // Assuming the API returns { totalAmount: number }
+      const { data } = await axiosInstance.get("/market/getTotalMarket");
+      return data; // Expecting { totalAmount: number }
     } catch (error) {
       return rejectWithValue(
-        error.response?.data || "Failed to fetch grand total amount"
+        error.response?.data?.message || "Failed to fetch grand total amount"
       );
     }
   }
 );
 
+// ✅ Slice
 const marketsSlice = createSlice({
   name: "markets",
   initialState: {
     markets: [],
     totalMarketAmount: 0,
-    grandTotalAmount: 0, // New state for grand total
+    grandTotalAmount: 0,
     loading: false,
     error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch market amounts
+      // Fetch market list
       .addCase(fetchMarketAmounts.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -72,25 +90,43 @@ const marketsSlice = createSlice({
       .addCase(fetchMarketAmounts.fulfilled, (state, action) => {
         state.loading = false;
         state.markets = action.payload;
-
-        // Calculate the total market amount
-        state.totalMarketAmount = action.payload.reduce((total, market) => {
-          return total + (market.amount || 0);
-        }, 0);
+        state.totalMarketAmount = action.payload.reduce(
+          (total, market) => total + (market.amount || 0),
+          0
+        );
       })
       .addCase(fetchMarketAmounts.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "An error occurred";
+        state.error = action.payload || "An error occurred while fetching markets";
       })
 
-      // Fetch grand total amount
+      // Add new market
+      .addCase(addMarket.fulfilled, (state, action) => {
+        state.markets.push(action.payload);
+        state.totalMarketAmount += action.payload.amount || 0;
+      })
+      .addCase(addMarket.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+
+      // Delete market
+      .addCase(deleteMarketById.fulfilled, (state, action) => {
+        state.markets = state.markets.filter(
+          (market) => market.id !== action.payload
+        );
+      })
+      .addCase(deleteMarketById.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+
+      // Fetch grand total
       .addCase(fetchGrandTotalAmount.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchGrandTotalAmount.fulfilled, (state, action) => {
         state.loading = false;
-        state.grandTotalAmount = action.payload.totalAmount; // Store grand total amount
+        state.grandTotalAmount = action.payload.totalAmount || 0;
       })
       .addCase(fetchGrandTotalAmount.rejected, (state, action) => {
         state.loading = false;
