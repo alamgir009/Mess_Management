@@ -5,6 +5,8 @@ const marketSchema = new mongoose.Schema({
   amount: Number,
   date: Date,
   marketOwner: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+},{
+  timestamps:true
 });
 
 const MarketModel = mongoose.model("market", marketSchema);

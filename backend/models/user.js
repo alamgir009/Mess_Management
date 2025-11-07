@@ -22,7 +22,9 @@ const userSchema = new mongoose.Schema({
   },
   resetPasswordOTP: { type: String },
   resetPasswordExpiry: { type: Date },
-});
+},
+{timestamps:true}
+);
 
 const UserModel = mongoose.model("user", userSchema);
 

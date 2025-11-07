@@ -24,6 +24,21 @@ export const addMarket = createAsyncThunk(
   }
 );
 
+// ✅ Update Market By Id - CORRECTED
+export const updateMarketById = createAsyncThunk(
+  "markets/updateMarketById",
+  async ({ id, marketData }, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.put(`/market/${id}`, marketData);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update market."
+      );
+    }
+  }
+);
+
 // ✅ Fetch all Markets total amount
 export const fetchMarketAmounts = createAsyncThunk(
   "markets/fetchMarketAmounts",
@@ -41,7 +56,7 @@ export const fetchMarketAmounts = createAsyncThunk(
 
 // ✅ Delete market item by ID
 export const deleteMarketById = createAsyncThunk(
-  "markets/deleteMarketById", // fixed incorrect type string
+  "markets/deleteMarketById",
   async (id, { rejectWithValue }) => {
     try {
       const { data } = await axiosInstance.delete(`/market/${id}`);
@@ -77,9 +92,17 @@ const marketsSlice = createSlice({
     totalMarketAmount: 0,
     grandTotalAmount: 0,
     loading: false,
+    marketLoading: false, // Added for better state management
     error: null,
+    marketError: null,
   },
-  reducers: {},
+  reducers: {
+    // Optional: Add a reducer to clear errors
+    clearError: (state) => {
+      state.error = null;
+      state.marketError = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
       // Fetch market list
@@ -101,22 +124,74 @@ const marketsSlice = createSlice({
       })
 
       // Add new market
+      .addCase(addMarket.pending, (state) => {
+        state.marketLoading = true;
+        state.marketError = null;
+      })
       .addCase(addMarket.fulfilled, (state, action) => {
+        state.marketLoading = false;
         state.markets.push(action.payload);
         state.totalMarketAmount += action.payload.amount || 0;
+        // Also update grand total if needed
+        state.grandTotalAmount += action.payload.amount || 0;
       })
       .addCase(addMarket.rejected, (state, action) => {
-        state.error = action.payload;
+        state.marketLoading = false;
+        state.marketError = action.payload;
+      })
+
+      // ✅ Update market - ADDED MISSING CASES
+      .addCase(updateMarketById.pending, (state) => {
+        state.marketLoading = true;
+        state.marketError = null;
+      })
+      .addCase(updateMarketById.fulfilled, (state, action) => {
+        state.marketLoading = false;
+        const updatedMarket = action.payload;
+        const index = state.markets.findIndex(market => market._id === updatedMarket._id);
+        
+        if (index !== -1) {
+          // Calculate the difference in amount for total updates
+          const oldAmount = state.markets[index].amount || 0;
+          const newAmount = updatedMarket.amount || 0;
+          const amountDifference = newAmount - oldAmount;
+          
+          // Update the market in the array
+          state.markets[index] = updatedMarket;
+          
+          // Update totals
+          state.totalMarketAmount += amountDifference;
+          state.grandTotalAmount += amountDifference;
+        }
+      })
+      .addCase(updateMarketById.rejected, (state, action) => {
+        state.marketLoading = false;
+        state.marketError = action.payload;
       })
 
       // Delete market
+      .addCase(deleteMarketById.pending, (state) => {
+        state.marketLoading = true;
+        state.marketError = null;
+      })
       .addCase(deleteMarketById.fulfilled, (state, action) => {
-        state.markets = state.markets.filter(
-          (market) => market.id !== action.payload
-        );
+        state.marketLoading = false;
+        const deletedMarketId = action.payload;
+        const deletedMarket = state.markets.find(market => market._id === deletedMarketId);
+        
+        if (deletedMarket) {
+          state.markets = state.markets.filter(
+            (market) => market._id !== deletedMarketId
+          );
+          // Update totals
+          const deletedAmount = deletedMarket.amount || 0;
+          state.totalMarketAmount -= deletedAmount;
+          state.grandTotalAmount -= deletedAmount;
+        }
       })
       .addCase(deleteMarketById.rejected, (state, action) => {
-        state.error = action.payload;
+        state.marketLoading = false;
+        state.marketError = action.payload;
       })
 
       // Fetch grand total
@@ -135,4 +210,5 @@ const marketsSlice = createSlice({
   },
 });
 
+export const { clearError } = marketsSlice.actions;
 export default marketsSlice.reducer;

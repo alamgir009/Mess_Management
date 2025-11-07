@@ -41,11 +41,12 @@ export const addMeal = createAsyncThunk(
       const { data } = await axiosInstance.post("/meal/addmeal", mealData);
       return data;
     } catch (error) {
-      return rejectWithValue(error?.response?.data || error.message);
+      return rejectWithValue(error?.response?.data?.message || error.message);
     }
   }
 );
 
+// ✅ CORRECTED: Update Meal By Id
 export const updateMealById = createAsyncThunk(
   "meals/updateMealById",
   async ({ id, mealData }, { rejectWithValue }) => {
@@ -53,7 +54,7 @@ export const updateMealById = createAsyncThunk(
       const { data } = await axiosInstance.put(`/meal/${id}`, mealData);
       return data;
     } catch (error) {
-      return rejectWithValue(error?.response?.data || error.message);
+      return rejectWithValue(error?.response?.data?.message || error.message);
     }
   }
 );
@@ -124,7 +125,7 @@ export const fetchTotalMeals = createAsyncThunk(
   }
 );
 
-// Meal slice
+// ✅ CORRECTED: Meal slice with proper update handling
 const mealSlice = createSlice({
   name: "meals",
   initialState: {
@@ -134,9 +135,15 @@ const mealSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    // Optional: Add a reducer to clear errors
+    clearError: (state) => {
+      state.error = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
+      // Fetch all meals
       .addCase(fetchAllMeals.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -149,37 +156,140 @@ const mealSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      
+      // Fetch meal by ID
+      .addCase(fetchMealById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchMealById.fulfilled, (state, action) => {
+        state.loading = false;
         state.meal = action.payload;
       })
+      .addCase(fetchMealById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
+      // Add meal
+      .addCase(addMeal.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addMeal.fulfilled, (state, action) => {
+        state.loading = false;
+        state.meals.push(action.payload);
+      })
+      .addCase(addMeal.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
+      // ✅ ADDED: Update meal by ID
+      .addCase(updateMealById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateMealById.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedMeal = action.payload;
+        const index = state.meals.findIndex(meal => meal._id === updatedMeal._id);
+        
+        if (index !== -1) {
+          state.meals[index] = updatedMeal;
+        }
+        
+        // Also update the single meal if it's the one being viewed
+        if (state.meal && state.meal._id === updatedMeal._id) {
+          state.meal = updatedMeal;
+        }
+      })
+      .addCase(updateMealById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
+      // Delete meal by ID
+      .addCase(deleteMealById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteMealById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.meals = state.meals.filter(meal => meal._id !== action.payload._id);
+        
+        // Clear the single meal if it's the one being deleted
+        if (state.meal && state.meal._id === action.payload._id) {
+          state.meal = null;
+        }
+      })
+      .addCase(deleteMealById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
+      // Add meal by admin
+      .addCase(addMealByAdmin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addMealByAdmin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.meals.push(action.payload);
+      })
+      .addCase(addMealByAdmin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
+      // Update meal by admin
+      .addCase(updateMealByAdmin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateMealByAdmin.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedMeal = action.payload;
+        const index = state.meals.findIndex(meal => meal._id === updatedMeal._id);
+        
+        if (index !== -1) {
+          state.meals[index] = updatedMeal;
+        }
+      })
+      .addCase(updateMealByAdmin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
+      // Delete meal by admin
+      .addCase(deleteMealByAdmin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteMealByAdmin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.meals = state.meals.filter(meal => meal._id !== action.payload._id);
+      })
+      .addCase(deleteMealByAdmin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
+      // Fetch total meals
+      .addCase(fetchTotalMeals.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchTotalMeals.fulfilled, (state, action) => {
+        state.loading = false;
         state.totalMeal = action.payload;
       })
-      .addMatcher(
-        (action) =>
-          action.type.endsWith("/pending") && action.type.startsWith("meals/"),
-        (state) => {
-          state.loading = true;
-          state.error = null;
-        }
-      )
-      .addMatcher(
-        (action) =>
-          action.type.endsWith("/rejected") && action.type.startsWith("meals/"),
-        (state, action) => {
-          state.loading = false;
-          state.error = action.payload;
-        }
-      )
-      .addMatcher(
-        (action) =>
-          action.type.endsWith("/fulfilled") &&
-          action.type.startsWith("meals/"),
-        (state) => {
-          state.loading = false;
-        }
-      );
+      .addCase(fetchTotalMeals.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
+export const { clearError } = mealSlice.actions;
 export default mealSlice.reducer;

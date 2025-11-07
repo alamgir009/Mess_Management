@@ -3,7 +3,7 @@ import { SideBar } from "./SideBar";
 import { useDispatch, useSelector } from "react-redux";
 import { Toaster, toast } from "react-hot-toast";
 import { fetchProfile } from "../../store/slices/userSlice";
-import { fetchGrandTotalAmount, deleteMarketById } from "../../store/slices/marketSlice";
+import { fetchGrandTotalAmount, deleteMarketById, updateMarketById } from "../../store/slices/marketSlice";
 import { deleteMealById, fetchAllMeals, fetchTotalMeals } from "../../store/slices/mealSlice";
 import {
     HiCurrencyRupee,
@@ -15,7 +15,8 @@ import {
     HiPencilAlt,
     HiTrash,
     HiDotsVertical,
-    HiOutlineCog
+    HiOutlineCog,
+    HiX
 } from "react-icons/hi";
 import { PiBowlSteamFill } from "react-icons/pi";
 
@@ -30,13 +31,18 @@ const Profiles = () => {
     const [localProfile, setLocalProfile] = useState(profile);
     const [localGrandTotal, setLocalGrandTotal] = useState(grandTotalAmount);
     const [localTotalMeal, setLocalTotalMeal] = useState(totalMeal);
-    
+
     // Single state to track which menu is open (only one at a time)
     const [openMenuId, setOpenMenuId] = useState(null);
-    
+
     // Loading states for delete operations
     const [deletingMealId, setDeletingMealId] = useState(null);
     const [deletingMarketId, setDeletingMarketId] = useState(null);
+
+    // Edit modal states
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editingMarket, setEditingMarket] = useState(null);
+    const [isUpdating, setIsUpdating] = useState(false);
 
     // Update local states when Redux states change
     useEffect(() => {
@@ -77,33 +83,125 @@ const Profiles = () => {
 
     const getWeekday = (date) => new Date(date).toLocaleString("default", { weekday: "long" });
 
+    // Function to open edit modal with market data
+    const handleMarketEdit = (market) => {
+        setOpenMenuId(null);
+        setEditingMarket(market);
+        setIsEditModalOpen(true);
+    };
+
+    // Function to close edit modal
+    const handleCloseEditModal = () => {
+        setIsEditModalOpen(false);
+        setEditingMarket(null);
+    };
+
+    // Function to update market
+    const handleMarketUpdate = async (updatedData) => {
+        setIsUpdating(true);
+
+        try {
+            const oldAmount = editingMarket.amount;
+            const newAmount = parseFloat(updatedData.amount);
+            const amountDifference = newAmount - oldAmount;
+
+            // Optimistically update local UI immediately for instant feedback
+            setLocalProfile(prev => ({
+                ...prev,
+                marketDetails: prev.marketDetails.map(market =>
+                    market._id === editingMarket._id
+                        ? {
+                            ...market,
+                            items: updatedData.items,
+                            amount: newAmount,
+                            date: updatedData.date
+                        }
+                        : market
+                )
+            }));
+
+            // Update local total amount immediately
+            setLocalProfile(prev => ({
+                ...prev,
+                totalAmount: (prev.totalAmount || 0) + amountDifference
+            }));
+
+            // Update grand total amount immediately
+            setLocalGrandTotal(prev => prev + amountDifference);
+
+            // Close modal immediately for better UX
+            handleCloseEditModal();
+
+            // Show success message immediately
+            toast.success("Market item updated successfully!");
+
+            // Update market in database via Redux action
+            await dispatch(updateMarketById({
+                id: editingMarket._id,
+                marketData: {
+                    items: updatedData.items,
+                    amount: newAmount,
+                    date: updatedData.date
+                }
+            })).unwrap();
+
+            // Refresh data from server in background to ensure consistency
+            dispatch(fetchProfile());
+            dispatch(fetchGrandTotalAmount());
+
+        } catch (error) {
+            console.error("Error updating market item:", error);
+
+            // Revert optimistic updates on error
+            const oldAmount = editingMarket.amount;
+            const newAmount = parseFloat(updatedData.amount);
+            const amountDifference = newAmount - oldAmount;
+
+            setLocalProfile(prev => ({
+                ...prev,
+                marketDetails: prev.marketDetails.map(market =>
+                    market._id === editingMarket._id
+                        ? editingMarket
+                        : market
+                ),
+                totalAmount: (prev.totalAmount || 0) - amountDifference
+            }));
+
+            setLocalGrandTotal(prev => prev - amountDifference);
+
+            toast.error(error?.message || "Failed to update market item. Changes reverted.");
+
+            // Refresh from server to ensure consistency
+            dispatch(fetchProfile());
+            dispatch(fetchGrandTotalAmount());
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
     // Function to delete meal from database and update UI
     const handleMealDelete = async (deletedMealId, deletedMealData) => {
         setOpenMenuId(null);
         setDeletingMealId(deletedMealId);
-        
+
         try {
-            // Delete meal from database via Redux action
             await dispatch(deleteMealById(deletedMealId)).unwrap();
-            
-            // Update local profile meals
+
             setLocalProfile(prev => ({
                 ...prev,
                 mealDetails: prev.mealDetails.filter(meal => meal._id !== deletedMealId)
             }));
 
-            // Update total meals count
             const mealReduction = deletedMealData.mealTime === "both" ? 2 : 1;
             setLocalTotalMeal(prev => ({
                 ...prev,
                 grandTotalMeal: prev.grandTotalMeal - mealReduction
             }));
-            
-            // Refresh data from server to ensure consistency
+
             dispatch(fetchProfile());
             dispatch(fetchTotalMeals());
             dispatch(fetchAllMeals());
-            
+
             toast.success("Meal deleted successfully!");
         } catch (error) {
             console.error("Error deleting meal:", error);
@@ -117,25 +215,21 @@ const Profiles = () => {
     const handleMarketDelete = async (deletedMarketId, deletedMarketAmount) => {
         setOpenMenuId(null);
         setDeletingMarketId(deletedMarketId);
-        
+
         try {
-            // Delete market from database via Redux action
             await dispatch(deleteMarketById(deletedMarketId)).unwrap();
-            
-            // Update local profile market details
+
             setLocalProfile(prev => ({
                 ...prev,
                 marketDetails: prev.marketDetails.filter(market => market._id !== deletedMarketId),
                 totalAmount: (prev.totalAmount || 0) - deletedMarketAmount
             }));
 
-            // Update grand total amount
             setLocalGrandTotal(prev => prev - deletedMarketAmount);
-            
-            // Refresh data from server to ensure consistency
+
             dispatch(fetchProfile());
             dispatch(fetchGrandTotalAmount());
-            
+
             toast.success("Market item deleted successfully!");
         } catch (error) {
             console.error("Error deleting market item:", error);
@@ -172,7 +266,6 @@ const Profiles = () => {
             <div className="flex-grow m-1 p-4 space-y-6">
                 {/* Profile Header */}
                 <div className="bg-white/5 p-6 rounded-3xl border border-white/20 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
-                    {/* Glass effect overlay */}
                     <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5"></div>
                     <div className="relative z-10 flex items-center gap-4">
                         {localProfile?.image ? (
@@ -250,7 +343,6 @@ const Profiles = () => {
                             key={idx}
                             className={`${stat.bg || stat.status} p-4 rounded-2xl border border-white/20 backdrop-blur-2xl shadow-2xl hover:bg-white/10 transition-all duration-300 relative overflow-hidden group`}
                         >
-                            {/* Glass shine effect */}
                             <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
                             <div className="relative z-10 flex items-center gap-3">
                                 <div className="p-2 bg-white/10 rounded-xl backdrop-blur-lg border border-white/20">{stat.icon}</div>
@@ -290,11 +382,12 @@ const Profiles = () => {
                                     </thead>
                                     <tbody className="bg-white/5">
                                         {localProfile.marketDetails.map((market) => (
-                                            <MarketRow 
-                                                key={market._id} 
-                                                market={market} 
+                                            <MarketRow
+                                                key={market._id}
+                                                market={market}
                                                 getWeekday={getWeekday}
                                                 onMarketDelete={handleMarketDelete}
+                                                onMarketEdit={handleMarketEdit}
                                                 openMenuId={openMenuId}
                                                 setOpenMenuId={setOpenMenuId}
                                                 isDeleting={deletingMarketId === market._id}
@@ -320,10 +413,10 @@ const Profiles = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {localProfile.mealDetails.map((meal) => (
-                                    <MealCard 
-                                        key={meal._id} 
-                                        meal={meal} 
-                                        getWeekday={getWeekday} 
+                                    <MealCard
+                                        key={meal._id}
+                                        meal={meal}
+                                        getWeekday={getWeekday}
                                         onMealDelete={handleMealDelete}
                                         openMenuId={openMenuId}
                                         setOpenMenuId={setOpenMenuId}
@@ -337,6 +430,16 @@ const Profiles = () => {
 
                 <Toaster position="top-center" reverseOrder={false} />
             </div>
+
+            {/* Edit Market Modal */}
+            {isEditModalOpen && editingMarket && (
+                <EditMarketModal
+                    market={editingMarket}
+                    onClose={handleCloseEditModal}
+                    onUpdate={handleMarketUpdate}
+                    isUpdating={isUpdating}
+                />
+            )}
         </div>
     );
 };
@@ -350,14 +453,206 @@ const formatDate = (date) => {
     return `${day}-${month}-${year}`;
 };
 
+// Helper function to convert date to YYYY-MM-DD for input
+const formatDateForInput = (date) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+};
+
+// Edit Market Modal Component
+const EditMarketModal = ({ market, onClose, onUpdate, isUpdating }) => {
+  const items_OPTIONS = ["Chicken", "Fish", "Beef", "Egg", "Veg", "Grocery"];
+  const [formData, setFormData] = useState({
+    items: market.items || "",
+    amount: market.amount || "",
+    date: formatDateForInput(market.date) || ""
+  });
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = 'unset'; };
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.items.trim()) newErrors.items = "Item name is required";
+    if (!formData.amount) newErrors.amount = "Amount is required";
+    else if (parseFloat(formData.amount) <= 0)
+      newErrors.amount = "Amount must be greater than 0";
+    if (!formData.date) newErrors.date = "Date is required";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      onUpdate({
+        items: formData.items.trim(),
+        amount: parseFloat(formData.amount),
+        date: new Date(formData.date).toISOString()
+      });
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fadeIn">
+      <div className="relative w-full max-w-md rounded-3xl border border-white/20 bg-white/10 shadow-[0_0_40px_rgba(0,0,0,0.3)] backdrop-blur-2xl transition-all duration-300">
+        
+        {/* Top subtle glow border */}
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-white/30 to-transparent pointer-events-none"></div>
+
+        {/* Header */}
+        <div className="flex justify-between items-center p-6 border-b border-white/10">
+          <h2 className="text-xl font-semibold text-white/90 tracking-tight">
+            Edit Market Item
+          </h2>
+          <button
+            onClick={onClose}
+            disabled={isUpdating}
+            className="p-2 rounded-lg text-white/60 hover:bg-white/10 hover:text-white transition-all duration-200 disabled:opacity-50"
+          >
+            <HiX className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          
+          {/* Item Name */}
+          <div>
+            <label htmlFor="items" className="block text-sm font-medium text-white/70 mb-2">
+              Item Name
+            </label>
+            <div className="relative">
+              <select
+                id="items"
+                name="items"
+                value={formData.items}
+                onChange={handleChange}
+                disabled={isUpdating}
+                className={`w-full px-4 py-3 rounded-2xl bg-white/10 border ${
+                  errors.items ? 'border-red-400' : 'border-white/20'
+                } text-white focus:outline-none focus:ring-0.5 focus:ring-teal-300 focus:border-teal-300
+                backdrop-blur-xl appearance-none transition-all duration-200 disabled:opacity-50 [color-scheme:dark]`}
+              >
+                <option value="" className="bg-gray-900 text-gray-300">Select an item</option>
+                {items_OPTIONS.map((item) => (
+                  <option key={item} value={item} className="bg-gray-900 text-gray-200">
+                    {item}
+                  </option>
+                ))}
+              </select>
+
+              {/* iOS-style dropdown icon */}
+              <svg
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+            {errors.items && <p className="mt-1 text-sm text-red-400">{errors.items}</p>}
+          </div>
+
+          {/* Amount */}
+          <div>
+            <label htmlFor="amount" className="block text-sm font-medium text-white/70 mb-2">
+              Amount (₹)
+            </label>
+            <input
+              type="number"
+              id="amount"
+              name="amount"
+              value={formData.amount}
+              onChange={handleChange}
+              disabled={isUpdating}
+              step="0.01"
+              min="0"
+              placeholder="Enter amount"
+              className={`w-full px-4 py-3 bg-white/10 border ${
+                errors.amount ? 'border-red-400' : 'border-white/20'
+              } rounded-2xl text-white placeholder-white/40 focus:outline-none focus:ring-0.5 
+              focus:ring-teal-300 focus:border-teal-300 transition-all duration-200 
+              backdrop-blur-xl disabled:opacity-50`}
+            />
+            {errors.amount && <p className="mt-1 text-sm text-red-400">{errors.amount}</p>}
+          </div>
+
+          {/* Date */}
+          <div>
+            <label htmlFor="date" className="block text-sm font-medium text-white/70 mb-2">
+              Date
+            </label>
+            <input
+              type="date"
+              id="date"
+              name="date"
+              value={formData.date}
+              onChange={handleChange}
+              disabled={isUpdating}
+              className={`w-full px-4 py-3 bg-white/10 border ${
+                errors.date ? 'border-red-400' : 'border-white/20'
+              } rounded-2xl text-white focus:outline-none focus:ring-0.5 
+              focus:ring-teal-300 focus:border-teal-300 transition-all duration-200 
+              backdrop-blur-xl disabled:opacity-50`}
+            />
+            {errors.date && <p className="mt-1 text-sm text-red-400">{errors.date}</p>}
+          </div>
+
+          {/* Buttons */}
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isUpdating}
+              className="flex-1 px-4 py-3 rounded-2xl font-medium text-white/90 bg-white/10 border border-white/20
+              hover:bg-white/20 transition-all duration-300 disabled:opacity-50 shadow-inner backdrop-blur-xl"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isUpdating}
+              className="flex-1 px-4 py-3 rounded-2xl font-medium text-black bg-gradient-to-r from-white to-gray-400 
+              hover:from-gray-400 hover:to-white shadow-lg transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {isUpdating ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-black"></div>
+                  Updating...
+                </>
+              ) : (
+                "Update Market"
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+
 // MarketRow Component for individual market items
-const MarketRow = ({ market, getWeekday, onMarketDelete, openMenuId, setOpenMenuId, isDeleting }) => {
+const MarketRow = ({ market, getWeekday, onMarketDelete, onMarketEdit, openMenuId, setOpenMenuId, isDeleting }) => {
     const menuRef = useRef(null);
-    
-    // Check if this specific menu is open
+
     const isMenuOpen = openMenuId === `market-${market._id}`;
 
-    // Close menu when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -382,8 +677,7 @@ const MarketRow = ({ market, getWeekday, onMarketDelete, openMenuId, setOpenMenu
     };
 
     const handleEdit = () => {
-        setOpenMenuId(null);
-        alert(`Editing market: ${market.items}`);
+        onMarketEdit(market);
     };
 
     const handleDelete = async () => {
@@ -410,9 +704,8 @@ const MarketRow = ({ market, getWeekday, onMarketDelete, openMenuId, setOpenMenu
                     ) : (
                         <>
                             <HiOutlineCog
-                                className={`w-5 h-5 cursor-pointer transition-all duration-200 ${
-                                    isMenuOpen ? 'text-teal-400 rotate-90' : 'text-white/70 hover:text-teal-400'
-                                }`}
+                                className={`w-5 h-5 cursor-pointer transition-all duration-200 ${isMenuOpen ? 'text-teal-400 rotate-90' : 'text-white/70 hover:text-teal-400'
+                                    }`}
                                 onClick={toggleMenu}
                             />
                             {isMenuOpen && (
@@ -442,11 +735,9 @@ const MarketRow = ({ market, getWeekday, onMarketDelete, openMenuId, setOpenMenu
 // MealCard Component
 const MealCard = ({ meal, getWeekday, onMealDelete, openMenuId, setOpenMenuId, isDeleting }) => {
     const menuRef = useRef(null);
-    
-    // Check if this specific menu is open
+
     const isMenuOpen = openMenuId === `meal-${meal._id}`;
 
-    // Close menu when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -483,14 +774,11 @@ const MealCard = ({ meal, getWeekday, onMealDelete, openMenuId, setOpenMenuId, i
 
     return (
         <div className={`relative bg-white/5 rounded-2xl border border-white/20 backdrop-blur-lg hover:bg-white/10 transition-all duration-300 group ${isDeleting ? 'opacity-50' : ''}`}>
-            {/* Glass shine effect - moved outside the content area */}
             <div className="absolute inset-0 rounded-2xl overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
             </div>
-            
-            {/* Content area - no overflow hidden */}
+
             <div className="relative p-4 z-10">
-                {/* Top Row: Meal Time + Menu Icon */}
                 <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center gap-3">
                         <HiClock className="w-5 h-5 text-teal-400" />
@@ -503,9 +791,8 @@ const MealCard = ({ meal, getWeekday, onMealDelete, openMenuId, setOpenMenuId, i
                         ) : (
                             <>
                                 <HiDotsVertical
-                                    className={`w-5 h-5 cursor-pointer transition-all duration-200 ${
-                                        isMenuOpen ? 'text-teal-400' : 'text-white/70 hover:text-teal-400'
-                                    }`}
+                                    className={`w-5 h-5 cursor-pointer transition-all duration-200 ${isMenuOpen ? 'text-teal-400' : 'text-white/70 hover:text-teal-400'
+                                        }`}
                                     onClick={toggleMenu}
                                 />
 
@@ -530,7 +817,6 @@ const MealCard = ({ meal, getWeekday, onMealDelete, openMenuId, setOpenMenuId, i
                     </div>
                 </div>
 
-                {/* Bottom Row: Date + Day */}
                 <div className="flex justify-between items-center text-sm text-white/70">
                     <div className="flex items-center gap-3">
                         <HiCalendar className="w-4 h-4 text-teal-400" />
