@@ -19,6 +19,21 @@ const Table = () => {
     return users.find(user => user._id === expandedUserId);
   }, [users, expandedUserId]);
 
+  // ✅ Calculate total statistics
+  const totalStats = useMemo(() => {
+    const totalMarket = users.reduce((sum, user) => sum + (user.totalAmount || 0), 0);
+    const totalMeal = users.reduce((sum, user) => sum + (user.totalMeal || 0), 0);
+    const totalUsers = users.filter(user => user.userStatus !== 'denied').length;
+    const pendingPayments = users.filter(user => user.payment === 'pending' & user.userStatus !== 'denied').length;
+    
+    return {
+      totalMarket,
+      totalMeal,
+      totalUsers,
+      pendingPayments
+    };
+  }, [users]);
+
   // ✅ Optimized: Memoized utility functions
   const getRoleClass = useCallback((role) => {
     switch (role) {
@@ -77,6 +92,38 @@ const Table = () => {
       {/* Main Content */}
       <div className="flex-grow border border-gray-500 rounded-md m-1 p-4 overflow-auto">
         <h1 className="text-center text-xl sm:text-2xl w-full mb-4">User Overview</h1>
+        
+        {/* ✅ ADDED: Dashboard Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          {/* Total Market Card */}
+          <div className="backdrop-blur-lg bg-green-500/10 border border-green-400/20 rounded-xl p-4 text-center transition-all duration-300 hover:bg-green-500/15 hover:border-green-400/30">
+            <div className="text-green-300 text-sm font-medium mb-1">Total Market</div>
+            <div className="text-2xl font-bold text-white">₹{totalStats.totalMarket}</div>
+            <div className="text-green-400/70 text-xs mt-1">All users combined</div>
+          </div>
+
+          {/* Total Meal Card */}
+          <div className="backdrop-blur-lg bg-blue-500/10 border border-blue-400/20 rounded-xl p-4 text-center transition-all duration-300 hover:bg-blue-500/15 hover:border-blue-400/30">
+            <div className="text-blue-300 text-sm font-medium mb-1">Total Meal</div>
+            <div className="text-2xl font-bold text-white">{totalStats.totalMeal}</div>
+            <div className="text-blue-400/70 text-xs mt-1">Total meals consumed</div>
+          </div>
+
+          {/* Total Users Card */}
+          <div className="backdrop-blur-lg bg-purple-500/10 border border-purple-400/20 rounded-xl p-4 text-center transition-all duration-300 hover:bg-purple-500/15 hover:border-purple-400/30">
+            <div className="text-purple-300 text-sm font-medium mb-1">Total Users</div>
+            <div className="text-2xl font-bold text-white">{totalStats.totalUsers}</div>
+            <div className="text-purple-400/70 text-xs mt-1">Active members</div>
+          </div>
+
+          {/* Pending Payments Card */}
+          <div className="backdrop-blur-lg bg-orange-500/10 border border-orange-400/20 rounded-xl p-4 text-center transition-all duration-300 hover:bg-orange-500/15 hover:border-orange-400/30">
+            <div className="text-orange-300 text-sm font-medium mb-1">Pending</div>
+            <div className="text-2xl font-bold text-white">{totalStats.pendingPayments}</div>
+            <div className="text-orange-400/70 text-xs mt-1">Need action</div>
+          </div>
+        </div>
+
         <hr className="mb-4 border-gray-500" />
 
         <div className="overflow-x-auto rounded-md border border-gray-500 font-inter">
