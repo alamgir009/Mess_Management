@@ -2,6 +2,27 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getUsers, updateUserByAdmin, fetchProfile } from "../../store/slices/userSlice";
 import { SideBar } from "./SideBar";
+import { 
+  FiUsers, 
+  FiShield, 
+  FiCheckCircle, 
+  FiClock,
+  FiSearch,
+  FiUser,
+  FiEdit,
+  FiSave,
+  FiX,
+  FiMail,
+  FiPhone,
+  FiBarChart2
+} from "react-icons/fi";
+import { 
+  HiOutlineUserGroup,
+  HiOutlineKey,
+  HiOutlineCheckBadge,
+  HiOutlineClock,
+  HiOutlineCurrencyRupee
+} from "react-icons/hi2";
 
 export const Dashboard = () => {
   const dispatch = useDispatch();
@@ -16,19 +37,61 @@ export const Dashboard = () => {
 
   const isAdmin = profile?.role === "admin";
 
+  // Function to render user avatar
+  const renderUserAvatar = (user, size = "w-10 h-10") => {
+    if (user.image) {
+      return (
+        <img 
+          src={user.image} 
+          alt={user.name} 
+          className={`${size} rounded-xl object-cover border border-cyan-400/30`}
+        />
+      );
+    }
+    return (
+      <div className={`${size} bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-xl flex items-center justify-center border border-cyan-400/30`}>
+        <FiUser className="text-cyan-300" />
+      </div>
+    );
+  };
+
+  // Function to render profile icon in top right corner
+  const renderProfileIcon = () => {
+    if (profile?.image) {
+      return (
+        <img 
+          src={profile.image} 
+          alt="Profile" 
+          className="w-10 h-10 rounded-xl object-cover border border-gray-600/50"
+        />
+      );
+    }
+    return (
+      <div className="w-10 h-10 bg-gray-700 rounded-xl flex items-center justify-center border border-gray-600/50">
+        <FiUser className="text-gray-300" />
+      </div>
+    );
+  };
+
   if (loading) return (
     <div className="flex items-center justify-center h-screen bg-gradient-to-b from-black to-blue-950">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 border-3 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-gray-300 text-sm font-medium">Loading...</p>
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 border-4 border-gray-600 border-t-blue-400 rounded-full animate-spin"></div>
+        <p className="text-gray-300 text-lg font-medium">Loading Dashboard...</p>
       </div>
     </div>
   );
   
   if (error) return (
     <div className="flex items-center justify-center h-screen bg-gradient-to-b from-black to-blue-950">
-      <div className="bg-red-900/30 border border-red-500/50 rounded-xl px-6 py-4 backdrop-blur-sm">
-        <p className="text-red-400 text-sm font-medium">Error: {error}</p>
+      <div className="bg-red-900/50 backdrop-blur-sm border border-red-500/30 rounded-2xl px-8 py-6 shadow-lg">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+            <FiX className="text-white text-sm" />
+          </div>
+          <h3 className="text-red-200 font-semibold">Error Loading Data</h3>
+        </div>
+        <p className="text-red-300 text-sm">{error}</p>
       </div>
     </div>
   );
@@ -36,23 +99,23 @@ export const Dashboard = () => {
   const getRoleBadgeClass = (role) => {
     switch (role) {
       case "admin":
-        return "bg-purple-500/20 text-purple-300 border-purple-400/30";
+        return "bg-purple-500/20 text-purple-300 border border-purple-400/30";
       case "user":
-        return "bg-cyan-500/20 text-cyan-300 border-cyan-400/30";
+        return "bg-cyan-500/20 text-cyan-300 border border-cyan-400/30";
       default:
-        return "bg-gray-500/20 text-gray-300 border-gray-400/30";
+        return "bg-gray-500/20 text-gray-300 border border-gray-400/30";
     }
   };
 
   const getStatusBadgeClass = (status) => 
     status === "approved" 
-      ? "bg-green-500/20 text-lime-400 border-green-400/30" 
-      : "bg-red-500/20 text-red-400 border-red-400/30";
+      ? "bg-green-500/20 text-lime-400 border border-green-400/30" 
+      : "bg-red-500/20 text-red-400 border border-red-400/30";
 
   const getPaymentBadgeClass = (payment) => 
     payment === "success" 
-      ? "bg-emerald-500/20 text-green-300 border-emerald-400/30" 
-      : "bg-orange-500/20 text-orange-300 border-orange-400/30";
+      ? "bg-emerald-500/20 text-green-300 border border-emerald-400/30" 
+      : "bg-orange-500/20 text-orange-300 border border-orange-400/30";
 
   const handleEditClick = (user) => {
     setEditUserId(user._id);
@@ -91,9 +154,15 @@ export const Dashboard = () => {
         await dispatch(getUsers());
         setEditUserId(null);
         setFormData({});
-        alert("User updated successfully!");
+        const successEvent = new CustomEvent('showToast', {
+          detail: { message: 'User updated successfully!', type: 'success' }
+        });
+        window.dispatchEvent(successEvent);
       } else {
-        alert("Failed to update user. Please check your API or data structure.");
+        const errorEvent = new CustomEvent('showToast', {
+          detail: { message: 'Failed to update user', type: 'error' }
+        });
+        window.dispatchEvent(errorEvent);
       }
     } catch (err) {
       console.error("Update error:", err);
@@ -101,64 +170,167 @@ export const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row justify-between text-white bg-gradient-to-b from-black to-blue-950 h-screen">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-gradient-to-b from-black to-blue-950">
+      {/* Sidebar - Original styling preserved */}
       <div className="sidebar w-screen m-1 rounded-md text-white lg:w-80 bg-gray-950">
         <SideBar />
       </div>
 
-      <div className="flex-grow border rounded-md border-gray-500 m-1 overflow-hidden flex flex-col">
-        {/* Header */}
-        <div className="bg-gray-900/50 backdrop-blur-sm border-b border-gray-700/50 px-8 py-5">
-          <h1 className="text-2xl font-semibold text-white">User Overview</h1>
-          <p className="text-sm text-gray-400 mt-1">Manage user accounts and permissions</p>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col m-1">
+        {/* Header - iOS Style */}
+        <div className="bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/60 rounded-t-lg sticky top-0 z-10">
+          <div className="px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-semibold text-white flex items-center gap-2">
+                  <FiBarChart2 className="text-blue-400" />
+                  User Management
+                </h1>
+                <p className="text-gray-400 text-sm mt-1">Manage user accounts and permissions</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search users..."
+                    className="pl-10 pr-4 py-2.5 bg-gray-800/50 border border-gray-600/50 rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent backdrop-blur-sm w-64"
+                  />
+                  <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                </div>
+                {renderProfileIcon()}
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Table Container */}
-        <div className="flex-1 overflow-auto p-4">
-          <div className="bg-gray-900/30 backdrop-blur-sm rounded-xl shadow-xl border border-gray-700/50 overflow-hidden">
+        {/* Content Area */}
+        <div className="flex-1 p-6">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/50 shadow-lg hover:border-cyan-400/30 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Total Users</p>
+                  <p className="text-2xl font-semibold text-white">{users.length}</p>
+                </div>
+                <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center border border-cyan-400/30">
+                  <HiOutlineUserGroup className="text-cyan-300 text-xl" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/50 shadow-lg hover:border-purple-400/30 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Admins</p>
+                  <p className="text-2xl font-semibold text-white">
+                    {users.filter(u => u.role === 'admin').length}
+                  </p>
+                </div>
+                <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center border border-purple-400/30">
+                  <HiOutlineKey className="text-purple-300 text-xl" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/50 shadow-lg hover:border-green-400/30 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Approved</p>
+                  <p className="text-2xl font-semibold text-white">
+                    {users.filter(u => u.userStatus === 'approved').length}
+                  </p>
+                </div>
+                <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center border border-green-400/30">
+                  <HiOutlineCheckBadge className="text-green-300 text-xl" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-4 border border-gray-700/50 shadow-lg hover:border-orange-400/30 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Pending</p>
+                  <p className="text-2xl font-semibold text-white">
+                    {users.filter(u => u.payment === 'pending').length}
+                  </p>
+                </div>
+                <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center border border-orange-400/30">
+                  <HiOutlineClock className="text-orange-300 text-xl" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Users Table */}
+          <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-lg overflow-hidden">
+            {/* Table Header */}
+            <div className="px-6 py-4 border-b border-gray-700/50 bg-gray-800/30">
+              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                <FiUsers className="text-blue-400" />
+                Users
+              </h2>
+            </div>
+
+            {/* Table */}
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-700/50">
-                <thead className="bg-gray-800/50">
+              <table className="w-full">
+                <thead className="bg-gray-800/30 border-b border-gray-700/50">
                   <tr>
-                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                      Name
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                      User
                     </th>
-                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                      Email
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                      Contact
                     </th>
-                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                      Phone
-                    </th>
-                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                       Role
                     </th>
-                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                      Payment ₹
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                      Payment
                     </th>
-                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
-                      Gas ₹
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                      Gas Bill
                     </th>
                     {isAdmin && (
-                      <th className="px-6 py-3.5 text-right text-xs font-semibold text-gray-300 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
                         Actions
                       </th>
                     )}
                   </tr>
                 </thead>
-                <tbody className="bg-gray-900/20 divide-y divide-gray-700/30">
+                <tbody className="divide-y divide-gray-700/50">
                   {users.map((user) => (
-                    <tr key={user._id} className="hover:bg-gray-800/40 transition-colors duration-150">
+                    <tr 
+                      key={user._id} 
+                      className="hover:bg-gray-800/40 transition-colors duration-150 group"
+                    >
+                      {/* User Info */}
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-white">{user.name}</div>
+                        <div className="flex items-center gap-3">
+                          {renderUserAvatar(user)}
+                          <div>
+                            <div className="text-sm font-medium text-white">{user.name}</div>
+                          </div>
+                        </div>
                       </td>
+
+                      {/* Contact */}
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-300">{user.email}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-300">{user.phone}</div>
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2 text-sm text-white">
+                            <FiMail className="text-gray-400 text-xs" />
+                            {user.email}
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-gray-400">
+                            <FiPhone className="text-gray-400 text-xs" />
+                            {user.phone}
+                          </div>
+                        </div>
                       </td>
 
                       {/* Role */}
@@ -168,13 +340,14 @@ export const Dashboard = () => {
                             name="role"
                             value={formData.role}
                             onChange={handleChange}
-                            className="text-sm rounded-lg border border-gray-600 px-3 py-1.5 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="text-sm rounded-xl border border-gray-600 px-3 py-2 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           >
                             <option value="user">user</option>
                             <option value="admin">admin</option>
                           </select>
                         ) : (
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${getRoleBadgeClass(user.role)}`}>
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getRoleBadgeClass(user.role)}`}>
+                            {user.role === 'admin' ? <FiShield className="mr-1" /> : <FiUser className="mr-1" />}
                             {user.role}
                           </span>
                         )}
@@ -187,13 +360,17 @@ export const Dashboard = () => {
                             name="userStatus"
                             value={formData.userStatus}
                             onChange={handleChange}
-                            className="text-sm rounded-lg border border-gray-600 px-3 py-1.5 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="text-sm rounded-xl border border-gray-600 px-3 py-2 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           >
                             <option value="approved">approved</option>
                             <option value="denied">denied</option>
                           </select>
                         ) : (
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${getStatusBadgeClass(user.userStatus)}`}>
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(user.userStatus)}`}>
+                            {user.userStatus === 'approved' ? 
+                              <FiCheckCircle className="mr-1" /> : 
+                              <FiX className="mr-1" />
+                            }
                             {user.userStatus}
                           </span>
                         )}
@@ -206,13 +383,17 @@ export const Dashboard = () => {
                             name="payment"
                             value={formData.payment}
                             onChange={handleChange}
-                            className="text-sm rounded-lg border border-gray-600 px-3 py-1.5 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="text-sm rounded-xl border border-gray-600 px-3 py-2 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           >
                             <option value="success">success</option>
                             <option value="pending">pending</option>
                           </select>
                         ) : (
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${getPaymentBadgeClass(user.payment)}`}>
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getPaymentBadgeClass(user.payment)}`}>
+                            {user.payment === 'success' ? 
+                              <HiOutlineCurrencyRupee className="mr-1" /> : 
+                              <HiOutlineClock className="mr-1" />
+                            }
                             {user.payment}
                           </span>
                         )}
@@ -225,13 +406,17 @@ export const Dashboard = () => {
                             name="gasBill"
                             value={formData.gasBill}
                             onChange={handleChange}
-                            className="text-sm rounded-lg border border-gray-600 px-3 py-1.5 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="text-sm rounded-xl border border-gray-600 px-3 py-2 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           >
                             <option value="success">success</option>
                             <option value="pending">pending</option>
                           </select>
                         ) : (
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${getPaymentBadgeClass(user.gasBill)}`}>
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getPaymentBadgeClass(user.gasBill)}`}>
+                            {user.gasBill === 'success' ? 
+                              <HiOutlineCurrencyRupee className="mr-1" /> : 
+                              <HiOutlineClock className="mr-1" />
+                            }
                             {user.gasBill}
                           </span>
                         )}
@@ -239,27 +424,30 @@ export const Dashboard = () => {
 
                       {/* Actions */}
                       {isAdmin && (
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <td className="px-6 py-4 whitespace-nowrap text-right">
                           {editUserId === user._id ? (
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => handleSave(user._id)}
-                                className="inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                                className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 shadow-sm"
                               >
+                                <FiSave className="mr-2" />
                                 Save
                               </button>
                               <button
                                 onClick={handleCancel}
-                                className="inline-flex items-center px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                                className="inline-flex items-center px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900"
                               >
+                                <FiX className="mr-2" />
                                 Cancel
                               </button>
                             </div>
                           ) : (
                             <button
                               onClick={() => handleEditClick(user)}
-                              className="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                              className="inline-flex items-center px-4 py-2 bg-blue-600 border border-blue-500 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 shadow-sm opacity-0 group-hover:opacity-100"
                             >
+                              <FiEdit className="mr-2" />
                               Edit
                             </button>
                           )}
