@@ -98,16 +98,11 @@ export const deleteUserById = createAsyncThunk(
     }
   }
 );
-
-// Admin update user by ID
 export const updateUserByAdmin = createAsyncThunk(
   "user/updateUserByAdmin",
   async ({ id, updatedData }, { rejectWithValue }) => {
     try {
-      const { data } = await axiosInstance.put(
-        `/user/updatebyadmin/${id}`,
-        updatedData
-      );
+      const { data } = await axiosInstance.put(`/user/updatebyadmin/${id}`, updatedData);
       return data;
     } catch (error) {
       return rejectWithValue(
@@ -116,6 +111,7 @@ export const updateUserByAdmin = createAsyncThunk(
     }
   }
 );
+
 
 // Admin delete user by ID
 export const deleteUserByAdmin = createAsyncThunk(

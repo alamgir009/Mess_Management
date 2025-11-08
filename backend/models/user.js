@@ -22,9 +22,38 @@ const userSchema = new mongoose.Schema({
   },
   resetPasswordOTP: { type: String },
   resetPasswordExpiry: { type: Date },
-},
-{timestamps:true}
-);
+  // Add this field for TTL
+  deleteIfNotApproved: { 
+    type: Date, 
+    default: function() {
+      // Set to 7 days from creation if status is denied
+      if (this.userStatus === 'denied') {
+        return new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+      }
+      return null;
+    }
+  }
+}, { timestamps: true });
+
+// Add TTL index - automatically removes documents after deleteIfNotApproved date
+userSchema.index({ deleteIfNotApproved: 1 }, { 
+  expireAfterSeconds: 0,
+  partialFilterExpression: { userStatus: "denied" }
+});
+
+// Middleware to update deleteIfNotApproved when userStatus changes
+userSchema.pre('save', function(next) {
+  if (this.isModified('userStatus')) {
+    if (this.userStatus === 'approved') {
+      // If approved, remove the deletion date
+      this.deleteIfNotApproved = null;
+    } else if (this.userStatus === 'denied' && !this.deleteIfNotApproved) {
+      // If denied and no deletion date set, set it to 7 days from now
+      this.deleteIfNotApproved = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    }
+  }
+  next();
+});
 
 const UserModel = mongoose.model("user", userSchema);
 
