@@ -89,7 +89,7 @@ export const SideBar = () => {
         <AlertBox message={alert.message} type={alert.type} onClose={() => setAlert({ message: '', type: '' })} />
       )}
       <div>
-        <h1 className="font-saira text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 text-xl lg:text-2xl p-5">
+        <h1 className="text-center font-saira text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 text-xl lg:text-2xl p-5">
           UnitedMess
         </h1>
         <div className="border-t border-gray-600 text-gray-300">

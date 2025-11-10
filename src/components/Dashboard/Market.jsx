@@ -5,10 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addMarket, fetchMarketAmounts } from "../../store/slices/marketSlice";
 import { fetchProfile } from "../../store/slices/userSlice";
-import { 
-  FiShoppingCart, 
-  FiDollarSign, 
-  FiCalendar, 
+import {
+  FiShoppingCart,
+  FiDollarSign,
+  FiCalendar,
   FiArrowRight,
   FiPackage,
   FiCheck,
@@ -24,6 +24,7 @@ import { BiLeaf } from "react-icons/bi";
 import { GiFishbone, GiChickenOven, GiCow } from "react-icons/gi";
 import { MdOutlineEgg } from "react-icons/md";
 import { PiShoppingCart } from "react-icons/pi";
+import { MdOutlineMenu } from 'react-icons/md';
 
 const items_OPTIONS = [
   { value: "Chicken", icon: GiChickenOven, color: "text-orange-400" },
@@ -40,7 +41,7 @@ const Market = () => {
 
   // Get market data from Redux store
   const { markets, loading, error } = useSelector((state) => state.market || { markets: [], loading: false, error: null });
-  
+
   // Get user profile data from Redux store
   const { profile, loading: profileLoading, error: profileError } = useSelector((state) => state.userData);
 
@@ -56,12 +57,25 @@ const Market = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showCustomItem, setShowCustomItem] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Fetch user profile and market data on component mount
   useEffect(() => {
     dispatch(fetchProfile());
     // dispatch(fetchMarketAmounts());
   }, [dispatch]);
+
+  // Close sidebar when clicking outside on mobile
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isSidebarOpen && !event.target.closest('.sidebar') && !event.target.closest('.menu-button')) {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isSidebarOpen]);
 
   // Use profile.marketDetails directly for recent entries
   const recentEntries = profile?.marketDetails
@@ -150,30 +164,55 @@ const Market = () => {
 
   return (
     <div className="flex flex-col lg:flex-row bg-gradient-to-br from-gray-900 via-gray-900 to-slate-900 min-h-screen">
-      {/* Sidebar */}
-      <div className="sidebar w-full lg:w-80 bg-gray-950 rounded-md lg:m-1 shadow-lg">
-        <SideBar />
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="menu-button lg:hidden fixed top-4 left-4 z-50 w-12 h-12 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/10 rounded-xl flex items-center justify-center shadow-lg hover:from-white/15 hover:to-white/10 transition-all duration-300"
+      >
+        {isSidebarOpen ? (
+          <FiX className="w-6 h-6 text-white" />
+        ) : (
+          <MdOutlineMenu className="w-6 h-6 text-white" />
+        )}
+      </button>
+
+      {/* Sidebar - Desktop and Mobile */}
+      <div className={`sidebar fixed lg:relative w-80 bg-black/60 rounded-md lg:m-1 shadow-2xl border border-white/5 z-40 h-screen lg:h-auto transition-all duration-300 ${isSidebarOpen ? 'left-0' : '-left-80 lg:left-0'
+        }`}>
+
+        {/* Sidebar Content with Top Padding for Mobile */}
+        <div className="h-full lg:pt-0 overflow-y-auto ">
+          <SideBar />
+        </div>
       </div>
+
+      {/* Overlay for mobile */}
+      {isSidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-30 transition-opacity duration-300"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
 
       {/* Main Content */}
       <div className="flex-grow relative overflow-hidden">
         {/* Animated Grid Background */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f0a_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f0a_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-        
+
         {/* Gradient Orbs */}
         <div className="absolute top-20 right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
         <div className="absolute bottom-20 left-20 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse-slower"></div>
 
-        <div className="relative z-10 p-6 lg:p-10 max-w-7xl mx-auto">
+        <div className="relative z-10 p-6 lg:p-10 max-w-7xl mx-auto mt-16 lg:mt-0">
           {/* Header Section */}
           <div className="mb-8">
             <div className="flex items-center gap-4 mb-6">
               <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg shadow-blue-500/20">
-                <PiShoppingCart  className="w-8 h-8 text-white" />
+                <PiShoppingCart className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold text-white mb-1">Add Market Entry</h1>
-                <p className="text-gray-400">Track and manage your market expenses</p>
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-1">Add Market Entry</h1>
+                <p className="text-gray-400 text-sm md:text-base">Track and manage your market expenses</p>
               </div>
             </div>
 
@@ -183,18 +222,18 @@ const Market = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm">Today's Total</p>
-                    <p className="text-2xl font-bold text-white mt-1">₹{todayTotal.toFixed(2)}</p>
+                    <p className="text-xl md:text-2xl font-bold text-white mt-1">₹{todayTotal.toFixed(2)}</p>
                   </div>
-                  <FiTrendingUp className="w-8 h-8 text-green-400" />
+                  <FiTrendingUp className="w-6 h-6 md:w-8 md:h-8 text-green-400" />
                 </div>
               </div>
               <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm">Total Entries</p>
-                    <p className="text-2xl font-bold text-white mt-1">{profile?.marketDetails?.length || 0}</p>
+                    <p className="text-xl md:text-2xl font-bold text-white mt-1">{profile?.marketDetails?.length || 0}</p>
                   </div>
-                  <FiPieChart className="w-8 h-8 text-blue-400" />
+                  <FiPieChart className="w-6 h-6 md:w-8 md:h-8 text-blue-400" />
                 </div>
               </div>
             </div>
@@ -238,19 +277,18 @@ const Market = () => {
                               key={option.value}
                               type="button"
                               onClick={() => setFormData(prev => ({ ...prev, items: option.value }))}
-                              className={`relative flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${
-                                isSelected
+                              className={`relative flex flex-col items-center justify-center p-3 md:p-4 rounded-xl border-2 transition-all duration-200 ${isSelected
                                   ? 'border-blue-500 bg-blue-500/20 shadow-lg shadow-blue-500/20'
                                   : 'border-gray-700 bg-gray-800/50 hover:border-gray-600 hover:bg-gray-700/50'
-                              }`}
+                                }`}
                             >
-                              <Icon className={`w-7 h-7 mb-2 ${isSelected ? option.color : 'text-gray-400'}`} />
+                              <Icon className={`w-5 h-5 md:w-7 md:h-7 mb-1 md:mb-2 ${isSelected ? option.color : 'text-gray-400'}`} />
                               <span className={`text-xs font-medium ${isSelected ? 'text-white' : 'text-gray-400'}`}>
                                 {option.value}
                               </span>
                               {isSelected && (
-                                <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
-                                  <FiCheck className="w-3 h-3 text-white" strokeWidth={3} />
+                                <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 w-4 h-4 md:w-6 md:h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                                  <FiCheck className="w-2 h-2 md:w-3 md:h-3 text-white" strokeWidth={3} />
                                 </div>
                               )}
                             </button>
@@ -506,7 +544,7 @@ const Market = () => {
         </div>
       </div>
 
-      <Toaster 
+      <Toaster
         position="top-center"
         toastOptions={{
           style: {
