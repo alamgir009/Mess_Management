@@ -26,8 +26,11 @@ import {
   FaCog,
   FaSyncAlt,
   FaExpandAlt,
-  FaFilter
+  FaFilter,
+  FaBars,
+  FaTimes
 } from 'react-icons/fa';
+import { FiX } from 'react-icons/fi';
 import {
   MdRestaurant,
   MdAccountBalanceWallet,
@@ -35,7 +38,8 @@ import {
   MdLocalGasStation,
   MdAdminPanelSettings,
   MdPerson,
-  MdVerified
+  MdVerified,
+  MdOutlineMenu
 } from 'react-icons/md';
 import {
   HiUserGroup,
@@ -50,11 +54,22 @@ const Table = () => {
   const dispatch = useDispatch();
   const { users, loading, error } = useSelector((state) => state.userData);
   const [expandedUserId, setExpandedUserId] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // ✅ Fetch users on initial load
   useEffect(() => {
     dispatch(getAggeratedUsers());
   }, [dispatch]);
+
+  // ✅ Toggle sidebar for mobile
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  // ✅ Close sidebar when clicking on overlay or link
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
+  };
 
   // ✅ Get the expanded user data directly from users array
   const expandedUser = useMemo(() => {
@@ -138,14 +153,43 @@ const Table = () => {
   );
 
   return (
-    <div className="flex flex-col lg:flex-row justify-between text-white bg-gradient-to-b from-black to-blue-950 min-h-screen">
+    <div className="flex flex-col lg:flex-row justify-between text-white bg-gradient-to-b from-black to-blue-950 min-h-screen relative">
+      {/* Mobile Sidebar Toggle Button */}
+      <button
+        onClick={toggleSidebar}
+        className="menu-button lg:hidden fixed top-4 left-4 z-50 w-12 h-12 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/10 rounded-xl flex items-center justify-center shadow-lg hover:from-white/15 hover:to-white/10 transition-all duration-300"
+
+      >
+        {isSidebarOpen ? (
+          <FiX className="text-white w-6 h-6" />
+        ) : (
+          <MdOutlineMenu className="text-white w-6 h-6" />
+        )}
+      </button>
+
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-30"
+          onClick={closeSidebar}
+        />
+      )}
+
       {/* Sidebar */}
-      <div className="sidebar w-full lg:w-80 bg-gray-950 rounded-md m-1">
-        <SideBar />
+      <div
+        className={`
+          sidebar fixed lg:relative z-40 h-screen lg:h-auto
+          transform transition-transform duration-300 ease-in-out
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          w-80 lg:w-80 bg-black/60 rounded-md m-1 lg:m-1
+          overflow-y-auto
+        `}
+      >
+        <SideBar onLinkClick={closeSidebar} />
       </div>
 
       {/* Main Content */}
-      <div className="flex-grow border border-gray-500 rounded-md m-1 p-4 overflow-auto">
+      <div className="flex-grow border border-gray-500 rounded-md m-1 p-4 overflow-auto lg:ml-0 mt-16 lg:mt-0">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
           <div className="flex items-center gap-3 mb-4 sm:mb-0">
@@ -320,7 +364,6 @@ const Table = () => {
                     </td>
                     <td className="py-4 px-4 border-t border-gray-700 font-semibold">
                       <div className="flex items-center gap-2 text-green-400">
-                        {/* <HiCurrencyRupee className="text-green-400" /> */}
                         ₹ {user.totalAmount || 0}
                       </div>
                     </td>

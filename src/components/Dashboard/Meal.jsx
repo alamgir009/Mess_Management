@@ -319,7 +319,7 @@ const Meal = () => {
       </button>
 
       {/* Sidebar - Desktop and Mobile */}
-      <div className={`sidebar fixed lg:relative w-80 bg-black/40 rounded-md lg:m-1 shadow-2xl border border-white/5 z-40 h-screen lg:h-auto transition-all duration-300 ${
+      <div className={`text-gray-200 sidebar fixed lg:relative w-80 bg-black/40 rounded-md lg:m-1 shadow-2xl border border-white/5 z-40 h-screen lg:h-auto transition-all duration-300 ${
         isSidebarOpen ? 'left-0' : '-left-80 lg:left-0'
       }`}>
         <SideBar />
