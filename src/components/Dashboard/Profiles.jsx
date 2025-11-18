@@ -317,8 +317,11 @@ const Profiles = () => {
 
     if (loading || marketLoading)
         return (
-            <div className="min-h-screen bg-gradient-to-b from-black to-blue-950 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-teal-500"></div>
+            <div className="flex items-center justify-center h-screen bg-gradient-to-b from-black to-blue-950">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-gray-600 border-t-blue-400 rounded-full animate-spin"></div>
+                    <p className="text-gray-300 text-lg font-medium">Loading...</p>
+                </div>
             </div>
         );
 
@@ -519,8 +522,8 @@ const Profiles = () => {
             )}
 
             {/* Edit Meal Modal */}
-            {isEditMealModalOpen && editingMeal &&(
-                <EditMealModal 
+            {isEditMealModalOpen && editingMeal && (
+                <EditMealModal
                     meal={editingMeal}
                     onClose={handleCloseMealEditModal}
                     onUpdate={handleMealUpdate}
@@ -737,157 +740,155 @@ const EditMarketModal = ({ market, onClose, onUpdate, isUpdating }) => {
 
 // Edit Meal Modal Component
 const EditMealModal = ({ meal, onClose, onUpdate, isUpdating }) => {
-  const mealTimeOptions = [ "night", "day", "both"];
-  const [formData, setFormData] = useState({
-    mealTime: meal?.mealTime || "",
-    date: formatDateForInput(meal?.date) || ""
-  });
-  const [errors, setErrors] = useState({});
+    const mealTimeOptions = ["night", "day", "both"];
+    const [formData, setFormData] = useState({
+        mealTime: meal?.mealTime || "",
+        date: formatDateForInput(meal?.date) || ""
+    });
+    const [errors, setErrors] = useState({});
 
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = 'unset'; };
-  }, []);
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => { document.body.style.overflow = 'unset'; };
+    }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
-  };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
+    };
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.mealTime.trim()) newErrors.mealTime = "Meal time is required";
-    if (!formData.date) newErrors.date = "Date is required";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    const validateForm = () => {
+        const newErrors = {};
+        if (!formData.mealTime.trim()) newErrors.mealTime = "Meal time is required";
+        if (!formData.date) newErrors.date = "Date is required";
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      onUpdate({
-        mealTime: formData.mealTime.trim(),
-        date: new Date(formData.date).toISOString()
-      });
-    }
-  };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (validateForm()) {
+            onUpdate({
+                mealTime: formData.mealTime.trim(),
+                date: new Date(formData.date).toISOString()
+            });
+        }
+    };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fadeIn">
-      <div className="relative w-full max-w-md rounded-3xl border border-white/20 bg-white/10 shadow-[0_0_40px_rgba(0,0,0,0.3)] backdrop-blur-2xl transition-all duration-300">
-        
-        {/* Top subtle glow border */}
-        <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-white/30 to-transparent pointer-events-none"></div>
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fadeIn">
+            <div className="relative w-full max-w-md rounded-3xl border border-white/20 bg-white/10 shadow-[0_0_40px_rgba(0,0,0,0.3)] backdrop-blur-2xl transition-all duration-300">
 
-        {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-white/10">
-          <h2 className="text-xl font-semibold text-white/90 tracking-tight">
-            Edit Meal
-          </h2>
-          <button
-            onClick={onClose}
-            disabled={isUpdating}
-            className="p-2 rounded-lg text-white/60 hover:bg-white/10 hover:text-white transition-all duration-200 disabled:opacity-50"
-          >
-            <HiX className="w-6 h-6" />
-          </button>
-        </div>
+                {/* Top subtle glow border */}
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-white/30 to-transparent pointer-events-none"></div>
 
-        {/* Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          
-          {/* Meal Time */}
-          <div>
-            <label htmlFor="mealTime" className="block text-sm font-medium text-white/70 mb-2">
-              Meal Time
-            </label>
-            <div className="relative">
-              <select
-                id="mealTime"
-                name="mealTime"
-                value={formData.mealTime}
-                onChange={handleChange}
-                disabled={isUpdating}
-                className={`w-full px-4 py-3 rounded-2xl bg-white/10 border ${
-                  errors.mealTime ? 'border-red-400' : 'border-white/20'
-                } text-white focus:outline-none focus:ring-0.5 focus:ring-teal-300 focus:border-teal-300
+                {/* Header */}
+                <div className="flex justify-between items-center p-6 border-b border-white/10">
+                    <h2 className="text-xl font-semibold text-white/90 tracking-tight">
+                        Edit Meal
+                    </h2>
+                    <button
+                        onClick={onClose}
+                        disabled={isUpdating}
+                        className="p-2 rounded-lg text-white/60 hover:bg-white/10 hover:text-white transition-all duration-200 disabled:opacity-50"
+                    >
+                        <HiX className="w-6 h-6" />
+                    </button>
+                </div>
+
+                {/* Body */}
+                <form onSubmit={handleSubmit} className="p-6 space-y-5">
+
+                    {/* Meal Time */}
+                    <div>
+                        <label htmlFor="mealTime" className="block text-sm font-medium text-white/70 mb-2">
+                            Meal Time
+                        </label>
+                        <div className="relative">
+                            <select
+                                id="mealTime"
+                                name="mealTime"
+                                value={formData.mealTime}
+                                onChange={handleChange}
+                                disabled={isUpdating}
+                                className={`w-full px-4 py-3 rounded-2xl bg-white/10 border ${errors.mealTime ? 'border-red-400' : 'border-white/20'
+                                    } text-white focus:outline-none focus:ring-0.5 focus:ring-teal-300 focus:border-teal-300
                 backdrop-blur-xl appearance-none transition-all duration-200 disabled:opacity-50 [color-scheme:dark]`}
-              >
-                <option value="" className="bg-gray-900 text-gray-300">Select meal time</option>
-                {mealTimeOptions.map((time) => (
-                  <option key={time} value={time} className="bg-gray-900 text-gray-200">
-                    {time.charAt(0).toUpperCase() + time.slice(1)}
-                  </option>
-                ))}
-              </select>
+                            >
+                                <option value="" className="bg-gray-900 text-gray-300">Select meal time</option>
+                                {mealTimeOptions.map((time) => (
+                                    <option key={time} value={time} className="bg-gray-900 text-gray-200">
+                                        {time.charAt(0).toUpperCase() + time.slice(1)}
+                                    </option>
+                                ))}
+                            </select>
 
-              {/* iOS-style dropdown icon */}
-              <svg
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
-              </svg>
-            </div>
-            {errors.mealTime && <p className="mt-1 text-sm text-red-400">{errors.mealTime}</p>}
-          </div>
+                            {/* iOS-style dropdown icon */}
+                            <svg
+                                className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+                            </svg>
+                        </div>
+                        {errors.mealTime && <p className="mt-1 text-sm text-red-400">{errors.mealTime}</p>}
+                    </div>
 
-          {/* Date */}
-          <div>
-            <label htmlFor="date" className="block text-sm font-medium text-white/70 mb-2">
-              Date
-            </label>
-            <input
-              type="date"
-              id="date"
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-              disabled={isUpdating}
-              className={`w-full px-4 py-3 bg-white/10 border ${
-                errors.date ? 'border-red-400' : 'border-white/20'
-              } rounded-2xl text-white focus:outline-none focus:ring-0.5 
+                    {/* Date */}
+                    <div>
+                        <label htmlFor="date" className="block text-sm font-medium text-white/70 mb-2">
+                            Date
+                        </label>
+                        <input
+                            type="date"
+                            id="date"
+                            name="date"
+                            value={formData.date}
+                            onChange={handleChange}
+                            disabled={isUpdating}
+                            className={`w-full px-4 py-3 bg-white/10 border ${errors.date ? 'border-red-400' : 'border-white/20'
+                                } rounded-2xl text-white focus:outline-none focus:ring-0.5 
               focus:ring-teal-300 focus:border-teal-300 transition-all duration-200 
               backdrop-blur-xl disabled:opacity-50`}
-            />
-            {errors.date && <p className="mt-1 text-sm text-red-400">{errors.date}</p>}
-          </div>
+                        />
+                        {errors.date && <p className="mt-1 text-sm text-red-400">{errors.date}</p>}
+                    </div>
 
-          {/* Buttons */}
-          <div className="flex gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isUpdating}
-              className="flex-1 px-4 py-3 rounded-2xl font-medium text-white/90 bg-white/10 border border-white/20
+                    {/* Buttons */}
+                    <div className="flex gap-3 pt-4">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            disabled={isUpdating}
+                            className="flex-1 px-4 py-3 rounded-2xl font-medium text-white/90 bg-white/10 border border-white/20
               hover:bg-white/20 transition-all duration-300 disabled:opacity-50 shadow-inner backdrop-blur-xl"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isUpdating}
-              className="flex-1 px-4 py-3 rounded-2xl font-medium text-black bg-gradient-to-r from-white to-gray-400 
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={isUpdating}
+                            className="flex-1 px-4 py-3 rounded-2xl font-medium text-black bg-gradient-to-r from-white to-gray-400 
               hover:from-gray-400 hover:to-white shadow-lg transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {isUpdating ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-black"></div>
-                  Updating...
-                </>
-              ) : (
-                "Update Meal"
-              )}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+                        >
+                            {isUpdating ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-black"></div>
+                                    Updating...
+                                </>
+                            ) : (
+                                "Update Meal"
+                            )}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
 };
 
 

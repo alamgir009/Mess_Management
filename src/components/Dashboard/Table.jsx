@@ -135,10 +135,10 @@ const Table = () => {
 
   // Loading and error states
   if (loading) return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-black to-blue-950">
-      <div className="flex flex-col items-center gap-3">
-        <FaSyncAlt className="text-cyan-400 text-4xl animate-spin" />
-        <p className="text-white text-xl font-light">Loading User Data...</p>
+    <div className="flex items-center justify-center h-screen bg-gradient-to-b from-black to-blue-950">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 border-4 border-gray-600 border-t-blue-400 rounded-full animate-spin"></div>
+        <p className="text-gray-300 text-lg font-medium">Loading Dashboard...</p>
       </div>
     </div>
   );
