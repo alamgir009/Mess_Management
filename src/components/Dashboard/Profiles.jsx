@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState, useRef } from "react";
 import { SideBar } from "./SideBar";
 import { useDispatch, useSelector } from "react-redux";
 import { Toaster, toast } from "react-hot-toast";
-import { fetchProfile,userUpdate } from "../../store/slices/userSlice";
+import { fetchProfile, userUpdate } from "../../store/slices/userSlice";
 import { fetchGrandTotalAmount, deleteMarketById, updateMarketById } from "../../store/slices/marketSlice";
 import { deleteMealById, fetchAllMeals, fetchTotalMeals, updateMealById } from "../../store/slices/mealSlice";
 import {
@@ -16,10 +16,13 @@ import {
     HiTrash,
     HiDotsVertical,
     HiOutlineCog,
-    HiX
+    HiX,
+    HiOutlineMail 
 } from "react-icons/hi";
-import {FiEdit} from "react-icons/fi"
+import { FiEdit } from "react-icons/fi";
 import { PiBowlSteamFill } from "react-icons/pi";
+import { MdOutlinePhone } from "react-icons/md";
+
 
 const Profiles = () => {
     const dispatch = useDispatch();
@@ -49,7 +52,45 @@ const Profiles = () => {
     const [isEditMealModalOpen, setIsEditMealModalOpen] = useState(false);
     const [editingMeal, setEditingMeal] = useState(null);
     const [isUpdatingMeal, setIsUpdatingMeal] = useState(false);
+    
+    // Edit modal states for Profile
+    const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
+    const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+    
+    
+    // Profile Actions
+    const handleProfileEditClick = () => setIsEditProfileModalOpen(true);
+    const handleCloseProfileModal = () => setIsEditProfileModalOpen(false);
+    
+    // Profile Update Handler
+    const handleProfileUpdate = async (updatedData) => {
+        setIsUpdatingProfile(true);
+        try {
+            // Optimistic update
+            setLocalProfile(prev => ({
+                ...prev,
+                ...updatedData
+            }));
 
+            handleCloseProfileModal();
+            toast.success("Profile updated successfully!");
+
+            await dispatch(userUpdate(updatedData)).unwrap();
+
+            // Refresh profile from server
+            dispatch(fetchProfile());
+
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            // Revert optimistic update on error
+            setLocalProfile(profile);
+            toast.error(error?.message || "Failed to update profile");
+            dispatch(fetchProfile());
+        } finally {
+            setIsUpdatingProfile(false);
+        }
+    };
+    
     // Update local states when Redux states change
     useEffect(() => {
         if (profile) {
@@ -360,12 +401,12 @@ const Profiles = () => {
                         )}
                         <div>
                             <div className="flex items-center">
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-400 to-lime-400 bg-clip-text text-transparent">
-                                {localProfile?.name || "User"}
-                            </h1>
-                            <FiEdit className="mx-2 cursor-pointer"/>
+                                <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-400 to-lime-400 bg-clip-text text-transparent">
+                                    {localProfile?.name || "User"}
+                                </h1>
+                                <FiEdit onClick={handleProfileEditClick} className="mx-2 cursor-pointer hover:text-teal-400 transition-colors" />
                             </div>
-                            <p className="flex items-center gap-2 text-teal-300">
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-sm">
                                 <span
                                     className={
                                         localProfile?.role === "admin"
@@ -375,9 +416,21 @@ const Profiles = () => {
                                 >
                                     {localProfile?.role || "user"}
                                 </span>
-                                <span className="text-white/60">•</span>
-                                <span className="text-sm text-white/80">{localProfile?.email || "No email"}</span>
-                            </p>
+                                
+                                {localProfile?.email && (
+                                    <div className="flex items-center gap-1 text-white/70 bg-white/5 px-3 py-1 rounded-full border border-white/10">
+                                        <HiOutlineMail size={14} className="text-teal-400" />
+                                        <span>{localProfile.email}</span>
+                                    </div>
+                                )}
+
+                                {localProfile?.phone && (
+                                    <div className="flex items-center gap-1 text-white/70 bg-white/5 px-3 py-1 rounded-full border border-white/10">
+                                        <MdOutlinePhone size={14} className="text-teal-400" />
+                                        <span>{localProfile.phone}</span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -532,6 +585,16 @@ const Profiles = () => {
                     onClose={handleCloseMealEditModal}
                     onUpdate={handleMealUpdate}
                     isUpdating={isUpdatingMeal}
+                />
+            )}
+
+            {/* Profile Edit Modal */}
+            {isEditProfileModalOpen && (
+                <EditProfileModal
+                    profile={localProfile}
+                    onClose={handleCloseProfileModal}
+                    onUpdate={handleProfileUpdate}
+                    isUpdating={isUpdatingProfile}
                 />
             )}
 
@@ -892,6 +955,159 @@ const EditMealModal = ({ meal, onClose, onUpdate, isUpdating }) => {
                 </form>
             </div>
         </div>
+    );
+};
+
+// Edit Profile Modal Component
+const EditProfileModal = ({ profile, onClose, onUpdate, isUpdating }) => {
+    const [formData, setFormData] = useState({
+        name: profile?.name || "",
+        email: profile?.email || "",
+        phone: profile?.phone || "",
+        image: profile?.image || ""
+    });
+    const [errors, setErrors] = useState({});
+
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => { document.body.style.overflow = 'unset'; };
+    }, []);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+        if (!formData.name.trim()) newErrors.name = "Name is required";
+        if (!formData.email.trim()) newErrors.email = "Email is required";
+        else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email is invalid";
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (validateForm()) {
+            onUpdate(formData);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fadeIn">
+  <div className="relative w-full max-w-md rounded-3xl border border-white/20 bg-gray-900/90 shadow-[0_0_40px_rgba(0,0,0,0.5)] backdrop-blur-2xl transition-all duration-300">
+    <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-teal-500/10 to-transparent pointer-events-none"></div>
+
+    {/* HEADER WITH SINGLE PROFILE IMAGE */}
+    <div className="flex justify-between items-center p-6 border-b border-white/10">
+      <h2 className="text-xl font-semibold text-white tracking-tight flex items-center gap-3">
+        {formData.image ? (
+          <img
+            src={formData.image}
+            alt="Profile"
+            loading="lazy"
+            className="h-20 w-20 rounded-xl object-cover border border-white/20 flex-shrink-0"
+            onError={(e) => (e.currentTarget.style.display = "none")}
+          />
+        ) : (
+          <HiUserCircle className="text-teal-400" size={32} />
+        )}
+        Edit Profile
+      </h2>
+
+      <button
+        onClick={onClose}
+        disabled={isUpdating}
+        className="p-2 rounded-lg text-white/60 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50"
+      >
+        <HiX size={24} />
+      </button>
+    </div>
+
+    {/* FORM */}
+    <form onSubmit={handleSubmit} className="p-6 space-y-5">
+
+      <div>
+        <label className="block text-sm font-medium text-white/70 mb-2">Name</label>
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          disabled={isUpdating}
+          className={`w-full px-4 py-3 bg-white/5 border ${errors.name ? 'border-red-400' : 'border-white/10'} rounded-xl text-white focus:outline-none focus:border-teal-400 transition-colors disabled:opacity-50`}
+        />
+        {errors.name && <p className="mt-1 text-sm text-red-400">{errors.name}</p>}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-white/70 mb-2">Email</label>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          disabled={isUpdating}
+          className={`w-full px-4 py-3 bg-white/5 border ${errors.email ? 'border-red-400' : 'border-white/10'} rounded-xl text-white focus:outline-none focus:border-teal-400 transition-colors disabled:opacity-50`}
+        />
+        {errors.email && <p className="mt-1 text-sm text-red-400">{errors.email}</p>}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-white/70 mb-2">Phone</label>
+        <input
+          type="text"
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
+          disabled={isUpdating}
+          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-teal-400 transition-colors disabled:opacity-50"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-white/70 mb-2">Image URL</label>
+        <input
+          type="text"
+          name="image"
+          value={formData.image}
+          onChange={handleChange}
+          disabled={isUpdating}
+          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-teal-400 transition-colors disabled:opacity-50"
+        />
+      </div>
+
+      <div className="pt-4 flex gap-3">
+        <button
+          type="button"
+          onClick={onClose}
+          disabled={isUpdating}
+          className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-white/70 hover:bg-white/5 transition-colors disabled:opacity-50"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          disabled={isUpdating}
+          className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-semibold shadow-lg hover:shadow-teal-500/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+          {isUpdating ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+              Updating...
+            </>
+          ) : (
+            "Save Changes"
+          )}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
     );
 };
 
