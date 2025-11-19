@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState, useRef } from "react";
 import { SideBar } from "./SideBar";
 import { useDispatch, useSelector } from "react-redux";
 import { Toaster, toast } from "react-hot-toast";
-import { fetchProfile } from "../../store/slices/userSlice";
+import { fetchProfile,userUpdate } from "../../store/slices/userSlice";
 import { fetchGrandTotalAmount, deleteMarketById, updateMarketById } from "../../store/slices/marketSlice";
 import { deleteMealById, fetchAllMeals, fetchTotalMeals, updateMealById } from "../../store/slices/mealSlice";
 import {
@@ -18,6 +18,7 @@ import {
     HiOutlineCog,
     HiX
 } from "react-icons/hi";
+import {FiEdit} from "react-icons/fi"
 import { PiBowlSteamFill } from "react-icons/pi";
 
 const Profiles = () => {
@@ -358,9 +359,12 @@ const Profiles = () => {
                             <HiUserCircle className="w-16 h-16 text-teal-400/80" />
                         )}
                         <div>
+                            <div className="flex items-center">
                             <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-400 to-lime-400 bg-clip-text text-transparent">
                                 {localProfile?.name || "User"}
                             </h1>
+                            <FiEdit className="mx-2 cursor-pointer"/>
+                            </div>
                             <p className="flex items-center gap-2 text-teal-300">
                                 <span
                                     className={
