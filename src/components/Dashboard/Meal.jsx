@@ -306,471 +306,393 @@ const Meal = () => {
 
   return (
     <div className="flex flex-col lg:flex-row bg-[#0a0a0a] min-h-screen">
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="menu-button lg:hidden fixed top-4 left-4 z-50 w-12 h-12 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/10 rounded-xl flex items-center justify-center shadow-lg hover:from-white/15 hover:to-white/10 transition-all duration-300"
-      >
-        {isSidebarOpen ? (
-          <FiX className="w-6 h-6 text-white" />
-        ) : (
-          <MdOutlineMenu className="w-6 h-6 text-white" />
-        )}
-      </button>
+  {/* Mobile Menu Button */}
+  <button
+    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+    className="lg:hidden fixed top-4 left-4 z-50 w-12 h-12 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/10 rounded-xl flex items-center justify-center shadow-lg hover:from-white/15 hover:to-white/10 transition-all duration-300"
+  >
+    {isSidebarOpen ? (
+      <FiX className="w-6 h-6 text-white" />
+    ) : (
+      <MdOutlineMenu className="w-6 h-6 text-white" />
+    )}
+  </button>
 
-      {/* Sidebar - Desktop and Mobile */}
-      <div className={`text-gray-200 sidebar fixed lg:relative w-80 bg-black/40 rounded-md lg:m-1 shadow-2xl border border-white/5 z-40 h-screen lg:h-auto transition-all duration-300 ${
-        isSidebarOpen ? 'left-0' : '-left-80 lg:left-0'
-      }`}>
-        <SideBar />
-      </div>
-
-      {/* Overlay for mobile */}
-      {isSidebarOpen && (
-        <div
-          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-30 transition-opacity duration-300"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
-
-      {/* Main Content */}
-      <div className="flex-grow relative overflow-hidden">
-        {/* Premium background pattern */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900 via-[#0a0a0a] to-[#0a0a0a]"></div>
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzIxMjEyMSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40"></div>
-        </div>
-
-        {/* Dynamic ambient lighting */}
-        {formData.mealTime && (
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {formData.mealTime === 'day' && (
-              <>
-                <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-amber-500/20 to-orange-600/10 rounded-full blur-[120px] animate-ambient-pulse"></div>
-                <div className="absolute top-1/2 left-1/4 w-[400px] h-[400px] bg-gradient-to-tl from-yellow-500/15 to-transparent rounded-full blur-[100px] animate-ambient-drift"></div>
-              </>
-            )}
-            {formData.mealTime === 'night' && (
-              <>
-                <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-indigo-500/20 to-purple-600/10 rounded-full blur-[120px] animate-ambient-pulse"></div>
-                <div className="absolute bottom-1/4 left-1/3 w-[400px] h-[400px] bg-gradient-to-tr from-blue-500/15 to-transparent rounded-full blur-[100px] animate-ambient-drift"></div>
-              </>
-            )}
-            {formData.mealTime === 'both' && (
-              <>
-                <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-violet-500/20 to-fuchsia-600/10 rounded-full blur-[120px] animate-ambient-pulse"></div>
-                <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-gradient-to-tl from-pink-500/15 to-transparent rounded-full blur-[100px] animate-ambient-drift"></div>
-              </>
-            )}
-          </div>
-        )}
-
-        <div className="relative z-10 p-6 lg:p-10 max-w-5xl mx-auto mt-16 lg:mt-0">
-          {/* Modern Header */}
-          <div className="mb-10">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${selectedOption ? selectedOption.gradient : 'from-gray-700 to-gray-800'} flex items-center justify-center shadow-2xl ${selectedOption ? selectedOption.glowColor : ''} transition-all duration-700`}>
-                    <FiClock className="w-7 h-7 text-white" />
+  {/* Sidebar */}
+              <div className={`sidebar fixed lg:fixed top-0 left-0 w-full max-w-xs bg-gradient-to-br from-black/80 to-blue-900/50 backdrop-blur-2xl shadow-2xl border-r border-white/10 z-40 h-screen overflow-y-auto transition-all duration-300 transform rounded-lg lg:translate-x-0 ${
+                  isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+              }`}>
+                  <div className="h-full custom-scrollbar text-gray-200">
+                      <SideBar />
                   </div>
-                  {selectedOption && (
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[#0a0a0a] animate-scale-in-bounce"></div>
-                  )}
-                </div>
-                <div>
-                  <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-1">
-                    Add Meal Entry
-                  </h1>
-                  <p className="text-gray-500 text-xs md:text-sm">Track your nutritional journey</p>
-                </div>
+              </div>
+
+  {/* Overlay for mobile */}
+  {isSidebarOpen && (
+    <div
+      className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-30 transition-opacity duration-300"
+      onClick={() => setIsSidebarOpen(false)}
+    />
+  )}
+
+  {/* Main Content - Adjusted for Fixed Sidebar */}
+  <div className="flex-grow relative overflow-hidden lg:ml-80 transition-all duration-300">
+    {/* Premium background pattern */}
+    <div className="absolute inset-0">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900 via-[#0a0a0a] to-[#0a0a0a]"></div>
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzIxMjEyMSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40"></div>
+    </div>
+
+    {/* Dynamic ambient lighting */}
+    {formData.mealTime && (
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {formData.mealTime === 'day' && (
+          <>
+            <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-amber-500/20 to-orange-600/10 rounded-full blur-[120px] animate-pulse"></div>
+            <div className="absolute top-1/2 left-1/4 w-[400px] h-[400px] bg-gradient-to-tl from-yellow-500/15 to-transparent rounded-full blur-[100px] animate-pulse delay-1000"></div>
+          </>
+        )}
+        {formData.mealTime === 'night' && (
+          <>
+            <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-indigo-500/20 to-purple-600/10 rounded-full blur-[120px] animate-pulse"></div>
+            <div className="absolute bottom-1/4 left-1/3 w-[400px] h-[400px] bg-gradient-to-tr from-blue-500/15 to-transparent rounded-full blur-[100px] animate-pulse delay-1000"></div>
+          </>
+        )}
+        {formData.mealTime === 'both' && (
+          <>
+            <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-violet-500/20 to-fuchsia-600/10 rounded-full blur-[120px] animate-pulse"></div>
+            <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-gradient-to-tl from-pink-500/15 to-transparent rounded-full blur-[100px] animate-pulse delay-1000"></div>
+          </>
+        )}
+      </div>
+    )}
+
+    <div className="relative z-10 p-6 lg:p-10 max-w-5xl mx-auto mt-16 lg:mt-0">
+      {/* Modern Header */}
+      <div className="mb-10">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${selectedOption ? selectedOption.gradient : 'from-gray-700 to-gray-800'} flex items-center justify-center shadow-2xl ${selectedOption ? selectedOption.glowColor : ''} transition-all duration-700`}>
+                <FiClock className="w-7 h-7 text-white" />
               </div>
               {selectedOption && (
-                <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-white/5 to-white/[0.02] rounded-full border border-white/10 backdrop-blur-xl animate-slide-in-right">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-gray-400 font-medium">Active Selection</span>
-                </div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[#0a0a0a] animate-bounce"></div>
               )}
+            </div>
+            <div>
+              <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-1">
+                Add Meal Entry
+              </h1>
+              <p className="text-gray-500 text-xs md:text-sm">Track your nutritional journey</p>
+            </div>
+          </div>
+          {selectedOption && (
+            <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-white/5 to-white/[0.02] rounded-full border border-white/10 backdrop-blur-xl">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-xs text-gray-400 font-medium">Active Selection</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Form */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Meal Selection Card */}
+          <div className="group relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-2xl rounded-[28px] border border-white/10 p-6 md:p-8 shadow-2xl shadow-black/20 transition-all duration-700 hover:border-white/20">
+            {selectedOption && (
+              <div className={`absolute inset-0 rounded-[28px] bg-gradient-to-r ${selectedOption.gradient} opacity-0 blur-xl group-hover:opacity-30 transition-opacity duration-700`}></div>
+            )}
+
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-base md:text-lg font-semibold text-white">Choose Meal Type</h3>
+                <FiZap className="w-5 h-5 text-gray-500" />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {MEAL_OPTIONS.map((option) => {
+                  const Icon = option.icon;
+                  const isSelected = formData.mealTime === option.value;
+                  const isDisabled = formData.date && checkMealExists(formData.date, option.value);
+
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => !isDisabled && handleMealTimeSelect(option.value)}
+                      disabled={isDisabled}
+                      className={`relative group/card overflow-hidden rounded-2xl border-2 transition-all duration-500 ${
+                        isDisabled
+                          ? 'border-red-500/30 bg-red-500/10 cursor-not-allowed opacity-60'
+                          : isSelected
+                          ? 'border-white/30 shadow-2xl scale-[1.02]'
+                          : 'border-white/5 hover:border-white/15 hover:scale-[1.01]'
+                      }`}
+                    >
+                      <div className={`absolute inset-0 bg-gradient-to-br ${option.bgGradient} transition-opacity duration-500 ${
+                        isSelected ? 'opacity-100' : isDisabled ? 'opacity-0' : 'opacity-0 group-hover/card:opacity-50'
+                      }`}></div>
+
+                      {isSelected && (
+                        <div className={`absolute inset-0 bg-gradient-to-br ${option.gradient} opacity-20 animate-pulse`}></div>
+                      )}
+
+                      <div className="relative p-4 md:p-6 flex flex-col items-center justify-center space-y-3">
+                        <div className={`relative p-3 md:p-4 rounded-2xl transition-all duration-500 ${
+                          isSelected
+                            ? `bg-gradient-to-br ${option.gradient} shadow-lg ${option.glowColor}`
+                            : isDisabled
+                            ? 'bg-red-500/20'
+                            : 'bg-white/5 group-hover/card:bg-white/10'
+                        }`}>
+                          <Icon className={`w-6 h-6 md:w-7 md:h-7 transition-all duration-500 ${
+                            isSelected ? 'text-white' : isDisabled ? 'text-red-400' : 'text-gray-400 group-hover/card:text-gray-300'
+                          }`} />
+                        </div>
+
+                        <div className="text-center space-y-1">
+                          <p className={`text-sm md:text-base font-semibold transition-colors duration-500 ${
+                            isSelected ? 'text-white' : isDisabled ? 'text-red-400' : 'text-gray-400 group-hover/card:text-gray-300'
+                          }`}>
+                            {option.label}
+                          </p>
+                          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-500 ${
+                            isSelected
+                              ? 'bg-white/20 text-white'
+                              : isDisabled
+                              ? 'bg-red-500/20 text-red-400'
+                              : 'bg-white/5 text-gray-500 group-hover/card:bg-white/10 group-hover/card:text-gray-400'
+                          }`}>
+                            <FiCheck className="w-3 h-3" />
+                            Count: {option.count}
+                          </div>
+                        </div>
+
+                        {isSelected && (
+                          <div className="absolute top-3 right-3 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg">
+                            <FiCheck className="w-4 h-4 text-black" strokeWidth={3} />
+                          </div>
+                        )}
+                        {isDisabled && (
+                          <div className="absolute top-3 right-3 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
+                            <FiUser className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main Form */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Meal Selection Card */}
-              <div className="group relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-2xl rounded-[28px] border border-white/10 p-6 md:p-8 shadow-2xl shadow-black/20 transition-all duration-700 hover:border-white/20">
-                {selectedOption && (
-                  <div className={`absolute inset-0 rounded-[28px] bg-gradient-to-r ${selectedOption.gradient} opacity-0 blur-xl animate-border-glow`}></div>
-                )}
-
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-base md:text-lg font-semibold text-white">Choose Meal Type</h3>
-                    <FiZap className="w-5 h-5 text-gray-500" />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {MEAL_OPTIONS.map((option) => {
-                      const Icon = option.icon;
-                      const isSelected = formData.mealTime === option.value;
-                      const isDisabled = formData.date && checkMealExists(formData.date, option.value);
-
-                      return (
-                        <button
-                          key={option.value}
-                          type="button"
-                          onClick={() => !isDisabled && handleMealTimeSelect(option.value)}
-                          disabled={isDisabled}
-                          className={`relative group/card overflow-hidden rounded-2xl border-2 transition-all duration-500 ${
-                            isDisabled
-                              ? 'border-red-500/30 bg-red-500/10 cursor-not-allowed opacity-60'
-                              : isSelected
-                              ? 'border-white/30 shadow-2xl scale-[1.02]'
-                              : 'border-white/5 hover:border-white/15 hover:scale-[1.01]'
-                          }`}
-                        >
-                          <div className={`absolute inset-0 bg-gradient-to-br ${option.bgGradient} transition-opacity duration-500 ${
-                            isSelected ? 'opacity-100' : isDisabled ? 'opacity-0' : 'opacity-0 group-hover/card:opacity-50'
-                          }`}></div>
-
-                          {isSelected && (
-                            <div className={`absolute inset-0 bg-gradient-to-br ${option.gradient} opacity-20 animate-pulse-slow`}></div>
-                          )}
-
-                          <div className="relative p-4 md:p-6 flex flex-col items-center justify-center space-y-3">
-                            <div className={`relative p-3 md:p-4 rounded-2xl transition-all duration-500 ${
-                              isSelected
-                                ? `bg-gradient-to-br ${option.gradient} shadow-lg ${option.glowColor}`
-                                : isDisabled
-                                ? 'bg-red-500/20'
-                                : 'bg-white/5 group-hover/card:bg-white/10'
-                            }`}>
-                              <Icon className={`w-6 h-6 md:w-7 md:h-7 transition-all duration-500 ${
-                                isSelected ? 'text-white' : isDisabled ? 'text-red-400' : 'text-gray-400 group-hover/card:text-gray-300'
-                              }`} />
-                            </div>
-
-                            <div className="text-center space-y-1">
-                              <p className={`text-sm md:text-base font-semibold transition-colors duration-500 ${
-                                isSelected ? 'text-white' : isDisabled ? 'text-red-400' : 'text-gray-400 group-hover/card:text-gray-300'
-                              }`}>
-                                {option.label}
-                              </p>
-                              <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-500 ${
-                                isSelected
-                                  ? 'bg-white/20 text-white'
-                                  : isDisabled
-                                  ? 'bg-red-500/20 text-red-400'
-                                  : 'bg-white/5 text-gray-500 group-hover/card:bg-white/10 group-hover/card:text-gray-400'
-                              }`}>
-                                <FiCheck className="w-3 h-3" />
-                                Count: {option.count}
-                              </div>
-                            </div>
-
-                            {isSelected && (
-                              <div className="absolute top-3 right-3 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg animate-scale-in-bounce">
-                                <FiCheck className="w-4 h-4 text-black" strokeWidth={3} />
-                              </div>
-                            )}
-                            {isDisabled && (
-                              <div className="absolute top-3 right-3 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center shadow-lg animate-scale-in-bounce">
-                                <FiUser className="w-4 h-4 text-white" />
-                              </div>
-                            )}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+          {/* Date Card */}
+          <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-2xl rounded-[28px] border border-white/10 p-6 md:p-8 shadow-2xl shadow-black/20 transition-all duration-700 hover:border-white/20">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base md:text-lg font-semibold text-white flex items-center gap-2">
+                  <FiCalendar className="w-5 h-5" />
+                  Select Date
+                </h3>
+                <button
+                  type="button"
+                  onClick={handleQuickDate}
+                  className="group/btn px-3 md:px-4 py-2 bg-gradient-to-r from-white/10 to-white/5 hover:from-white/15 hover:to-white/10 rounded-xl text-xs md:text-sm text-gray-300 hover:text-white border border-white/10 hover:border-white/20 transition-all duration-300 flex items-center gap-2"
+                >
+                  <FiCalendar className="w-3 md:w-4 h-3 md:h-4" />
+                  <span>Today</span>
+                  <FiArrowRight className="w-3 h-3 opacity-0 group-hover/btn:opacity-100 -ml-2 group-hover/btn:ml-0 transition-all duration-300" />
+                </button>
               </div>
 
-              {/* Date Card */}
-              <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-2xl rounded-[28px] border border-white/10 p-6 md:p-8 shadow-2xl shadow-black/20 transition-all duration-700 hover:border-white/20">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-base md:text-lg font-semibold text-white flex items-center gap-2">
-                      <FiCalendar className="w-5 h-5" />
-                      Select Date
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={handleQuickDate}
-                      className="group/btn px-3 md:px-4 py-2 bg-gradient-to-r from-white/10 to-white/5 hover:from-white/15 hover:to-white/10 rounded-xl text-xs md:text-sm text-gray-300 hover:text-white border border-white/10 hover:border-white/20 transition-all duration-300 flex items-center gap-2"
-                    >
-                      <FiCalendar className="w-3 md:w-4 h-3 md:h-4" />
-                      <span>Today</span>
-                      <FiArrowRight className="w-3 h-3 opacity-0 group-hover/btn:opacity-100 -ml-2 group-hover/btn:ml-0 transition-all duration-300" />
-                    </button>
-                  </div>
+              <div className="relative group/input">
+                <input
+                  type="date"
+                  id="date"
+                  name="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                  className="w-full px-4 md:px-6 py-3 md:py-4 bg-white/5 hover:bg-white/8 focus:bg-white/10 text-white border border-white/10 hover:border-white/20 focus:border-white/30 rounded-2xl focus:outline-none transition-all duration-300 text-sm md:text-base font-medium"
+                  required
+                />
+              </div>
+            </div>
+          </div>
 
-                  <div className="relative group/input">
-                    <input
-                      type="date"
-                      id="date"
-                      name="date"
-                      value={formData.date}
-                      onChange={handleChange}
-                      className="w-full px-4 md:px-6 py-3 md:py-4 bg-white/5 hover:bg-white/8 focus:bg-white/10 text-white border border-white/10 hover:border-white/20 focus:border-white/30 rounded-2xl focus:outline-none transition-all duration-300 text-sm md:text-base font-medium"
-                      required
-                    />
-                  </div>
+          {/* Existing Meals Warning */}
+          {existingMeals.length > 0 && (
+            <div className="relative bg-gradient-to-br from-red-500/10 to-red-500/5 backdrop-blur-2xl rounded-[28px] border border-red-500/20 p-6 shadow-2xl shadow-black/20">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 bg-gradient-to-br from-red-400 to-red-500 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30">
+                  <FiAlertCircle className="w-4 h-4 text-white" />
                 </div>
+                <h3 className="text-base md:text-lg font-semibold text-white">Existing Meals Found</h3>
               </div>
 
-              {/* Existing Meals Warning */}
-              {existingMeals.length > 0 && (
-                <div className="relative bg-gradient-to-br from-red-500/10 to-red-500/5 backdrop-blur-2xl rounded-[28px] border border-red-500/20 p-6 shadow-2xl shadow-black/20">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-8 h-8 bg-gradient-to-br from-red-400 to-red-500 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30">
-                      <FiAlertCircle className="w-4 h-4 text-white" />
+              <div className="space-y-3">
+                <p className="text-red-300 text-sm">
+                  The following meals already exist for {formData.date}:
+                </p>
+                <div className="space-y-2">
+                  {existingMeals.map((meal) => (
+                    <div key={meal._id} className="flex justify-between items-center p-3 bg-red-500/10 rounded-xl border border-red-500/20">
+                      <span className="text-red-300 text-sm capitalize">{meal.mealTime} meal</span>
+                      <span className="text-red-400 text-sm font-medium">Already exists</span>
                     </div>
-                    <h3 className="text-base md:text-lg font-semibold text-white">Existing Meals Found</h3>
-                  </div>
-
-                  <div className="space-y-3">
-                    <p className="text-red-300 text-sm">
-                      The following meals already exist for {formData.date}:
-                    </p>
-                    <div className="space-y-2">
-                      {existingMeals.map((meal) => (
-                        <div key={meal._id} className="flex justify-between items-center p-3 bg-red-500/10 rounded-xl border border-red-500/20">
-                          <span className="text-red-300 text-sm capitalize">{meal.mealTime} meal</span>
-                          <span className="text-red-400 text-sm font-medium">Already exists</span>
-                        </div>
-                      ))}
-                    </div>
-                    <button
-                      onClick={() => navigate('/profile')}
-                      className="w-full py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 mt-4"
-                    >
-                      <FiEdit className="w-4 h-4" />
-                      Go to Profile to Edit
-                    </button>
-                  </div>
+                  ))}
                 </div>
+                <button
+                  onClick={() => navigate('/profile')}
+                  className="w-full py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 mt-4"
+                >
+                  <FiEdit className="w-4 h-4" />
+                  Go to Profile to Edit
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Submit Button */}
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={isSubmitting || existingMeals.length > 0 || !formData.mealTime || !formData.date}
+            className={`group/submit w-full relative overflow-hidden rounded-2xl transition-all duration-500 ${
+              formData.mealTime && formData.date && !isSubmitting && existingMeals.length === 0
+                ? `bg-gradient-to-r ${selectedOption?.gradient || 'from-gray-600 to-gray-700'} hover:shadow-2xl ${selectedOption?.glowColor || ''} hover:scale-[1.02] active:scale-[0.98]`
+                : 'bg-gradient-to-r from-gray-700 to-gray-800 cursor-not-allowed opacity-50'
+            }`}
+          >
+            {formData.mealTime && formData.date && !isSubmitting && existingMeals.length === 0 && (
+              <div className="absolute inset-0 -translate-x-full group-hover/submit:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+            )}
+
+            <div className="relative px-6 md:px-8 py-4 md:py-5 flex items-center justify-center gap-3">
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span className="text-white font-semibold text-sm md:text-base">Processing...</span>
+                </>
+              ) : existingMeals.length > 0 ? (
+                <>
+                  <FiUser className="w-5 h-5 text-white" />
+                  <span className="text-white font-semibold text-sm md:text-base">Meal Exists - Edit in Profile</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-white font-semibold text-sm md:text-base">Add Meal Entry</span>
+                  <FiArrowRight className="w-5 h-5 text-white transition-transform duration-300 group-hover/submit:translate-x-1" />
+                </>
               )}
+            </div>
+          </button>
+        </div>
 
-              {/* Submit Button */}
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={isSubmitting || existingMeals.length > 0 || !formData.mealTime || !formData.date}
-                className={`group/submit w-full relative overflow-hidden rounded-2xl transition-all duration-500 ${
-                  formData.mealTime && formData.date && !isSubmitting && existingMeals.length === 0
-                    ? `bg-gradient-to-r ${selectedOption?.gradient || 'from-gray-600 to-gray-700'} hover:shadow-2xl ${selectedOption?.glowColor || ''} hover:scale-[1.02] active:scale-[0.98]`
-                    : 'bg-gradient-to-r from-gray-700 to-gray-800 cursor-not-allowed opacity-50'
-                }`}
-              >
-                {formData.mealTime && formData.date && !isSubmitting && existingMeals.length === 0 && (
-                  <div className="absolute inset-0 -translate-x-full group-hover/submit:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-                )}
-
-                <div className="relative px-6 md:px-8 py-4 md:py-5 flex items-center justify-center gap-3">
-                  {isSubmitting ? (
-                    <>
-                      <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                      <span className="text-white font-semibold text-sm md:text-base">Processing...</span>
-                    </>
-                  ) : existingMeals.length > 0 ? (
-                    <>
-                      <FiUser className="w-5 h-5 text-white" />
-                      <span className="text-white font-semibold text-sm md:text-base">Meal Exists - Edit in Profile</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-white font-semibold text-sm md:text-base">Add Meal Entry</span>
-                      <FiArrowRight className="w-5 h-5 text-white transition-transform duration-300 group-hover/submit:translate-x-1" />
-                    </>
-                  )}
+        {/* Sidebar */}
+        <div className="space-y-4">
+          {/* Status Card */}
+          {formData.mealTime && (
+            <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-2xl rounded-[24px] border border-white/10 p-6 shadow-xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30">
+                  <FiCheck className="w-4 h-4 text-white" strokeWidth={3} />
                 </div>
-              </button>
+                <h3 className="text-base font-semibold text-white">Summary</h3>
+              </div>
+
+              {/* Animation Display */}
+              <div className="mb-4">
+                {formData.mealTime === 'day' && <SunriseAnimation />}
+                {formData.mealTime === 'night' && <NightAnimation />}
+                {formData.mealTime === 'both' && <BothAnimation />}
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                  <span className="text-sm text-gray-400">Type</span>
+                  <span className="text-sm text-white font-medium capitalize">{formData.mealTime}</span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                  <span className="text-sm text-gray-400">Count</span>
+                  <span className={`text-sm font-bold bg-gradient-to-r ${selectedOption?.gradient} bg-clip-text text-transparent`}>
+                    {mealCount}
+                  </span>
+                </div>
+                {formData.date && (
+                  <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                    <span className="text-sm text-gray-400">Date</span>
+                    <span className="text-sm text-white font-medium">{formData.date}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                  <span className="text-sm text-gray-400">Status</span>
+                  <span className={`text-sm font-bold ${existingMeals.length > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                    {existingMeals.length > 0 ? 'Meal Exists' : 'Ready to Add'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Info Card */}
+          <div className="relative bg-gradient-to-br from-white/[0.05] to-white/[0.01] backdrop-blur-2xl rounded-[24px] border border-white/5 p-6 shadow-xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <FiAlertCircle className="w-4 h-4 text-white" />
+              </div>
+              <h3 className="text-base font-semibold text-white">Quick Guide</h3>
             </div>
 
-            {/* Sidebar */}
-            <div className="space-y-4">
-              {/* Status Card */}
-              {formData.mealTime && (
-                <div className="relative bg-gradient-to-br from-white/[0.07] to-white/[0.02] backdrop-blur-2xl rounded-[24px] border border-white/10 p-6 shadow-xl animate-slide-in-left">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/30">
-                      <FiCheck className="w-4 h-4 text-white" strokeWidth={3} />
-                    </div>
-                    <h3 className="text-base font-semibold text-white">Summary</h3>
-                  </div>
-
-                  {/* Animation Display */}
-                  <div className="mb-4">
-                    {formData.mealTime === 'day' && <SunriseAnimation />}
-                    {formData.mealTime === 'night' && <NightAnimation />}
-                    {formData.mealTime === 'both' && <BothAnimation />}
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
-                      <span className="text-sm text-gray-400">Type</span>
-                      <span className="text-sm text-white font-medium capitalize">{formData.mealTime}</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
-                      <span className="text-sm text-gray-400">Count</span>
-                      <span className={`text-sm font-bold bg-gradient-to-r ${selectedOption?.gradient} bg-clip-text text-transparent`}>
-                        {mealCount}
-                      </span>
-                    </div>
-                    {formData.date && (
-                      <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
-                        <span className="text-sm text-gray-400">Date</span>
-                        <span className="text-sm text-white font-medium">{formData.date}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
-                      <span className="text-sm text-gray-400">Status</span>
-                      <span className={`text-sm font-bold ${existingMeals.length > 0 ? 'text-red-400' : 'text-green-400'}`}>
-                        {existingMeals.length > 0 ? 'Meal Exists' : 'Ready to Add'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Info Card */}
-              <div className="relative bg-gradient-to-br from-white/[0.05] to-white/[0.01] backdrop-blur-2xl rounded-[24px] border border-white/5 p-6 shadow-xl">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                    <FiAlertCircle className="w-4 h-4 text-white" />
-                  </div>
-                  <h3 className="text-base font-semibold text-white">Quick Guide</h3>
-                </div>
-
-                <div className="space-y-3 text-sm text-gray-400">
-                  <div className="flex items-start gap-3 p-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 mt-1.5 flex-shrink-0"></div>
-                    <p className="leading-relaxed"><span className="text-gray-300 font-medium">Day</span> & <span className="text-gray-300 font-medium">Night</span> meals count as <span className="text-white font-semibold">1</span> entry</p>
-                  </div>
-                  <div className="flex items-start gap-3 p-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-violet-400 to-pink-500 mt-1.5 flex-shrink-0"></div>
-                    <p className="leading-relaxed"><span className="text-gray-300 font-medium">Both</span> option counts as <span className="text-white font-semibold">2</span> entries</p>
-                  </div>
-                  <div className="flex items-start gap-3 p-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 mt-1.5 flex-shrink-0"></div>
-                    <p className="leading-relaxed">Consistent tracking builds better habits</p>
-                  </div>
-                </div>
+            <div className="space-y-3 text-sm text-gray-400">
+              <div className="flex items-start gap-3 p-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 mt-1.5 flex-shrink-0"></div>
+                <p className="leading-relaxed"><span className="text-gray-300 font-medium">Day</span> & <span className="text-gray-300 font-medium">Night</span> meals count as <span className="text-white font-semibold">1</span> entry</p>
+              </div>
+              <div className="flex items-start gap-3 p-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-violet-400 to-pink-500 mt-1.5 flex-shrink-0"></div>
+                <p className="leading-relaxed"><span className="text-gray-300 font-medium">Both</span> option counts as <span className="text-white font-semibold">2</span> entries</p>
+              </div>
+              <div className="flex items-start gap-3 p-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 mt-1.5 flex-shrink-0"></div>
+                <p className="leading-relaxed">Consistent tracking builds better habits</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          style: {
-            background: '#1f2937',
-            color: '#f3f4f6',
-            border: '1px solid #374151',
-            borderRadius: '12px',
-            padding: '16px',
-          },
-          success: {
-            iconTheme: {
-              primary: '#10b981',
-              secondary: '#f3f4f6',
-            },
-          },
-          error: {
-            iconTheme: {
-              primary: '#ef4444',
-              secondary: '#f3f4f6',
-            },
-          },
-        }}
-      />
-
-      <style jsx>{`
-        @keyframes ambient-pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.8; transform: scale(1.05); }
-        }
-        
-        @keyframes ambient-drift {
-          0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(30px, -30px); }
-        }
-        
-        @keyframes border-glow {
-          0% { opacity: 0; }
-          50% { opacity: 0.3; }
-          100% { opacity: 0; }
-        }
-        
-        @keyframes scale-in-bounce {
-          0% { transform: scale(0); opacity: 0; }
-          50% { transform: scale(1.2); }
-          100% { transform: scale(1); opacity: 1; }
-        }
-        
-        @keyframes slide-in-right {
-          0% { transform: translateX(20px); opacity: 0; }
-          100% { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes slide-in-left {
-          0% { transform: translateX(-20px); opacity: 0; }
-          100% { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 0.2; }
-          50% { opacity: 0.4; }
-        }
-        
-        .animate-ambient-pulse {
-          animation: ambient-pulse 4s ease-in-out forwards;
-        }
-        
-        .animate-ambient-drift {
-          animation: ambient-drift 6s ease-in-out 0.5s forwards;
-        }
-        
-        .animate-border-glow {
-          animation: border-glow 1.5s ease-out forwards;
-        }
-        
-        .animate-scale-in-bounce {
-          animation: scale-in-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-        
-        .animate-slide-in-right {
-          animation: slide-in-right 0.6s ease-out forwards;
-        }
-        
-        .animate-slide-in-left {
-          animation: slide-in-left 0.6s ease-out forwards;
-        }
-        
-        .animate-pulse-slow {
-          animation: pulse-slow 3s ease-in-out forwards;
-        }
-        
-        input[type="date"]::-webkit-calendar-picker-indicator {
-          filter: invert(0.7);
-          cursor: pointer;
-          padding: 8px;
-          border-radius: 6px;
-          transition: all 0.3s;
-        }
-        
-        input[type="date"]::-webkit-calendar-picker-indicator:hover {
-          filter: invert(1);
-          background: rgba(255, 255, 255, 0.1);
-        }
-      `}</style>
     </div>
+  </div>
+
+  <Toaster
+    position="top-center"
+    toastOptions={{
+      style: {
+        background: '#1f2937',
+        color: '#f3f4f6',
+        border: '1px solid #374151',
+        borderRadius: '12px',
+        padding: '16px',
+      },
+      success: {
+        iconTheme: {
+          primary: '#10b981',
+          secondary: '#f3f4f6',
+        },
+      },
+      error: {
+        iconTheme: {
+          primary: '#ef4444',
+          secondary: '#f3f4f6',
+        },
+      },
+    }}
+  />
+</div>
   );
 };
 

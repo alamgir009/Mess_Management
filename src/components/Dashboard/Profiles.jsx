@@ -6,83 +6,45 @@ import { fetchProfile, userUpdate } from "../../store/slices/userSlice";
 import { fetchGrandTotalAmount, deleteMarketById, updateMarketById } from "../../store/slices/marketSlice";
 import { deleteMealById, fetchAllMeals, fetchTotalMeals, updateMealById } from "../../store/slices/mealSlice";
 import {
-    HiCurrencyRupee,
-    HiFire,
-    HiShoppingCart,
-    HiUserCircle,
-    HiCalendar,
-    HiClock,
-    HiPencilAlt,
-    HiTrash,
-    HiDotsVertical,
-    HiOutlineCog,
-    HiX,
-    HiOutlineMail 
+    HiCurrencyRupee, HiFire, HiShoppingCart, HiUserCircle, HiCalendar,
+    HiClock, HiPencilAlt, HiTrash, HiDotsVertical, HiOutlineCog,
+    HiX, HiOutlineMail
 } from "react-icons/hi";
-import { FiEdit } from "react-icons/fi";
+import { FiEdit, FiX } from "react-icons/fi";
 import { PiBowlSteamFill } from "react-icons/pi";
-import { MdOutlinePhone } from "react-icons/md";
-
+import { MdOutlinePhone, MdOutlineMenu } from "react-icons/md";
 
 const Profiles = () => {
     const dispatch = useDispatch();
-
     const { profile, loading, error } = useSelector((state) => state.userData);
     const { grandTotalAmount, marketLoading, marketError } = useSelector((state) => state.marketData);
     const { totalMeal, meal } = useSelector((state) => state.mealData);
 
-    // Local state for immediate UI updates
     const [localProfile, setLocalProfile] = useState(profile || {});
     const [localGrandTotal, setLocalGrandTotal] = useState(grandTotalAmount || 0);
     const [localTotalMeal, setLocalTotalMeal] = useState(totalMeal || {});
-
-    // Single state to track which menu is open (only one at a time)
     const [openMenuId, setOpenMenuId] = useState(null);
-
-    // Loading states for delete operations
     const [deletingMealId, setDeletingMealId] = useState(null);
     const [deletingMarketId, setDeletingMarketId] = useState(null);
-
-    // Edit modal states
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingMarket, setEditingMarket] = useState(null);
     const [isUpdating, setIsUpdating] = useState(false);
-
-    // Edit modal states for Meal
     const [isEditMealModalOpen, setIsEditMealModalOpen] = useState(false);
     const [editingMeal, setEditingMeal] = useState(null);
     const [isUpdatingMeal, setIsUpdatingMeal] = useState(false);
-    
-    // Edit modal states for Profile
     const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
     const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
-    
-    
-    // Profile Actions
-    const handleProfileEditClick = () => setIsEditProfileModalOpen(true);
-    const handleCloseProfileModal = () => setIsEditProfileModalOpen(false);
-    
-    // Profile Update Handler
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
     const handleProfileUpdate = async (updatedData) => {
         setIsUpdatingProfile(true);
         try {
-            // Optimistic update
-            setLocalProfile(prev => ({
-                ...prev,
-                ...updatedData
-            }));
-
-            handleCloseProfileModal();
+            setLocalProfile(prev => ({ ...prev, ...updatedData }));
+            setIsEditProfileModalOpen(false);
             toast.success("Profile updated successfully!");
-
             await dispatch(userUpdate(updatedData)).unwrap();
-
-            // Refresh profile from server
             dispatch(fetchProfile());
-
         } catch (error) {
-            console.error("Error updating profile:", error);
-            // Revert optimistic update on error
             setLocalProfile(profile);
             toast.error(error?.message || "Failed to update profile");
             dispatch(fetchProfile());
@@ -90,27 +52,19 @@ const Profiles = () => {
             setIsUpdatingProfile(false);
         }
     };
-    
-    // Update local states when Redux states change
+
     useEffect(() => {
-        if (profile) {
-            setLocalProfile(profile);
-        }
+        if (profile) setLocalProfile(profile);
     }, [profile]);
 
     useEffect(() => {
-        if (grandTotalAmount !== undefined) {
-            setLocalGrandTotal(grandTotalAmount);
-        }
+        if (grandTotalAmount !== undefined) setLocalGrandTotal(grandTotalAmount);
     }, [grandTotalAmount]);
 
     useEffect(() => {
-        if (totalMeal) {
-            setLocalTotalMeal(totalMeal);
-        }
+        if (totalMeal) setLocalTotalMeal(totalMeal);
     }, [totalMeal]);
 
-    // Memoized calculations using local states
     const mealCount = useMemo(() => {
         return localProfile?.mealDetails?.reduce((count, meal) => count + (meal.mealTime === "both" ? 2 : 1), 0) || 0;
     }, [localProfile?.mealDetails]);
@@ -119,11 +73,8 @@ const Profiles = () => {
         return localProfile?.marketDetails?.reduce((count, market) => count + (market.amount >= 1 ? market.amount : 0), 0) || 0;
     }, [localProfile?.marketDetails]);
 
-    // Calculate meal charge safely
     const mealCharge = useMemo(() => {
-        if (!localGrandTotal || !localTotalMeal?.grandTotalMeal || localTotalMeal.grandTotalMeal === 0) {
-            return 0;
-        }
+        if (!localGrandTotal || !localTotalMeal?.grandTotalMeal || localTotalMeal.grandTotalMeal === 0) return 0;
         return (localGrandTotal / localTotalMeal.grandTotalMeal).toFixed(2);
     }, [localGrandTotal, localTotalMeal]);
 
@@ -136,90 +87,45 @@ const Profiles = () => {
 
     const getWeekday = (date) => new Date(date).toLocaleString("default", { weekday: "long" });
 
-    // Function to open edit modal with market data
     const handleMarketEdit = (market) => {
         setOpenMenuId(null);
         setEditingMarket(market);
         setIsEditModalOpen(true);
     };
 
-    // Function to close edit modal
     const handleCloseEditModal = () => {
         setIsEditModalOpen(false);
         setEditingMarket(null);
     };
 
-    // Function to update market
     const handleMarketUpdate = async (updatedData) => {
         setIsUpdating(true);
-
         try {
-            const oldAmount = editingMarket.amount;
-            const newAmount = parseFloat(updatedData.amount);
-            const amountDifference = newAmount - oldAmount;
-
-            // Optimistically update local UI immediately for instant feedback
+            const amountDifference = parseFloat(updatedData.amount) - editingMarket.amount;
             setLocalProfile(prev => ({
                 ...prev,
                 marketDetails: prev.marketDetails?.map(market =>
                     market._id === editingMarket._id
-                        ? {
-                            ...market,
-                            items: updatedData.items,
-                            amount: newAmount,
-                            date: updatedData.date
-                        }
+                        ? { ...market, items: updatedData.items, amount: parseFloat(updatedData.amount), date: updatedData.date }
                         : market
                 ) || [],
                 totalAmount: (prev.totalAmount || 0) + amountDifference
             }));
-
-            // Update grand total amount immediately
             setLocalGrandTotal(prev => prev + amountDifference);
-
-            // Close modal immediately for better UX
             handleCloseEditModal();
-
-            // Show success message immediately
             toast.success("Market item updated successfully!");
-
-            // Update market in database via Redux action
-            await dispatch(updateMarketById({
-                id: editingMarket._id,
-                marketData: {
-                    items: updatedData.items,
-                    amount: newAmount,
-                    date: updatedData.date
-                }
-            })).unwrap();
-
-            // Refresh data from server in background to ensure consistency
+            await dispatch(updateMarketById({ id: editingMarket._id, marketData: updatedData })).unwrap();
             dispatch(fetchProfile());
             dispatch(fetchGrandTotalAmount());
-
         } catch (error) {
-            console.error("Error updating market item:", error);
-
-            // Revert optimistic updates on error
-            const oldAmount = editingMarket.amount;
-            const newAmount = parseFloat(updatedData.amount);
-            const amountDifference = newAmount - oldAmount;
-
+            const amountDifference = parseFloat(updatedData.amount) - editingMarket.amount;
             setLocalProfile(prev => ({
                 ...prev,
-                marketDetails: prev.marketDetails?.map(market =>
-                    market._id === editingMarket._id
-                        ? editingMarket
-                        : market
-                ) || [],
+                marketDetails: prev.marketDetails?.map(market => market._id === editingMarket._id ? editingMarket : market) || [],
                 totalAmount: (prev.totalAmount || 0) - amountDifference
             }));
-
             setLocalGrandTotal(prev => prev - amountDifference);
-
-            toast.error(error?.message || "Failed to update market item. Changes reverted.");
-
-            // Refresh from server to ensure consistency
+            toast.error(error?.message || "Failed to update market item");
             dispatch(fetchProfile());
             dispatch(fetchGrandTotalAmount());
         } finally {
@@ -241,35 +147,19 @@ const Profiles = () => {
     const handleMealUpdate = async (updatedData) => {
         setIsUpdatingMeal(true);
         try {
-            // Optimistic update for meal
             setLocalProfile(prev => ({
                 ...prev,
-                mealDetails: prev.mealDetails?.map(m =>
-                    m._id === editingMeal._id
-                        ? { ...m, ...updatedData }
-                        : m
-                ) || []
+                mealDetails: prev.mealDetails?.map(m => m._id === editingMeal._id ? { ...m, ...updatedData } : m) || []
             }));
-
             handleCloseMealEditModal();
             toast.success("Meal updated successfully!");
-
-            await dispatch(updateMealById({
-                id: editingMeal._id,
-                mealData: updatedData
-            })).unwrap();
-
+            await dispatch(updateMealById({ id: editingMeal._id, mealData: updatedData })).unwrap();
             dispatch(fetchProfile());
             dispatch(fetchAllMeals());
         } catch (error) {
-            // Revert optimistic update on error
             setLocalProfile(prev => ({
                 ...prev,
-                mealDetails: prev.mealDetails?.map(m =>
-                    m._id === editingMeal._id
-                        ? editingMeal
-                        : m
-                ) || []
+                mealDetails: prev.mealDetails?.map(m => m._id === editingMeal._id ? editingMeal : m) || []
             }));
             toast.error(error?.message || "Failed to update meal");
         } finally {
@@ -277,35 +167,25 @@ const Profiles = () => {
         }
     };
 
-    // Function to delete meal from database and update UI
     const handleMealDelete = async (deletedMealId, deletedMealData) => {
         setOpenMenuId(null);
         setDeletingMealId(deletedMealId);
-
         try {
-            // Optimistic update
             setLocalProfile(prev => ({
                 ...prev,
                 mealDetails: prev.mealDetails?.filter(meal => meal._id !== deletedMealId) || []
             }));
-
             const mealReduction = deletedMealData.mealTime === "both" ? 2 : 1;
             setLocalTotalMeal(prev => ({
                 ...prev,
                 grandTotalMeal: (prev.grandTotalMeal || 0) - mealReduction
             }));
-
             toast.success("Meal deleted successfully!");
-
             await dispatch(deleteMealById(deletedMealId)).unwrap();
-
             dispatch(fetchProfile());
             dispatch(fetchTotalMeals());
             dispatch(fetchAllMeals());
-
         } catch (error) {
-            console.error("Error deleting meal:", error);
-            // Revert optimistic update on error
             setLocalProfile(prev => ({
                 ...prev,
                 mealDetails: [...(prev.mealDetails || []), deletedMealData]
@@ -314,44 +194,34 @@ const Profiles = () => {
                 ...prev,
                 grandTotalMeal: (prev.grandTotalMeal || 0) + (deletedMealData.mealTime === "both" ? 2 : 1)
             }));
-            toast.error(error?.message || "Failed to delete meal. Please try again!");
+            toast.error(error?.message || "Failed to delete meal");
         } finally {
             setDeletingMealId(null);
         }
     };
 
-    // Function to delete market from database and update UI
     const handleMarketDelete = async (deletedMarketId, deletedMarketAmount) => {
         setOpenMenuId(null);
         setDeletingMarketId(deletedMarketId);
-
         try {
-            // Optimistic update
             setLocalProfile(prev => ({
                 ...prev,
                 marketDetails: prev.marketDetails?.filter(market => market._id !== deletedMarketId) || [],
                 totalAmount: (prev.totalAmount || 0) - deletedMarketAmount
             }));
-
             setLocalGrandTotal(prev => prev - deletedMarketAmount);
-
             toast.success("Market item deleted successfully!");
-
             await dispatch(deleteMarketById(deletedMarketId)).unwrap();
-
             dispatch(fetchProfile());
             dispatch(fetchGrandTotalAmount());
-
         } catch (error) {
-            console.error("Error deleting market item:", error);
-            // Revert optimistic update on error
             setLocalProfile(prev => ({
                 ...prev,
                 marketDetails: [...(prev.marketDetails || []), { _id: deletedMarketId, amount: deletedMarketAmount }],
                 totalAmount: (prev.totalAmount || 0) + deletedMarketAmount
             }));
             setLocalGrandTotal(prev => prev + deletedMarketAmount);
-            toast.error(error?.message || "Failed to delete market item. Please try again!");
+            toast.error(error?.message || "Failed to delete market item");
         } finally {
             setDeletingMarketId(null);
         }
@@ -359,272 +229,303 @@ const Profiles = () => {
 
     if (loading || marketLoading)
         return (
-            <div className="flex items-center justify-center h-screen bg-gradient-to-b from-black to-blue-950">
+            <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-black to-blue-950">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-gray-600 border-t-blue-400 rounded-full animate-spin"></div>
-                    <p className="text-gray-300 text-lg font-medium">Loading...</p>
+                    <p className="text-gray-300 text-sm md:text-lg font-medium">Loading...</p>
                 </div>
             </div>
         );
 
     if (error || marketError)
         return (
-            <div className="min-h-screen bg-gradient-to-b from-black to-blue-950 flex items-center justify-center">
-                <div className="bg-red-500/10 p-6 rounded-2xl border border-red-500/30 backdrop-blur-2xl shadow-2xl">
-                    <p className="text-red-400 text-lg">Error: {error || marketError}</p>
+            <div className="min-h-screen bg-gradient-to-b from-black to-blue-950 flex items-center justify-center p-4">
+                <div className="bg-red-500/10 p-4 md:p-6 rounded-2xl border border-red-500/30 backdrop-blur-2xl shadow-2xl max-w-md">
+                    <p className="text-red-400 text-sm md:text-lg">Error: {error || marketError}</p>
                 </div>
             </div>
         );
 
     return (
-        <div className="font-inter flex flex-col lg:flex-row justify-between text-white bg-gradient-to-b from-black to-blue-950 min-h-screen">
-            {/* Sidebar */}
-            <div className="sidebar w-full lg:w-80 m-1 rounded-2xl bg-black/20 backdrop-blur-2xl border border-white/10 shadow-2xl">
-                <SideBar />
+        <div className="font-inter flex flex-col lg:flex-row text-white bg-gradient-to-br from-black/80 to-blue-900/50 min-h-screen relative overflow-x-hidden">
+            {/* Animated Background */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -top-40 -right-40 w-64 h-64 md:w-80 md:h-80 bg-teal-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute -bottom-40 -left-40 w-64 h-64 md:w-80 md:h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 md:w-96 md:h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
             </div>
 
-            {/* Main Content */}
-            <div className="flex-grow m-1 p-4 space-y-6">
-                {/* Profile Header */}
-                <div className="bg-white/5 p-6 rounded-3xl border border-white/20 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5"></div>
-                    <div className="relative z-10 flex items-center gap-4">
-                        {localProfile?.image ? (
-                            <img
-                                src={localProfile.image}
-                                alt={localProfile.name || "User Profile"}
-                                className="w-16 h-16 rounded-2xl object-cover border border-white/30 backdrop-blur-lg shadow-lg"
-                                onError={(e) => (e.target.style.display = "none")}
-                            />
-                        ) : (
-                            <HiUserCircle className="w-16 h-16 text-teal-400/80" />
-                        )}
-                        <div>
-                            <div className="flex items-center">
-                                <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-400 to-lime-400 bg-clip-text text-transparent">
-                                    {localProfile?.name || "User"}
-                                </h1>
-                                <FiEdit onClick={handleProfileEditClick} className="mx-2 cursor-pointer hover:text-teal-400 transition-colors" />
-                            </div>
-                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-sm">
-                                <span
-                                    className={
-                                        localProfile?.role === "admin"
-                                            ? "text-purple-300 bg-purple-500/20 px-3 py-1 rounded-full backdrop-blur-lg border border-purple-500/30"
-                                            : "text-yellow-300 bg-teal-500/20 px-3 py-1 rounded-full backdrop-blur-lg border border-teal-500/30"
-                                    }
-                                >
-                                    {localProfile?.role || "user"}
-                                </span>
-                                
-                                {localProfile?.email && (
-                                    <div className="flex items-center gap-1 text-white/70 bg-white/5 px-3 py-1 rounded-full border border-white/10">
-                                        <HiOutlineMail size={14} className="text-teal-400" />
-                                        <span>{localProfile.email}</span>
-                                    </div>
-                                )}
+            {/* Mobile Menu Button */}
+            <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="menu-button lg:hidden fixed top-3 left-3 z-50 w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl border border-white/20 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg hover:from-white/20 hover:to-white/10 transition-all duration-300"
+                aria-label={isSidebarOpen ? "Close menu" : "Open menu"}
+            >
+                {isSidebarOpen ? <FiX className="w-5 h-5 md:w-6 md:h-6" /> : <MdOutlineMenu className="w-5 h-5 md:w-6 md:h-6" />}
+            </button>
 
-                                {localProfile?.phone && (
-                                    <div className="flex items-center gap-1 text-white/70 bg-white/5 px-3 py-1 rounded-full border border-white/10">
-                                        <MdOutlinePhone size={14} className="text-teal-400" />
-                                        <span>{localProfile.phone}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+            {/* Sidebar */}
+            <div className={`sidebar fixed lg:fixed top-0 left-0 w-full max-w-xs bg-gradient-to-br from-black/80 to-blue-900/50 backdrop-blur-2xl shadow-2xl border-r border-white/10 z-40 h-screen overflow-y-auto transition-all duration-300 transform rounded-lg lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+                }`}>
+                <div className="h-full custom-scrollbar text-gray-300">
+                    <SideBar />
                 </div>
+            </div>
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                    {[
-                        {
-                            icon: <HiCurrencyRupee className="w-6 h-6" />,
-                            title: "Total Market",
-                            value: `₹${localGrandTotal || 0}`,
-                            bg: "bg-blue-500/10"
-                        },
-                        {
-                            icon: <PiBowlSteamFill className="w-6 h-6" />,
-                            title: "Total Meal",
-                            value: localTotalMeal?.grandTotalMeal || 0,
-                            bg: "bg-purple-500/10"
-                        },
-                        {
-                            icon: <HiShoppingCart className="w-6 h-6" />,
-                            title: "Meal Charge",
-                            value: `₹${mealCharge}`,
-                            bg: "bg-teal-500/10"
-                        },
-                        {
-                            icon: <HiCurrencyRupee className="w-6 h-6" />,
-                            title: "Payment",
-                            value: localProfile?.payment || "pending",
-                            status:
-                                localProfile?.payment === "success"
-                                    ? "bg-green-500/10 text-green-400"
-                                    : "bg-orange-500/10 text-orange-400"
-                        },
-                        {
-                            icon: <HiFire className="w-6 h-6" />,
-                            title: "Gas Bill",
-                            value: localProfile?.gasBill || "pending",
-                            status:
-                                localProfile?.gasBill === "success"
-                                    ? "bg-green-500/10 text-green-400"
-                                    : "bg-orange-500/10 text-orange-400"
-                        }
-                    ].map((stat, idx) => (
-                        <div
-                            key={idx}
-                            className={`${stat.bg || stat.status} p-4 rounded-2xl border border-white/20 backdrop-blur-2xl shadow-2xl hover:bg-white/10 transition-all duration-300 relative overflow-hidden group`}
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-                            <div className="relative z-10 flex items-center gap-3">
-                                <div className="p-2 bg-white/10 rounded-xl backdrop-blur-lg border border-white/20">{stat.icon}</div>
-                                <div>
-                                    <p className="text-sm text-white/70">{stat.title}</p>
-                                    <p className="text-xl font-semibold text-white">{stat.value}</p>
+            {/* Mobile Overlay */}
+            {isSidebarOpen && (
+                <div
+                    className="lg:hidden fixed inset-0 bg-black/70 backdrop-blur-md z-30"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+
+            {/* Main Content */}
+            <div className="flex-grow w-full pt-16 lg:pt-0 lg:ml-80 h-screen lg:h-auto overflow-y-auto">
+                <div className="p-3 sm:p-4 md:p-6 space-y-3 sm:space-y-4 md:space-y-6 max-w-7xl">
+                    {/* Profile Header */}
+                    <div className="bg-gradient-to-br from-white/10 to-white/5 p-3 sm:p-4 md:p-6 rounded-2xl sm:rounded-3xl border border-white/20 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-purple-500/5"></div>
+                        <div className="relative z-10">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 md:gap-6">
+                                {/* Profile Image */}
+                                {localProfile?.image ? (
+                                    <div className="relative group flex-shrink-0">
+                                        <img
+                                            src={localProfile.image}
+                                            alt={localProfile.name}
+                                            className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-xl sm:rounded-2xl object-cover border-2 border-white/30 shadow-lg"
+                                            onError={(e) => { e.target.style.display = "none"; e.target.nextSibling.style.display = "block"; }}
+                                        />
+                                        <HiUserCircle className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 text-teal-400/80 hidden" />
+                                    </div>
+                                ) : (
+                                    <HiUserCircle className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 text-teal-400/80 flex-shrink-0" />
+                                )}
+
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex flex-col gap-2 mb-2">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-teal-400 to-lime-400 bg-clip-text text-transparent truncate">
+                                                {localProfile?.name || "User"}
+                                            </h1>
+                                            <button
+                                                onClick={() => setIsEditProfileModalOpen(true)}
+                                                className="flex items-center gap-1 text-white/70 hover:text-teal-400 transition-colors text-xs sm:text-sm"
+                                            >
+                                                <FiEdit className="w-4 h-4" />
+                                                <span>Edit</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Info Badges */}
+                                    <div className="flex flex-wrap gap-2">
+                                        <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm backdrop-blur-lg border ${localProfile?.role === "admin"
+                                                ? "text-purple-300 bg-purple-500/20 border-purple-500/30"
+                                                : "text-teal-300 bg-teal-500/20 border-teal-500/30"
+                                            }`}>
+                                            {localProfile?.role || "user"}
+                                        </span>
+                                        {localProfile?.email && (
+                                            <div className="flex items-center gap-1 text-white/70 bg-white/5 px-2 sm:px-3 py-1 rounded-full border border-white/10 text-xs sm:text-sm truncate">
+                                                <HiOutlineMail size={12} className="text-teal-400 flex-shrink-0" />
+                                                <span className="truncate max-w-[120px] sm:max-w-[150px]">{localProfile.email}</span>
+                                            </div>
+                                        )}
+                                        {localProfile?.phone && (
+                                            <div className="flex items-center gap-1 text-white/70 bg-white/5 px-2 sm:px-3 py-1 rounded-full border border-white/10 text-xs sm:text-sm">
+                                                <MdOutlinePhone size={12} className="text-teal-400 flex-shrink-0" />
+                                                <span>{localProfile.phone}</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    ))}
-                </div>
+                    </div>
 
-                {/* Market Details Section */}
-                {localProfile?.marketDetails?.length > 0 && (
-                    <div className="bg-white/5 p-6 rounded-3xl border border-white/20 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/0"></div>
-                        <div className="relative z-10">
-                            <div className="flex items-center gap-2 mb-6">
-                                <HiShoppingCart className="w-6 h-6 text-teal-400" />
-                                <h2 className="text-xl font-semibold text-white">Your Market :</h2>
-                                <span className="ml-2 font-semibold text-teal-400">{localProfile.totalAmount || 0} ₹</span>
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
+                        {[
+                            {
+                                icon: <HiCurrencyRupee />,
+                                title: "Total Market",
+                                value: `₹${localGrandTotal || 0}`,
+                                bg: "from-blue-500/10 to-blue-600/10",
+                                border: "border-blue-500/20"
+                            },
+                            {
+                                icon: <PiBowlSteamFill />,
+                                title: "Total Meal",
+                                value: localTotalMeal?.grandTotalMeal || 0,
+                                bg: "from-purple-500/10 to-purple-600/10",
+                                border: "border-purple-500/20"
+                            },
+                            {
+                                icon: <HiShoppingCart />,
+                                title: "Meal Charge",
+                                value: `₹${mealCharge}`,
+                                bg: "from-teal-500/10 to-teal-600/10",
+                                border: "border-teal-500/20"
+                            },
+                            {
+                                icon: <HiCurrencyRupee />,
+                                title: "Payment",
+                                value: localProfile?.payment || "pending",
+                                bg: localProfile?.payment === "success" ? "from-green-500/10 to-green-600/10" : "from-orange-500/10 to-orange-600/10",
+                                border: localProfile?.payment === "success" ? "border-green-500/20" : "border-orange-500/20"
+                            },
+                            {
+                                icon: <HiFire />,
+                                title: "Gas Bill",
+                                value: localProfile?.gasBill || "pending",
+                                bg: localProfile?.gasBill === "success" ? "from-green-500/10 to-green-600/10" : "from-orange-500/10 to-orange-600/10",
+                                border: localProfile?.gasBill === "success" ? "border-green-500/20" : "border-orange-500/20"
+                            }
+                        ].map((stat, idx) => (
+                            <div
+                                key={idx}
+                                className={`bg-gradient-to-br ${stat.bg} p-2.5 sm:p-3 md:p-4 rounded-lg sm:rounded-2xl border ${stat.border} backdrop-blur-2xl shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group hover:scale-105`}
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                                <div className="relative z-10">
+                                    <div className="flex items-center justify-center mb-2 text-lg sm:text-xl md:text-2xl">{stat.icon}</div>
+                                    <p className="text-xs text-center text-white/70 truncate">{stat.title}</p>
+                                    <p className="text-xs sm:text-sm md:text-base font-semibold text-white text-center truncate mt-1">{stat.value}</p>
+                                </div>
                             </div>
+                        ))}
+                    </div>
 
-                            <div className="overflow-x-auto rounded-2xl border border-white/20 backdrop-blur-lg">
-                                <table className="w-full">
-                                    <thead className="bg-white/10 backdrop-blur-lg">
-                                        <tr>
-                                            {["Item", "Amount", "Date", "Day", "Action"].map((header, idx) => (
-                                                <th
-                                                    key={idx}
-                                                    className="px-4 py-3 text-left text-sm font-semibold text-teal-300 border-b border-white/10"
-                                                >
-                                                    {header}
-                                                </th>
+                    {/* Market Details */}
+                    {localProfile?.marketDetails?.length > 0 && (
+                        <div className="bg-gradient-to-br from-white/10 to-white/5 p-3 sm:p-4 md:p-6 rounded-2xl sm:rounded-3xl border border-white/20 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-purple-500/5"></div>
+                            <div className="relative z-10">
+                                <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-teal-500/10 rounded-lg border border-teal-500/20">
+                                    <HiShoppingCart className="w-5 h-5 text-teal-400" />
+                                </div>
+                                <h2 className="lg:text-xl font-bold text-white">Market History</h2>
+                            </div>
+                            <span className="px-4 py-2 bg-teal-500/10 rounded-full border border-teal-500/20 text-teal-300 font-mono font-semibold">
+                                ₹{localProfile.totalAmount || 0}
+                            </span>
+                        </div>
+
+                                <div className="overflow-x-auto max-h-96 overflow-y-auto rounded-lg sm:rounded-2xl border border-white/20 backdrop-blur-lg custom-scrollbar">
+                                    <table className="w-full text-xs sm:text-sm">
+                                        <thead className="bg-white/10 backdrop-blur-lg sticky top-0">
+                                            <tr>
+                                                <th className="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-left font-semibold text-teal-300 border-b border-white/10 whitespace-nowrap">Item</th>
+                                                <th className="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-left font-semibold text-teal-300 border-b border-white/10 whitespace-nowrap">Amount</th>
+                                                <th className="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-left font-semibold text-teal-300 border-b border-white/10 whitespace-nowrap">Date</th>
+                                                <th className="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-left font-semibold text-teal-300 border-b border-white/10 hidden md:table-cell whitespace-nowrap">Day</th>
+                                                <th className="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-center font-semibold text-teal-300 border-b border-white/10 whitespace-nowrap">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-white/10">
+                                            {localProfile.marketDetails.map((market) => (
+                                                <MarketRow
+                                                    key={market._id}
+                                                    market={market}
+                                                    getWeekday={getWeekday}
+                                                    onMarketDelete={handleMarketDelete}
+                                                    onMarketEdit={handleMarketEdit}
+                                                    openMenuId={openMenuId}
+                                                    setOpenMenuId={setOpenMenuId}
+                                                    isDeleting={deletingMarketId === market._id}
+                                                />
                                             ))}
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white/5">
-                                        {localProfile.marketDetails.map((market) => (
-                                            <MarketRow
-                                                key={market._id}
-                                                market={market}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Meal Details */}
+                    {localProfile?.mealDetails?.length > 0 && (
+                        <div className="bg-gradient-to-br from-white/10 to-white/5 p-3 sm:p-4 md:p-6 rounded-2xl sm:rounded-3xl border border-white/20 backdrop-blur-2xl shadow-2xl relative overflow-hidden mb-6">
+                            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-orange-500/5"></div>
+                            <div className="relative z-10">
+                                <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                                    <PiBowlSteamFill className="w-5 h-5 text-yellow-400" />
+                                </div>
+                                <h2 className="lg:text-xl font-bold text-white">Meal Log</h2>
+                            </div>
+                            <span className="px-4 py-2 bg-yellow-500/10 rounded-full border border-yellow-500/20 text-yellow-300 font-bold">
+                                {mealCount} <span className="text-xs opacity-70 font-normal ml-1">Meals</span>
+                            </span>
+                        </div>
+
+                                <div className="max-h-96 overflow-y-auto custom-scrollbar pr-2">
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
+                                        {localProfile.mealDetails.map((meal) => (
+                                            <MealCard
+                                                key={meal._id}
+                                                meal={meal}
                                                 getWeekday={getWeekday}
-                                                onMarketDelete={handleMarketDelete}
-                                                onMarketEdit={handleMarketEdit}
+                                                onMealDelete={handleMealDelete}
                                                 openMenuId={openMenuId}
+                                                onMealEdit={handleMealEdit}
                                                 setOpenMenuId={setOpenMenuId}
-                                                isDeleting={deletingMarketId === market._id}
+                                                isDeleting={deletingMealId === meal._id}
                                             />
                                         ))}
-                                    </tbody>
-                                </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {/* Meal Details Section */}
-                {localProfile?.mealDetails?.length > 0 && (
-                    <div className="bg-white/5 p-6 rounded-3xl border border-white/20 backdrop-blur-2xl shadow-2xl relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/0"></div>
-                        <div className="relative z-10">
-                            <div className="flex items-center gap-2 mb-6">
-                                <PiBowlSteamFill className="w-6 h-6 text-yellow-300" />
-                                <h2 className="text-xl font-semibold text-white">Your Meal :</h2>
-                                <span className="ml-2 font-semibold text-yellow-300">{mealCount} 🍽️</span>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {localProfile.mealDetails.map((meal) => (
-                                    <MealCard
-                                        key={meal._id}
-                                        meal={meal}
-                                        getWeekday={getWeekday}
-                                        onMealDelete={handleMealDelete}
-                                        openMenuId={openMenuId}
-                                        onMealEdit={handleMealEdit}
-                                        setOpenMenuId={setOpenMenuId}
-                                        isDeleting={deletingMealId === meal._id}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                <Toaster position="top-center" reverseOrder={false} />
+                    <Toaster position="top-center" reverseOrder={false} />
+                </div>
             </div>
 
-            {/* Edit Market Modal */}
+            {/* Modals */}
             {isEditModalOpen && editingMarket && (
-                <EditMarketModal
-                    market={editingMarket}
-                    onClose={handleCloseEditModal}
-                    onUpdate={handleMarketUpdate}
-                    isUpdating={isUpdating}
-                />
+                <EditMarketModal market={editingMarket} onClose={handleCloseEditModal} onUpdate={handleMarketUpdate} isUpdating={isUpdating} />
             )}
-
-            {/* Edit Meal Modal */}
             {isEditMealModalOpen && editingMeal && (
-                <EditMealModal
-                    meal={editingMeal}
-                    onClose={handleCloseMealEditModal}
-                    onUpdate={handleMealUpdate}
-                    isUpdating={isUpdatingMeal}
-                />
+                <EditMealModal meal={editingMeal} onClose={handleCloseMealEditModal} onUpdate={handleMealUpdate} isUpdating={isUpdatingMeal} />
             )}
-
-            {/* Profile Edit Modal */}
             {isEditProfileModalOpen && (
-                <EditProfileModal
-                    profile={localProfile}
-                    onClose={handleCloseProfileModal}
-                    onUpdate={handleProfileUpdate}
-                    isUpdating={isUpdatingProfile}
-                />
+                <EditProfileModal profile={localProfile} onClose={() => setIsEditProfileModalOpen(false)} onUpdate={handleProfileUpdate} isUpdating={isUpdatingProfile} />
             )}
-
         </div>
     );
 };
 
-// Helper function to format date
 const formatDate = (date) => {
     if (!date) return "Invalid Date";
     const d = new Date(date);
     if (isNaN(d.getTime())) return "Invalid Date";
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const year = d.getFullYear();
-    return `${day}-${month}-${year}`;
+    return `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
 };
 
-// Helper function to convert date to YYYY-MM-DD for input
 const formatDateForInput = (date) => {
     if (!date) return "";
     const d = new Date(date);
     if (isNaN(d.getTime())) return "";
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 
-// Edit Market Modal Component
+// Unified Modal Style Component
+const ModalWrapper = ({ children, onClose }) => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-3 sm:p-4">
+        <div className="relative w-full max-w-md rounded-2xl sm:rounded-3xl border border-white/20 bg-gradient-to-br from-gray-900/95 to-gray-800/95 shadow-2xl backdrop-blur-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
+            {children}
+        </div>
+    </div>
+);
+
+// Edit Market Modal
 const EditMarketModal = ({ market, onClose, onUpdate, isUpdating }) => {
     const items_OPTIONS = ["Chicken", "Fish", "Beef", "Egg", "Veg", "Grocery"];
     const [formData, setFormData] = useState({
@@ -649,8 +550,7 @@ const EditMarketModal = ({ market, onClose, onUpdate, isUpdating }) => {
         const newErrors = {};
         if (!formData.items.trim()) newErrors.items = "Item name is required";
         if (!formData.amount) newErrors.amount = "Amount is required";
-        else if (parseFloat(formData.amount) <= 0)
-            newErrors.amount = "Amount must be greater than 0";
+        else if (parseFloat(formData.amount) <= 0) newErrors.amount = "Amount must be greater than 0";
         if (!formData.date) newErrors.date = "Date is required";
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -668,144 +568,89 @@ const EditMarketModal = ({ market, onClose, onUpdate, isUpdating }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fadeIn">
-            <div className="relative w-full max-w-md rounded-3xl border border-white/20 bg-white/10 shadow-[0_0_40px_rgba(0,0,0,0.3)] backdrop-blur-2xl transition-all duration-300">
+        <ModalWrapper onClose={onClose}>
+            <div className="flex justify-between items-center p-4 sm:p-6 border-b border-white/10 relative z-10">
+                <h2 className="text-lg sm:text-xl font-semibold text-white/90">Edit Market Item</h2>
+                <button onClick={onClose} disabled={isUpdating} className="p-2 rounded-lg text-white/60 hover:bg-white/10 hover:text-white transition-all disabled:opacity-50">
+                    <HiX className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+            </div>
 
-                {/* Top subtle glow border */}
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-white/30 to-transparent pointer-events-none"></div>
-
-                {/* Header */}
-                <div className="flex justify-between items-center p-6 border-b border-white/10">
-                    <h2 className="text-xl font-semibold text-white/90 tracking-tight">
-                        Edit Market Item
-                    </h2>
-                    <button
-                        onClick={onClose}
-                        disabled={isUpdating}
-                        className="p-2 rounded-lg text-white/60 hover:bg-white/10 hover:text-white transition-all duration-200 disabled:opacity-50"
-                    >
-                        <HiX className="w-6 h-6" />
-                    </button>
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 relative z-10">
+                <div>
+                    <label className="block text-xs sm:text-sm font-medium text-white/70 mb-2">Item Name</label>
+                    <div className="relative">
+                        <select
+                            name="items"
+                            value={formData.items}
+                            onChange={handleChange}
+                            disabled={isUpdating}
+                            className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-2xl bg-gray-800/80 border ${errors.items ? 'border-red-400' : 'border-white/20'} text-white text-sm backdrop-blur-xl transition-all disabled:opacity-50 appearance-none cursor-pointer hover:bg-gray-700/80 focus:bg-gray-700/80 focus:border-white/40`}
+                        >
+                            <option value="" className="bg-gray-800 text-white">Select an item</option>
+                            {items_OPTIONS.map((item) => (
+                                <option key={item} value={item} className="bg-gray-800 text-white hover:bg-gray-700">
+                                    {item}
+                                </option>
+                            ))}
+                        </select>
+                        <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+                        </svg>
+                    </div>
+                    {errors.items && <p className="mt-1 text-xs text-red-400">{errors.items}</p>}
                 </div>
 
-                {/* Body */}
-                <form onSubmit={handleSubmit} className="p-6 space-y-5">
+                <div>
+                    <label className="block text-xs sm:text-sm font-medium text-white/70 mb-2">Amount (₹)</label>
+                    <input
+                        type="number"
+                        name="amount"
+                        value={formData.amount}
+                        onChange={handleChange}
+                        disabled={isUpdating}
+                        step="0.01"
+                        min="0"
+                        placeholder="Enter amount"
+                        className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-800/80 border ${errors.amount ? 'border-red-400' : 'border-white/20'} rounded-lg sm:rounded-2xl text-white placeholder-white/40 text-sm transition-all disabled:opacity-50 hover:bg-gray-700/80 focus:bg-gray-700/80 focus:border-white/40`}
+                    />
+                    {errors.amount && <p className="mt-1 text-xs text-red-400">{errors.amount}</p>}
+                </div>
 
-                    {/* Item Name */}
-                    <div>
-                        <label htmlFor="items" className="block text-sm font-medium text-white/70 mb-2">
-                            Item Name
-                        </label>
-                        <div className="relative">
-                            <select
-                                id="items"
-                                name="items"
-                                value={formData.items}
-                                onChange={handleChange}
-                                disabled={isUpdating}
-                                className={`w-full px-4 py-3 rounded-2xl bg-white/10 border ${errors.items ? 'border-red-400' : 'border-white/20'
-                                    } text-white focus:outline-none focus:ring-0.5 focus:ring-teal-300 focus:border-teal-300
-                backdrop-blur-xl appearance-none transition-all duration-200 disabled:opacity-50 [color-scheme:dark]`}
-                            >
-                                <option value="" className="bg-gray-900 text-gray-300">Select an item</option>
-                                {items_OPTIONS.map((item) => (
-                                    <option key={item} value={item} className="bg-gray-900 text-gray-200">
-                                        {item}
-                                    </option>
-                                ))}
-                            </select>
+                <div>
+                    <label className="block text-xs sm:text-sm font-medium text-white/70 mb-2">Date</label>
+                    <input
+                        type="date"
+                        name="date"
+                        value={formData.date}
+                        onChange={handleChange}
+                        disabled={isUpdating}
+                        className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-800/80 border ${errors.date ? 'border-red-400' : 'border-white/20'} rounded-lg sm:rounded-2xl text-white text-sm transition-all disabled:opacity-50 hover:bg-gray-700/80 focus:bg-gray-700/80 focus:border-white/40`}
+                    />
+                    {errors.date && <p className="mt-1 text-xs text-red-400">{errors.date}</p>}
+                </div>
 
-                            {/* iOS-style dropdown icon */}
-                            <svg
-                                className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24"
-                            >
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
-                            </svg>
-                        </div>
-                        {errors.items && <p className="mt-1 text-sm text-red-400">{errors.items}</p>}
-                    </div>
-
-                    {/* Amount */}
-                    <div>
-                        <label htmlFor="amount" className="block text-sm font-medium text-white/70 mb-2">
-                            Amount (₹)
-                        </label>
-                        <input
-                            type="number"
-                            id="amount"
-                            name="amount"
-                            value={formData.amount}
-                            onChange={handleChange}
-                            disabled={isUpdating}
-                            step="0.01"
-                            min="0"
-                            placeholder="Enter amount"
-                            className={`w-full px-4 py-3 bg-white/10 border ${errors.amount ? 'border-red-400' : 'border-white/20'
-                                } rounded-2xl text-white placeholder-white/40 focus:outline-none focus:ring-0.5 
-              focus:ring-teal-300 focus:border-teal-300 transition-all duration-200 
-              backdrop-blur-xl disabled:opacity-50`}
-                        />
-                        {errors.amount && <p className="mt-1 text-sm text-red-400">{errors.amount}</p>}
-                    </div>
-
-                    {/* Date */}
-                    <div>
-                        <label htmlFor="date" className="block text-sm font-medium text-white/70 mb-2">
-                            Date
-                        </label>
-                        <input
-                            type="date"
-                            id="date"
-                            name="date"
-                            value={formData.date}
-                            onChange={handleChange}
-                            disabled={isUpdating}
-                            className={`w-full px-4 py-3 bg-white/10 border ${errors.date ? 'border-red-400' : 'border-white/20'
-                                } rounded-2xl text-white focus:outline-none focus:ring-0.5 
-              focus:ring-teal-300 focus:border-teal-300 transition-all duration-200 
-              backdrop-blur-xl disabled:opacity-50`}
-                        />
-                        {errors.date && <p className="mt-1 text-sm text-red-400">{errors.date}</p>}
-                    </div>
-
-                    {/* Buttons */}
-                    <div className="flex gap-3 pt-4">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            disabled={isUpdating}
-                            className="flex-1 px-4 py-3 rounded-2xl font-medium text-white/90 bg-white/10 border border-white/20
-              hover:bg-white/20 transition-all duration-300 disabled:opacity-50 shadow-inner backdrop-blur-xl"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={isUpdating}
-                            className="flex-1 px-4 py-3 rounded-2xl font-medium text-black bg-gradient-to-r from-white to-gray-400 
-              hover:from-gray-400 hover:to-white shadow-lg transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
-                        >
-                            {isUpdating ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-black"></div>
-                                    Updating...
-                                </>
-                            ) : (
-                                "Update Market"
-                            )}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                <div className="flex gap-3 pt-4">
+                    <button type="button" onClick={onClose} disabled={isUpdating} className="flex-1 px-4 py-2 sm:py-3 rounded-lg sm:rounded-2xl font-medium text-white/90 bg-gray-800/80 border border-white/20 hover:bg-gray-700/80 hover:border-white/40 transition-all disabled:opacity-50 text-sm">
+                        Cancel
+                    </button>
+                    <button type="submit" disabled={isUpdating} className="flex-1 px-4 py-2 sm:py-3 rounded-lg sm:rounded-2xl font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-sm">
+                        {isUpdating ? (
+                            <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                                Updating...
+                            </>
+                        ) : (
+                            "Update Market"
+                        )}
+                    </button>
+                </div>
+            </form>
+        </ModalWrapper>
     );
 };
 
-// Edit Meal Modal Component
+// Edit Meal Modal
 const EditMealModal = ({ meal, onClose, onUpdate, isUpdating }) => {
     const mealTimeOptions = ["night", "day", "both"];
     const [formData, setFormData] = useState({
@@ -844,121 +689,73 @@ const EditMealModal = ({ meal, onClose, onUpdate, isUpdating }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fadeIn">
-            <div className="relative w-full max-w-md rounded-3xl border border-white/20 bg-white/10 shadow-[0_0_40px_rgba(0,0,0,0.3)] backdrop-blur-2xl transition-all duration-300">
+        <ModalWrapper onClose={onClose}>
+            <div className="flex justify-between items-center p-4 sm:p-6 border-b border-white/10 relative z-10">
+                <h2 className="text-lg sm:text-xl font-semibold text-white/90">Edit Meal</h2>
+                <button onClick={onClose} disabled={isUpdating} className="p-2 rounded-lg text-white/60 hover:bg-white/10 hover:text-white transition-all disabled:opacity-50">
+                    <HiX className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+            </div>
 
-                {/* Top subtle glow border */}
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-white/30 to-transparent pointer-events-none"></div>
-
-                {/* Header */}
-                <div className="flex justify-between items-center p-6 border-b border-white/10">
-                    <h2 className="text-xl font-semibold text-white/90 tracking-tight">
-                        Edit Meal
-                    </h2>
-                    <button
-                        onClick={onClose}
-                        disabled={isUpdating}
-                        className="p-2 rounded-lg text-white/60 hover:bg-white/10 hover:text-white transition-all duration-200 disabled:opacity-50"
-                    >
-                        <HiX className="w-6 h-6" />
-                    </button>
-                </div>
-
-                {/* Body */}
-                <form onSubmit={handleSubmit} className="p-6 space-y-5">
-
-                    {/* Meal Time */}
-                    <div>
-                        <label htmlFor="mealTime" className="block text-sm font-medium text-white/70 mb-2">
-                            Meal Time
-                        </label>
-                        <div className="relative">
-                            <select
-                                id="mealTime"
-                                name="mealTime"
-                                value={formData.mealTime}
-                                onChange={handleChange}
-                                disabled={isUpdating}
-                                className={`w-full px-4 py-3 rounded-2xl bg-white/10 border ${errors.mealTime ? 'border-red-400' : 'border-white/20'
-                                    } text-white focus:outline-none focus:ring-0.5 focus:ring-teal-300 focus:border-teal-300
-                backdrop-blur-xl appearance-none transition-all duration-200 disabled:opacity-50 [color-scheme:dark]`}
-                            >
-                                <option value="" className="bg-gray-900 text-gray-300">Select meal time</option>
-                                {mealTimeOptions.map((time) => (
-                                    <option key={time} value={time} className="bg-gray-900 text-gray-200">
-                                        {time.charAt(0).toUpperCase() + time.slice(1)}
-                                    </option>
-                                ))}
-                            </select>
-
-                            {/* iOS-style dropdown icon */}
-                            <svg
-                                className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                viewBox="0 0 24 24"
-                            >
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
-                            </svg>
-                        </div>
-                        {errors.mealTime && <p className="mt-1 text-sm text-red-400">{errors.mealTime}</p>}
-                    </div>
-
-                    {/* Date */}
-                    <div>
-                        <label htmlFor="date" className="block text-sm font-medium text-white/70 mb-2">
-                            Date
-                        </label>
-                        <input
-                            type="date"
-                            id="date"
-                            name="date"
-                            value={formData.date}
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 relative z-10">
+                <div>
+                    <label className="block text-xs sm:text-sm font-medium text-white/70 mb-2">Meal Time</label>
+                    <div className="relative">
+                        <select
+                            name="mealTime"
+                            value={formData.mealTime}
                             onChange={handleChange}
                             disabled={isUpdating}
-                            className={`w-full px-4 py-3 bg-white/10 border ${errors.date ? 'border-red-400' : 'border-white/20'
-                                } rounded-2xl text-white focus:outline-none focus:ring-0.5 
-              focus:ring-teal-300 focus:border-teal-300 transition-all duration-200 
-              backdrop-blur-xl disabled:opacity-50`}
-                        />
-                        {errors.date && <p className="mt-1 text-sm text-red-400">{errors.date}</p>}
+                            className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-2xl bg-gray-800/80 border ${errors.mealTime ? 'border-red-400' : 'border-white/20'} text-white text-sm backdrop-blur-xl transition-all disabled:opacity-50 appearance-none cursor-pointer hover:bg-gray-700/80 focus:bg-gray-700/80 focus:border-white/40`}
+                        >
+                            <option value="" className="bg-gray-800 text-white">Select meal time</option>
+                            {mealTimeOptions.map((time) => (
+                                <option key={time} value={time} className="bg-gray-800 text-white hover:bg-gray-700">
+                                    {time.charAt(0).toUpperCase() + time.slice(1)}
+                                </option>
+                            ))}
+                        </select>
+                        <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+                        </svg>
                     </div>
+                    {errors.mealTime && <p className="mt-1 text-xs text-red-400">{errors.mealTime}</p>}
+                </div>
 
-                    {/* Buttons */}
-                    <div className="flex gap-3 pt-4">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            disabled={isUpdating}
-                            className="flex-1 px-4 py-3 rounded-2xl font-medium text-white/90 bg-white/10 border border-white/20
-              hover:bg-white/20 transition-all duration-300 disabled:opacity-50 shadow-inner backdrop-blur-xl"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={isUpdating}
-                            className="flex-1 px-4 py-3 rounded-2xl font-medium text-black bg-gradient-to-r from-white to-gray-400 
-              hover:from-gray-400 hover:to-white shadow-lg transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
-                        >
-                            {isUpdating ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-black"></div>
-                                    Updating...
-                                </>
-                            ) : (
-                                "Update Meal"
-                            )}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                <div>
+                    <label className="block text-xs sm:text-sm font-medium text-white/70 mb-2">Date</label>
+                    <input
+                        type="date"
+                        name="date"
+                        value={formData.date}
+                        onChange={handleChange}
+                        disabled={isUpdating}
+                        className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-800/80 border ${errors.date ? 'border-red-400' : 'border-white/20'} rounded-lg sm:rounded-2xl text-white text-sm transition-all disabled:opacity-50 hover:bg-gray-700/80 focus:bg-gray-700/80 focus:border-white/40 [color-scheme:dark]`}
+                    />
+                    {errors.date && <p className="mt-1 text-xs text-red-400">{errors.date}</p>}
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                    <button type="button" onClick={onClose} disabled={isUpdating} className="flex-1 px-4 py-2 sm:py-3 rounded-lg sm:rounded-2xl font-medium text-white/90 bg-gray-800/80 border border-white/20 hover:bg-gray-700/80 hover:border-white/40 transition-all disabled:opacity-50 text-sm">
+                        Cancel
+                    </button>
+                    <button type="submit" disabled={isUpdating} className="flex-1 px-4 py-2 sm:py-3 rounded-lg sm:rounded-2xl font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-sm">
+                        {isUpdating ? (
+                            <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                                Updating...
+                            </>
+                        ) : (
+                            "Update Meal"
+                        )}
+                    </button>
+                </div>
+            </form>
+        </ModalWrapper>
     );
 };
 
-// Edit Profile Modal Component
+// Edit Profile Modal
 const EditProfileModal = ({ profile, onClose, onUpdate, isUpdating }) => {
     const [formData, setFormData] = useState({
         name: profile?.name || "",
@@ -990,202 +787,173 @@ const EditProfileModal = ({ profile, onClose, onUpdate, isUpdating }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (validateForm()) {
-            onUpdate(formData);
-        }
+        if (validateForm()) onUpdate(formData);
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-fadeIn">
-  <div className="relative w-full max-w-md rounded-3xl border border-white/20 bg-gray-900/90 shadow-[0_0_40px_rgba(0,0,0,0.5)] backdrop-blur-2xl transition-all duration-300">
-    <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-teal-500/10 to-transparent pointer-events-none"></div>
+        <ModalWrapper onClose={onClose}>
+            <div className="flex justify-between items-center p-4 sm:p-6 border-b border-white/10 relative z-10">
+                <h2 className="text-lg sm:text-xl font-semibold text-white flex items-center gap-2 sm:gap-3">
+                    {formData.image ? (
+                        <img src={formData.image} alt="Profile" className="h-10 sm:h-12 w-10 sm:w-12 rounded-lg object-cover border border-white/20" onError={(e) => (e.currentTarget.style.display = "none")} />
+                    ) : (
+                        <HiUserCircle className="text-teal-400 text-2xl sm:text-3xl" />
+                    )}
+                    <span>Edit Profile</span>
+                </h2>
+                <button onClick={onClose} disabled={isUpdating} className="p-2 rounded-lg text-white/60 hover:bg-white/10 hover:text-white transition-all disabled:opacity-50">
+                    <HiX className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+            </div>
 
-    {/* HEADER WITH SINGLE PROFILE IMAGE */}
-    <div className="flex justify-between items-center p-6 border-b border-white/10">
-      <h2 className="text-xl font-semibold text-white tracking-tight flex items-center gap-3">
-        {formData.image ? (
-          <img
-            src={formData.image}
-            alt="Profile"
-            loading="lazy"
-            className="h-20 w-20 rounded-xl object-cover border border-white/20 flex-shrink-0"
-            onError={(e) => (e.currentTarget.style.display = "none")}
-          />
-        ) : (
-          <HiUserCircle className="text-teal-400" size={32} />
-        )}
-        Edit Profile
-      </h2>
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 relative z-10">
+                <div>
+                    <label className="block text-xs sm:text-sm font-medium text-white/70 mb-2">Name</label>
+                    <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        disabled={isUpdating}
+                        className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-800/80 border ${errors.name ? 'border-red-400' : 'border-white/20'} rounded-lg sm:rounded-2xl text-white text-sm transition-all disabled:opacity-50 hover:bg-gray-700/80 focus:bg-gray-700/80 focus:border-white/40`}
+                    />
+                    {errors.name && <p className="mt-1 text-xs text-red-400">{errors.name}</p>}
+                </div>
 
-      <button
-        onClick={onClose}
-        disabled={isUpdating}
-        className="p-2 rounded-lg text-white/60 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50"
-      >
-        <HiX size={24} />
-      </button>
-    </div>
+                <div>
+                    <label className="block text-xs sm:text-sm font-medium text-white/70 mb-2">Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        disabled={isUpdating}
+                        className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-800/80 border ${errors.email ? 'border-red-400' : 'border-white/20'} rounded-lg sm:rounded-2xl text-white text-sm transition-all disabled:opacity-50 hover:bg-gray-700/80 focus:bg-gray-700/80 focus:border-white/40`}
+                    />
+                    {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
+                </div>
 
-    {/* FORM */}
-    <form onSubmit={handleSubmit} className="p-6 space-y-5">
+                <div>
+                    <label className="block text-xs sm:text-sm font-medium text-white/70 mb-2">Phone</label>
+                    <input
+                        type="text"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        disabled={isUpdating}
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-800/80 border border-white/20 rounded-lg sm:rounded-2xl text-white text-sm transition-all disabled:opacity-50 hover:bg-gray-700/80 focus:bg-gray-700/80 focus:border-white/40"
+                    />
+                </div>
 
-      <div>
-        <label className="block text-sm font-medium text-white/70 mb-2">Name</label>
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          disabled={isUpdating}
-          className={`w-full px-4 py-3 bg-white/5 border ${errors.name ? 'border-red-400' : 'border-white/10'} rounded-xl text-white focus:outline-none focus:border-teal-400 transition-colors disabled:opacity-50`}
-        />
-        {errors.name && <p className="mt-1 text-sm text-red-400">{errors.name}</p>}
-      </div>
+                <div>
+                    <label className="block text-xs sm:text-sm font-medium text-white/70 mb-2">Image URL</label>
+                    <input
+                        type="text"
+                        name="image"
+                        value={formData.image}
+                        onChange={handleChange}
+                        disabled={isUpdating}
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-800/80 border border-white/20 rounded-lg sm:rounded-2xl text-white text-sm transition-all disabled:opacity-50 hover:bg-gray-700/80 focus:bg-gray-700/80 focus:border-white/40"
+                    />
+                </div>
 
-      <div>
-        <label className="block text-sm font-medium text-white/70 mb-2">Email</label>
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          disabled={isUpdating}
-          className={`w-full px-4 py-3 bg-white/5 border ${errors.email ? 'border-red-400' : 'border-white/10'} rounded-xl text-white focus:outline-none focus:border-teal-400 transition-colors disabled:opacity-50`}
-        />
-        {errors.email && <p className="mt-1 text-sm text-red-400">{errors.email}</p>}
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-white/70 mb-2">Phone</label>
-        <input
-          type="text"
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-          disabled={isUpdating}
-          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-teal-400 transition-colors disabled:opacity-50"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-white/70 mb-2">Image URL</label>
-        <input
-          type="text"
-          name="image"
-          value={formData.image}
-          onChange={handleChange}
-          disabled={isUpdating}
-          className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-teal-400 transition-colors disabled:opacity-50"
-        />
-      </div>
-
-      <div className="pt-4 flex gap-3">
-        <button
-          type="button"
-          onClick={onClose}
-          disabled={isUpdating}
-          className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-white/70 hover:bg-white/5 transition-colors disabled:opacity-50"
-        >
-          Cancel
-        </button>
-
-        <button
-          type="submit"
-          disabled={isUpdating}
-          className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-semibold shadow-lg hover:shadow-teal-500/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-        >
-          {isUpdating ? (
-            <>
-              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
-              Updating...
-            </>
-          ) : (
-            "Save Changes"
-          )}
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
+                <div className="flex gap-3 pt-4">
+                    <button type="button" onClick={onClose} disabled={isUpdating} className="flex-1 px-4 py-2 sm:py-3 rounded-lg sm:rounded-2xl font-medium text-white/90 bg-gray-800/80 border border-white/20 hover:bg-gray-700/80 hover:border-white/40 transition-all disabled:opacity-50 text-sm">
+                        Cancel
+                    </button>
+                    <button type="submit" disabled={isUpdating} className="flex-1 px-4 py-2 sm:py-3 rounded-lg sm:rounded-2xl font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-sm">
+                        {isUpdating ? (
+                            <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                                Updating...
+                            </>
+                        ) : (
+                            "Save Changes"
+                        )}
+                    </button>
+                </div>
+            </form>
+        </ModalWrapper>
     );
 };
 
-
-// MarketRow Component for individual market items
+// Market Row Component
+// Market Row Component
 const MarketRow = ({ market, getWeekday, onMarketDelete, onMarketEdit, openMenuId, setOpenMenuId, isDeleting }) => {
     const menuRef = useRef(null);
-
     const isMenuOpen = openMenuId === `market-${market._id}`;
+    const [shouldOpenUp, setShouldOpenUp] = useState(false);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (menuRef.current && !menuRef.current.contains(event.target)) {
-                setOpenMenuId(null);
-            }
+            if (menuRef.current && !menuRef.current.contains(event.target)) setOpenMenuId(null);
         };
-
-        if (isMenuOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
+        if (isMenuOpen) document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isMenuOpen, setOpenMenuId]);
 
     const toggleMenu = (e) => {
         e.stopPropagation();
         if (!isDeleting) {
+            if (!isMenuOpen) {
+                // Calculate if menu should open upward
+                const menuButton = e.currentTarget;
+                const rect = menuButton.getBoundingClientRect();
+                const scrollContainer = menuButton.closest('.overflow-y-auto');
+                
+                if (scrollContainer) {
+                    const containerRect = scrollContainer.getBoundingClientRect();
+                    const spaceBelow = containerRect.bottom - rect.bottom;
+                    setShouldOpenUp(spaceBelow < 150); // Adjust threshold as needed
+                }
+            }
             setOpenMenuId(isMenuOpen ? null : `market-${market._id}`);
         }
     };
 
-    const handleEdit = () => {
-        onMarketEdit(market);
-    };
-
-    const handleDelete = async () => {
-        if (window.confirm(`Are you sure you want to delete "${market.items}"?`)) {
-            await onMarketDelete(market._id, market.amount);
-        }
-    };
-
     return (
-        <tr className={`hover:bg-white/10 transition-colors duration-200 border-b border-white/10 last:border-b-0 ${isDeleting ? 'opacity-50' : ''}`}>
-            <td className="px-4 py-3 font-medium text-white/90">{market.items}</td>
-            <td className="px-4 py-3 text-lime-300 font-semibold">₹{market.amount}</td>
-            <td className="px-4 py-3 flex items-center gap-2 text-white/80">
-                <HiCalendar className="w-4 h-4 text-teal-400" />
-                {formatDate(market.date)}
+        <tr className={`hover:bg-white/20 transition-colors text-xs sm:text-sm ${isDeleting ? 'opacity-50' : ''}`}>
+            <td className="px-2 sm:px-3 md:px-4 py-2 sm:py-3 font-medium text-white/90 truncate">{market.items}</td>
+            <td className="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-lime-300 font-semibold whitespace-nowrap">₹{market.amount}</td>
+            <td className="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-white/80 whitespace-nowrap">
+                <div className="flex items-center gap-1">
+                    <HiCalendar className="w-3 h-3 sm:w-4 sm:h-4 text-teal-400 flex-shrink-0" />
+                    <span className="truncate">{formatDate(market.date)}</span>
+                </div>
             </td>
-            <td className="px-4 py-3 text-white/70">
-                {getWeekday(market.date)}
-            </td>
-            <td className="px-4 py-3">
-                <div className="relative" ref={menuRef}>
+            <td className="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-white/70 hidden md:table-cell whitespace-nowrap">{getWeekday(market.date)}</td>
+            <td className="px-2 sm:px-3 md:px-4 py-2 sm:py-3 text-center">
+                <div className="relative inline-block" ref={menuRef}>
                     {isDeleting ? (
-                        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-teal-500"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-teal-500"></div>
                     ) : (
                         <>
-                            <HiOutlineCog
-                                className={`w-5 h-5 cursor-pointer transition-all duration-200 ${isMenuOpen ? 'text-teal-400 rotate-90' : 'text-white/70 hover:text-teal-400'
-                                    }`}
+                            <button
                                 onClick={toggleMenu}
-                            />
+                                className={`w-8 h-8 flex items-center justify-center transition-all duration-300
+    ${isMenuOpen
+                                        ? 'text-teal-400 bg-white/10 rounded-xl'
+                                        : 'text-white/70 hover:text-teal-400 rounded-md'
+                                    }`}
+                            >
+                                <HiOutlineCog
+                                    className={`w-5 h-5 transition-transform duration-300
+      ${isMenuOpen ? 'rotate-45' : 'rotate-0'}
+    `}
+                                />
+                            </button>
+
                             {isMenuOpen && (
-                                <div className="absolute right-0 mt-2 w-32 bg-black/80 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl z-50 animate-fadeIn overflow-hidden">
-                                    <button
-                                        onClick={handleEdit}
-                                        className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/10 w-full text-left transition-colors duration-200 border-b border-white/10"
-                                    >
-                                        <HiPencilAlt className="w-4 h-4 text-blue-400" /> Edit
+                                <div className={`absolute w-28 sm:w-32 bg-black/80 backdrop-blur-2xl border border-white/20 rounded-lg shadow-2xl z-50 overflow-hidden transition-all
+                                    ${shouldOpenUp 
+                                        ? 'bottom-full mb-2 right-0' 
+                                        : 'top-full mt-2 right-0'
+                                    }`}>
+                                    <button onClick={() => onMarketEdit(market)} className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm hover:bg-white/10 w-full text-left border-b border-white/10">
+                                        <HiPencilAlt className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" /> Edit
                                     </button>
-                                    <button
-                                        onClick={handleDelete}
-                                        className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/10 w-full text-left text-red-400 transition-colors duration-200"
-                                    >
-                                        <HiTrash className="w-4 h-4" /> Delete
+                                    <button onClick={() => onMarketDelete(market._id, market.amount) && window.confirm(`Delete "${market.items}"?`)} className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm hover:bg-white/10 w-full text-left text-red-400">
+                                        <HiTrash className="w-3 h-3 sm:w-4 sm:h-4" /> Delete
                                     </button>
                                 </div>
                             )}
@@ -1197,82 +965,53 @@ const MarketRow = ({ market, getWeekday, onMarketDelete, onMarketEdit, openMenuI
     );
 };
 
-// MealCard Component
+// Meal Card Component
 const MealCard = ({ meal, getWeekday, onMealDelete, onMealEdit, openMenuId, setOpenMenuId, isDeleting }) => {
     const menuRef = useRef(null);
-
     const isMenuOpen = openMenuId === `meal-${meal._id}`;
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (menuRef.current && !menuRef.current.contains(event.target)) {
-                setOpenMenuId(null);
-            }
+            if (menuRef.current && !menuRef.current.contains(event.target)) setOpenMenuId(null);
         };
-
-        if (isMenuOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
+        if (isMenuOpen) document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isMenuOpen, setOpenMenuId]);
 
     const toggleMenu = (e) => {
         e.stopPropagation();
-        if (!isDeleting) {
-            setOpenMenuId(isMenuOpen ? null : `meal-${meal._id}`);
-        }
-    };
-
-    const handleEdit = () => {
-        onMealEdit(meal);
-    };
-
-    const handleDelete = async () => {
-        if (window.confirm(`Are you sure you want to delete this ${meal.mealTime} meal?`)) {
-            await onMealDelete(meal._id, meal);
-        }
+        if (!isDeleting) setOpenMenuId(isMenuOpen ? null : `meal-${meal._id}`);
     };
 
     return (
-        <div className={`relative bg-white/5 rounded-2xl border border-white/20 backdrop-blur-lg hover:bg-white/10 transition-all duration-300 group ${isDeleting ? 'opacity-50' : ''}`}>
-            <div className="absolute inset-0 rounded-2xl overflow-hidden">
+        <div className={`relative bg-white/5 rounded-lg sm:rounded-2xl border border-white/20 backdrop-blur-lg hover:bg-white/10 transition-all duration-300 group ${isDeleting ? 'opacity-50' : ''}`}>
+            <div className="absolute inset-0 rounded-lg sm:rounded-2xl overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
             </div>
 
-            <div className="relative p-4 z-10">
-                <div className="flex justify-between items-center mb-3">
-                    <div className="flex items-center gap-3">
-                        <HiClock className="w-5 h-5 text-teal-400" />
-                        <span className="font-medium capitalize text-white/90">{meal.mealTime}</span>
+            <div className="relative p-3 sm:p-4 z-10">
+                <div className="flex justify-between items-start gap-2 mb-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                        <HiClock className="w-3 h-3 sm:w-4 sm:h-4 text-teal-400 flex-shrink-0" />
+                        <span className="font-medium capitalize text-white/90 text-xs sm:text-sm truncate">{meal.mealTime}</span>
                     </div>
 
                     <div className="relative" ref={menuRef}>
                         {isDeleting ? (
-                            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-teal-500"></div>
+                            <div className="animate-spin rounded-full h-3 w-3 border-t border-b border-teal-500"></div>
                         ) : (
                             <>
-                                <HiDotsVertical
-                                    className={`w-5 h-5 cursor-pointer transition-all duration-200 ${isMenuOpen ? 'text-teal-400' : 'text-white/70 hover:text-teal-400'
-                                        }`}
-                                    onClick={toggleMenu}
-                                />
+                                <button onClick={toggleMenu} className={`w-5 h-5 flex items-center justify-center rounded transition-all ${isMenuOpen ? 'text-teal-400 bg-white/10' : 'text-white/70 hover:text-teal-400'}`}>
+                                    <HiDotsVertical className="w-4 h-4" />
+                                </button>
 
                                 {isMenuOpen && (
-                                    <div className="absolute right-0 top-full mt-2 w-32 bg-black/80 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl z-50 animate-fadeIn">
-                                        <button
-                                            onClick={handleEdit}
-                                            className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/10 w-full rounded-t-2xl text-left transition-colors duration-200 border-b border-white/10"
-                                        >
-                                            <HiPencilAlt className="w-4 h-4 text-blue-400" /> Edit
+                                    <div className="absolute right-0 top-full mt-1 w-28 bg-black/80 backdrop-blur-2xl border border-white/20 rounded-lg shadow-2xl z-50">
+                                        <button onClick={() => onMealEdit(meal)} className="flex items-center gap-2 px-3 py-2 text-xs hover:bg-white/10 w-full text-left border-b border-white/10">
+                                            <HiPencilAlt className="w-3 h-3 text-blue-400" /> Edit
                                         </button>
-                                        <button
-                                            onClick={handleDelete}
-                                            className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/10 w-full rounded-b-2xl text-left text-red-400 transition-colors duration-200"
-                                        >
-                                            <HiTrash className="w-4 h-4" /> Delete
+                                        <button onClick={() => onMealDelete(meal._id, meal) && window.confirm(`Delete ${meal.mealTime} meal?`)} className="flex items-center gap-2 px-3 py-2 text-xs hover:bg-white/10 w-full text-left text-red-400">
+                                            <HiTrash className="w-3 h-3" /> Delete
                                         </button>
                                     </div>
                                 )}
@@ -1281,14 +1020,12 @@ const MealCard = ({ meal, getWeekday, onMealDelete, onMealEdit, openMenuId, setO
                     </div>
                 </div>
 
-                <div className="flex justify-between items-center text-sm text-white/70">
-                    <div className="flex items-center gap-3">
-                        <HiCalendar className="w-4 h-4 text-teal-400" />
-                        <span>{formatDate(meal.date)}</span>
-                        <span className="px-2 py-1 bg-white/10 rounded-full backdrop-blur-lg border border-white/10 text-white/80">
-                            {getWeekday(meal.date)}
-                        </span>
+                <div className="flex flex-col gap-2 text-xs text-white/70">
+                    <div className="flex items-center gap-2 min-w-0">
+                        <HiCalendar className="w-3 h-3 text-teal-400 flex-shrink-0" />
+                        <span className="truncate">{formatDate(meal.date)}</span>
                     </div>
+                    <span className="px-2 py-1 bg-white/10 rounded-full text-white/80 text-xs w-fit">{getWeekday(meal.date).slice(0, 3)}</span>
                 </div>
             </div>
         </div>
